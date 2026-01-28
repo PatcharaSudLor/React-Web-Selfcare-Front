@@ -22,12 +22,13 @@ a:hover {
   color: #535bf2;
 }
 
+/* แก้ไขส่วนนี้ - เอา display: flex และ place-items: center ออก */
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  padding: 0;
   min-width: 320px;
   min-height: 100vh;
+  overflow-x: hidden; /* ป้องกันเลื่อนซ้าย-ขวา */
 }
 
 h1 {

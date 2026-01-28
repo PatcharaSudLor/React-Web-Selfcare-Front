@@ -1,4 +1,5 @@
 import { Leaf } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface FirstPageProps {
   onLogin: () => void;
@@ -7,53 +8,86 @@ interface FirstPageProps {
 
 export default function FirstPage({ onLogin, onSignUp }: FirstPageProps) {
   return (
-    // เพิ่ม fixed positioning เพื่อ override body styles
-    <div className="fixed inset-0 h-screen w-screen bg-emerald-50 flex flex-col items-center justify-center overflow-hidden">
-      
+    <div className="fixed inset-0 h-screen w-screen bg-emerald-50 flex items-center justify-center overflow-hidden">
+
+      {/* Floating Leaves */}
+      <motion.div
+        className="absolute top-10 left-10 text-emerald-300"
+        animate={{ y: [0, 20, 0], rotate: [0, 10, 0] }}
+        transition={{ duration: 6, repeat: Infinity }}
+      >
+        <Leaf size={40} />
+      </motion.div>
+
+      <motion.div
+        className="absolute bottom-20 right-20 text-emerald-200"
+        animate={{ y: [0, -30, 0], rotate: [0, -12, 0] }}
+        transition={{ duration: 8, repeat: Infinity }}
+      >
+        <Leaf size={56} />
+      </motion.div>
+
       {/* Content Wrapper */}
-      <div className="text-center space-y-16 w-full max-w-5xl px-8">
-        
+      <motion.div
+        className="text-center space-y-16 w-full max-w-5xl px-8"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+      >
+
         {/* Logo Section */}
-        <div className="mb-8">
-          {/* Brand Name */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 1, ease: 'easeOut' }}
+        >
           <div className="flex items-center justify-center gap-2 mb-16">
-            <h1 className="text-8xl lg:text-9xl xl:text-[8rem] 2xl:text-[10rem] font-normal leading-none">
+            <h1 className="text-8xl lg:text-9xl font-normal leading-none">
               <span className="text-emerald-500">Self</span>
               <span className="text-gray-600 relative">
                 care
-                {/* Leaf Icon */}
-                <Leaf className="w-12 h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 text-emerald-600 fill-emerald-600 absolute -top-5 lg:-top-6 xl:-top-8 2xl:-top-10 -right-3 lg:-right-4" />
+                <motion.span
+                  initial={{ opacity: 0, rotate: -20 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  transition={{ delay: 0.8 }}
+                  className="absolute -top-5 -right-4"
+                >
+                  <Leaf className="w-14 h-14 text-emerald-600 fill-emerald-600" />
+                </motion.span>
               </span>
             </h1>
           </div>
-          
-          {/* Tagline */}
-          <p className="text-gray-500 text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl leading-relaxed">
+
+          <p className="text-gray-500 text-2xl leading-relaxed">
             Personalized nutrition, safe workouts,
             <br />
             and simple progress tracking
           </p>
-        </div>
+        </motion.div>
 
-        {/* Buttons Section */}
-        <div className="flex flex-row gap-6 lg:gap-8 xl:gap-10 justify-center items-center mt-12">
-          {/* Login Button */}
+        {/* Buttons */}
+        <motion.div
+          className="flex gap-8 justify-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.2 }}
+        >
           <button
             onClick={onLogin}
-            className="w-48 lg:w-56 xl:w-64 2xl:w-72 py-4 lg:py-5 xl:py-6 2xl:py-7 rounded-full bg-emerald-200 hover:bg-emerald-300 text-emerald-700 font-medium text-lg lg:text-xl xl:text-2xl 2xl:text-3xl transition-all shadow-md hover:shadow-xl transform hover:scale-105"
+            className="w-56 py-5 rounded-full bg-emerald-200 hover:bg-emerald-300 text-emerald-700 text-xl shadow-md hover:scale-105 transition"
           >
             Log in
           </button>
-          
-          {/* Sign Up Button */}
+
           <button
             onClick={onSignUp}
-            className="w-48 lg:w-56 xl:w-64 2xl:w-72 py-4 lg:py-5 xl:py-6 2xl:py-7 rounded-full bg-white hover:bg-gray-50 text-emerald-600 font-medium text-lg lg:text-xl xl:text-2xl 2xl:text-3xl transition-all shadow-md hover:shadow-xl border-2 border-emerald-200 transform hover:scale-105"
+            className="w-56 py-5 rounded-full bg-white text-emerald-600 text-xl border-2 border-emerald-200 shadow-md hover:scale-105 transition"
           >
             Sign up
           </button>
-        </div>
-      </div>
+        </motion.div>
+
+      </motion.div>
     </div>
   );
 }

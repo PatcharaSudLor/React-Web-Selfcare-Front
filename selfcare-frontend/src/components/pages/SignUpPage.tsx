@@ -134,7 +134,6 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
 
                     {/* Password Input */}
                     <motion.div variants={item}>
-                        {/* Label ชิดซ้าย - ไม่มี px-4 */}
                         <label className="block text-left text-sm lg:text-base text-gray-500 mb-3 ml-6">
                             Password
                         </label>
@@ -152,16 +151,16 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                                 className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                             >
                                 {showPassword ? (
-                                    <EyeOff className="w-6 h-6 lg:w-7 lg:h-7" />
+                                    <EyeOff className="w-6 h-6 lg:w-5 lg:h-5 rounded-full" />
                                 ) : (
-                                    <Eye className="w-6 h-6 lg:w-7 lg:h-7" />
+                                    <Eye className="w-6 h-6 lg:w-5 lg:h-5 rounded-full" />
                                 )}
                             </button>
                         </div>
                     </motion.div>
 
                     {/* Terms Checkbox */}
-                    <motion.div variants={item} className="flex items-center gap-3">
+                    <motion.div variants={item} className="flex items-center gap-3 ml-2">
                         <input
                             type="checkbox"
                             id="terms"

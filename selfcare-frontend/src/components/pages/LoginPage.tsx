@@ -1,12 +1,28 @@
 import { useState } from 'react';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../utils/supabase.ts';
+import { motion } from 'framer-motion';
 
 interface LoginPageProps {
   onBack: () => void;
   onSignUp: () => void;
   onLoginSuccess: (email: string) => void;
 }
+
+/* animation presets */
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.12 },
+  },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0 },
+};
+
 
 export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPageProps) {
   const [email, setEmail] = useState('');
@@ -84,29 +100,36 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <motion.div className="min-full-screen w-full bg-white flex flex-col"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}>
       {/* Header */}
-      <div className="px-6 py-4">
+      <motion.div className="px-8 lg:px-12 py-6 lg:py-8"
+        initial={{ x: -20, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}>
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-emerald-400 hover:text-emerald-500 transition-colors"
+          className="flex items-center gap-3 text-emerald-400 hover:text-emerald-500 transition-colors"
         >
-          <ArrowLeft className="w-5 h-5" />
-          <span className="text-sm">Back</span>
+          <ArrowLeft className="w-6 h-6 lg:w-7 lg:h-7" />
+          <span className="text-base lg:text-lg">Back</span>
         </button>
-      </div>
+      </motion.div>
 
       {/* Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 pb-12">
-        <div className="w-full max-w-sm space-y-6">
+        <motion.div className="w-full max-w-lg lg:max-w-xl space-y-8"
+          variants={container}
+          initial="hidden"
+          animate="show">
           {/* Title */}
-          <h1 className="text-3xl text-center text-emerald-300 mb-8">
+          <motion.h1 className="text-4xl lg:text-5xl text-center text-emerald-300 mb-10" variants={item}>
             Welcome back!
-          </h1>
+          </motion.h1>
 
           {/* Email Input */}
-          <div>
-            <label className="block text-xs text-gray-500 mb-2 px-4">
+          <motion.div>
+            <label className="block text-left text-sm lg:text-base text-gray-500 mb-3 ml-6">
               Email address
             </label>
             <input
@@ -114,13 +137,13 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:border-emerald-400 transition-colors text-gray-700"
+              className="w-full px-5 lg:px-6 py-4 lg:py-5 rounded-full border-2 border-gray-300 focus:outline-none focus:border-emerald-400 transition-colors text-gray-700 text-base lg:text-lg"
             />
-          </div>
+          </motion.div>
 
           {/* Password Input */}
-          <div>
-            <label className="block text-xs text-gray-500 mb-2 px-4">
+          <motion.div variants={item}>
+            <label className="block text-left text-sm lg:text-base text-gray-500 mb-3 ml-6">
               Password
             </label>
             <div className="relative">
@@ -129,76 +152,80 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:border-emerald-400 transition-colors text-gray-700 pr-12"
+                className="w-full px-5 lg:px-6 py-4 lg:py-5 rounded-full border-2 border-gray-300 focus:outline-none focus:border-emerald-400 transition-colors text-gray-700 text-base lg:text-lg pr-14"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
+                  <EyeOff className="w-6 h-6 lg:w-5 lg:h-5 rounded-full" />
                 ) : (
-                  <Eye className="w-5 h-5" />
+                  <Eye className="w-6 h-6 lg:w-5 lg:h-5 rounded-full" />
                 )}
               </button>
             </div>
-          </div>
+          </motion.div>
 
           {/* Remember Me & Forgot Password */}
-          <div className="flex items-center justify-between px-2">
-            <div className="flex items-center gap-2">
+          <motion.div variants={item} className="flex items-center justify-between px-2">
+            <motion.div variants={item} className="flex items-center gap-3">
               <input
                 type="checkbox"
                 id="remember"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-emerald-300 text-emerald-500 focus:ring-emerald-400 cursor-pointer"
+                className="w-5 h-5 lg:w-6 lg:h-6 rounded border-emerald-300 text-emerald-500 focus:ring-emerald-400 cursor-pointer flex-shrink-0"
               />
-              <label htmlFor="remember" className="text-sm text-emerald-400 cursor-pointer">
+              <label htmlFor="remember" className="text-sm lg:text-base text-emerald-300 cursor-pointer">
                 Remember me
               </label>
-            </div>
+            </motion.div>
             <button
               onClick={handleForgotPassword}
               className="text-sm text-gray-600 hover:text-gray-800"
             >
               Forgot password?
             </button>
-          </div>
+          </motion.div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-full text-sm text-center">
+            <motion.div animate={{ x: [0, -6, 6, -4, 4, 0] }}
+              transition={{ duration: 0.4 }} className="bg-red-50 border-2 border-red-200 text-red-600 px-5 py-3 lg:py-4 rounded-full text-sm lg:text-base text-center">
               {error}
-            </div>
+            </motion.div>
           )}
 
           {/* Login Button */}
-          <button
+          <motion.button
+            variants={item}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
             onClick={handleLogin}
-            className="w-full py-3 rounded-full bg-emerald-200 hover:bg-emerald-300 text-white font-medium transition-all shadow-sm mt-4"
+            className="w-full py-4 lg:py-5 rounded-full bg-emerald-200 hover:bg-emerald-300 disabled:bg-emerald-100 text-white font-medium text-lg lg:text-xl transition-all shadow-md hover:shadow-lg transform hover:scale-105 disabled:transform-none mt-6"
           >
             {loading ? 'Logging in...' : 'Login'}
-          </button>
+          </motion.button>
 
           {/* Divider */}
-          <div className="relative my-6">
+          <div className="relative my-8 lg:my-10">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t-2 border-gray-300"></div>
             </div>
             <div className="relative flex justify-center">
-              <span className="px-4 bg-white text-sm text-emerald-400">Login with</span>
+              <span className="px-6 bg-white text-base lg:text-lg text-emerald-400">Login with</span>
             </div>
           </div>
 
           {/* Social Login Buttons */}
-          <div className="flex justify-center gap-6 mt-6">
+          <motion.div variants={item} className="flex justify-center gap-8 lg:gap-10 mt-8">
             <button
               onClick={() => handleSocialLogin('Google')}
-              className="w-12 h-12 rounded-full bg-white border border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all shadow-sm"
+              className="w-16 h-16 lg:w-20 lg:h-20 xl:w-20 xl:h-20 rounded-full bg-white border-2 border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all shadow-md hover:shadow-xl transform hover:scale-110"
             >
-              <svg className="w-6 h-6" viewBox="0 0 24 24">
+              <svg className="w-9 h-9 lg:w-11 lg:h-11 xl:w-14 xl:h-14" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -218,27 +245,27 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
               </svg>
             </button>
 
-            <button
+            <motion.button
               onClick={() => handleSocialLogin('Facebook')}
-              className="w-12 h-12 rounded-full bg-white border border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all shadow-sm"
+              className="w-16 h-16 lg:w-20 lg:h-20 xl:w-20 xl:h-20 rounded-full bg-white border-2 border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all shadow-md hover:shadow-xl transform hover:scale-110"
             >
-              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="#1877F2">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              <svg className="w-9 h-9 lg:w-11 lg:h-11 xl:w-14 xl:h-14" viewBox="0 0 24 24" fill="#1877F2">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
               onClick={() => handleSocialLogin('Apple')}
-              className="w-12 h-12 rounded-full bg-white border border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all shadow-sm"
+              className="w-16 h-16 lg:w-20 lg:h-20 xl:w-22 xl:h-22 rounded-full bg-white border-2 border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all shadow-md hover:shadow-xl transform hover:scale-110"
             >
-              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="#000000">
-                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+              <svg className="w-9 h-9 lg:w-11 lg:h-11 xl:w-14 xl:h-14" viewBox="0 0 24 24" fill="#000000">
+                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
               </svg>
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
 
           {/* Sign Up Link */}
-          <p className="text-center text-sm text-emerald-400 mt-6">
+          <motion.p variants={item} className="text-center text-base lg:text-lg text-gray-500 mt-8">
             Don't have an account?{' '}
             <button
               onClick={onSignUp}
@@ -246,9 +273,9 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
             >
               Signup
             </button>
-          </p>
-        </div>
-      </div>
-    </div>
+          </motion.p>
+        </motion.div>
+      </div >
+    </motion.div >
   );
 }

@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import FirstPage from './components/pages/FirstPage'
 import SignUpPage from './components/pages/SignUpPage'
+import LoginPage from './components/pages/LoginPage'
 import './App.css'
 import { useNavigate } from 'react-router-dom'
 
@@ -8,8 +9,7 @@ function AppContent() {
   const navigate = useNavigate()
 
   const handleLogin = () => {
-    // TODO: Implement login logic
-    console.log('Login clicked')
+    navigate('/login')
   }
 
   const handleSignUp = () => {
@@ -20,10 +20,16 @@ function AppContent() {
     navigate('/')
   }
 
+  const handleLoginSuccess = (email: string) => {
+    console.log('Login successful:', email)
+    navigate('/home')
+  }
+
   return (
     <Routes>
       <Route path="/" element={<FirstPage onLogin={handleLogin} onSignUp={handleSignUp} />} />
       <Route path="/signup" element={<SignUpPage onBack={handleBack} onLogin={handleLogin} />} />
+      <Route path="/login" element={<LoginPage onBack={handleBack} onSignUp={handleSignUp} onLoginSuccess={handleLoginSuccess} />} />
     </Routes>
   )
 }

@@ -1,20 +1,38 @@
-//import { useState } from 'react'
-//import reactLogo from './assets/react.svg'
-//import viteLogo from '/vite.svg'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import FirstPage from './components/pages/FirstPage'
+import SignUpPage from './components/pages/SignUpPage'
 import './App.css'
+import { useNavigate } from 'react-router-dom'
+
+function AppContent() {
+  const navigate = useNavigate()
+
+  const handleLogin = () => {
+    // TODO: Implement login logic
+    console.log('Login clicked')
+  }
+
+  const handleSignUp = () => {
+    navigate('/signup')
+  }
+
+  const handleBack = () => {
+    navigate('/')
+  }
+
+  return (
+    <Routes>
+      <Route path="/" element={<FirstPage onLogin={handleLogin} onSignUp={handleSignUp} />} />
+      <Route path="/signup" element={<SignUpPage onBack={handleBack} onLogin={handleLogin} />} />
+    </Routes>
+  )
+}
 
 function App() {
   return (
-    <div className="min-h-screen bg-primary-500 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-xl shadow-lg">
-        <h1 className="text-3xl font-bold text-primary-600 mb-4">
-          Selfcare Application 💚
-        </h1>
-        <p className="text-gray-600">
-          ถ้าเห็นข้อความนี้เป็นสีเขียว แสดงว่า Tailwind ทำงานแล้ว!
-        </p>
-      </div>
-    </div>
+    <Router>
+      <AppContent />
+    </Router>
   )
 }
 

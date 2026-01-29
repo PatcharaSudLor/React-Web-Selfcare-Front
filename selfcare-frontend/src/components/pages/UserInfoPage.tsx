@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { supabase } from '../../utils/supabase';
 import { ArrowLeft, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -43,7 +44,7 @@ export default function UserInfoPage({ onBack, onConfirm }: UserInfoPageProps) {
 
   const bloodTypes = ['A', 'B', 'AB', 'O', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!username || !gender || !height || !weight || !age || !bloodType) {
       alert('Please fill in all fields');
       return;
@@ -68,6 +69,39 @@ export default function UserInfoPage({ onBack, onConfirm }: UserInfoPageProps) {
       bmiCategory = 'Morbidly Obese';
     }
 
+    // Attach authenticated user's id (if available) and save to Supabase.
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData?.user;
+      if (!user) {
+        alert('You must be signed in to save your profile.');
+        return;
+      }
+
+      const { error } = await supabase.from('users').insert([{ 
+        user_id: user.id,
+        username,
+        gender,
+        height: parseFloat(height),
+        weight: parseFloat(weight),
+        age: parseInt(age, 10),
+        blood_type: bloodType,
+        bmi,
+        bmi_category: bmiCategory,
+      }]);
+
+      if (error) {
+        console.error('Supabase insert error:', error);
+        alert('Failed to save user info. Please try again.');
+        return;
+      }
+    } catch (err) {
+      console.error('Unexpected error saving to Supabase:', err);
+      alert('Failed to save user info. Please try again.');
+      return;
+    }
+
+    // Notify parent after successful save
     onConfirm({
       username,
       gender,

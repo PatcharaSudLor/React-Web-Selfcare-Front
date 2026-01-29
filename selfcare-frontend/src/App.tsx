@@ -6,10 +6,11 @@ import SignUpPage from './components/pages/SignUpPage'
 import LoginPage from './components/pages/LoginPage'
 import UserInfoPage from './components/pages/UserInfoPage'
 import BMIResultPage from './components/pages/BMIResultPage'
-import './App.css'
 import { useNavigate } from 'react-router-dom'
 import BMRResultPage from './components/pages/BMRResultPage'
 import TDEEResultPage from './components/pages/TDEEResultPage'
+import { HomePage } from './components/pages/HomePage'
+import './App.css'
 
 function AppContent() {
   const navigate = useNavigate()
@@ -43,23 +44,37 @@ function AppContent() {
   }
 
   const goToTDEEResult = (bmr: number) => {
-  setUserInfo(prev => prev ? { ...prev, bmr } : prev);
-  navigate('/tdeeresults');
- }
+    setUserInfo(prev => prev ? { ...prev, bmr } : prev);
+    navigate('/tdeeresults');
+  }
 
- const goToHome = (tdee: number) => {
-  navigate('/home');
- }
+  const goToHome = (tdee: number) => {
+    setUserInfo(prev => prev ? { ...prev, tdee } : prev);
+    navigate('/home');
+  };
+
 
   return (
     <Routes>
       <Route path="/" element={<FirstPage onLogin={handleLogin} onSignUp={handleSignUp} />} />
       <Route path="/signup" element={<SignUpPage onBack={handleBack} onLogin={handleLogin} />} />
       <Route path="/login" element={<LoginPage onBack={handleBack} onSignUp={handleSignUp} onLoginSuccess={handleLoginSuccess} />} />
-      <Route path="/userinfo" element={<UserInfoPage onBack={handleBack} onConfirm={handleConfirm}/>} />
+      <Route path="/userinfo" element={<UserInfoPage onBack={handleBack} onConfirm={handleConfirm} />} />
       <Route path="/bmiresults" element={<BMIResultPage onBack={handleBack} onBMRResult={goToBMRResult} bmi={userInfo?.bmi ?? 0} bmiCategory={userInfo?.bmiCategory ?? ''} height={userInfo?.height ?? '0'} weight={userInfo?.weight ?? '0'} />} />
-      <Route path="/bmrresults" element={<BMRResultPage onBack={handleBack} onTDEEResult={goToTDEEResult}  gender={userInfo?.gender || 'male'} height={userInfo?.height ?? '0'} weight={userInfo?.weight ?? '0'} age={userInfo?.age ?? '0'} />} />
+      <Route path="/bmrresults" element={<BMRResultPage onBack={handleBack} onTDEEResult={goToTDEEResult} gender={userInfo?.gender || 'male'} height={userInfo?.height ?? '0'} weight={userInfo?.weight ?? '0'} age={userInfo?.age ?? '0'} />} />
       <Route path="/tdeeresults" element={<TDEEResultPage onBack={handleBack} onHome={goToHome} bmr={userInfo?.bmr ?? 0} />} />
+      <Route path="/home" element={<HomePage username={userInfo?.username} bmi={userInfo?.bmi} bmr={userInfo?.bmr} tdee={userInfo?.tdee}
+            onNavigateToBMI={() => navigate('/bmiresults')}
+            onNavigateToBMR={() => navigate('/bmrresults')}
+            onNavigateToTDEE={() => navigate('/tdeeresults')}
+            onNavigateToWorkouts={() => navigate('/workouts')}
+            onNavigateToMeals={() => navigate('/meals')}
+            onNavigateToAssistant={() => navigate('/assistant')}
+            onNavigateToFavorite={() => navigate('/favorite')}
+            onNavigateToSchedule={() => navigate('/schedule')}
+          />
+        }
+      />
     </Routes>
   )
 }

@@ -4,14 +4,14 @@ import { motion } from 'framer-motion';
 
 interface BMIResultPageProps {
   onBack: () => void;
-  onNext: () => void;
+  onBMRResult: () => void;
   bmi: number;
   bmiCategory: string;
   height: string;
   weight: string;
 }
 
-export default function BMIResultPage({ onBack, onNext, bmi, bmiCategory, height, weight }: BMIResultPageProps) {
+export default function BMIResultPage({ onBack, onBMRResult, bmi, bmiCategory, height, weight }: BMIResultPageProps) {
   const [showInfo, setShowInfo] = useState(false);
 
   const getBMIColor = (bmiValue: number) => {
@@ -192,7 +192,7 @@ export default function BMIResultPage({ onBack, onNext, bmi, bmiCategory, height
           </div>
 
           <motion.button
-            onClick={onNext}
+            onClick={onBMRResult}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             initial={{ opacity: 0, y: 10 }}

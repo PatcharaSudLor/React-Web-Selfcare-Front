@@ -17,6 +17,8 @@ export interface UserInfoData {
   bloodType: string;
   bmi: number;
   bmiCategory: string;
+  bmr?: number;
+  tdee?: number;
 }
 
 // Custom Gender Icons

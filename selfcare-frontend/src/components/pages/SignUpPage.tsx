@@ -88,7 +88,7 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
 
     return (
         // Container หลัก - เต็มหน้าจอ
-        <motion.div className="min-full-screen w-full bg-white flex flex-col"
+        <motion.div className="fixed inset-0 h-screen w-screen bg-white flex flex-col overflow-hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}>
 

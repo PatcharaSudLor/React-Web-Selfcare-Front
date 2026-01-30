@@ -387,14 +387,10 @@ export default function TDEEResultPage({ onBack, onHome, bmr }: TDEEResultPagePr
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.65 }}
         >
-          <div className="w-3 h-3 rounded-full bg-emerald-400" />
-          <div className="w-3 h-3 rounded-full bg-emerald-400" />
-          <div className="w-3 h-3 rounded-full bg-emerald-400" />
-          <motion.div
-            className="w-10 h-3 rounded-full bg-emerald-400"
-            animate={{ width: [40, 50, 40] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          />
+          <motion.div className="w-3 h-3 rounded-full bg-emerald-400"  transition={{ duration: 1.5, repeat: Infinity }}/>
+          <motion.div className="w-3 h-3 rounded-full bg-emerald-400"  transition={{ duration: 1.5, repeat: Infinity }}/>
+          <motion.div className="w-3 h-3 rounded-full bg-emerald-400"  transition={{ duration: 1.5, repeat: Infinity }}/>
+          <motion.div className="w-10 h-3 rounded-full bg-emerald-400" transition={{ duration: 1.5, repeat: Infinity }}/>
         </motion.div>
       </motion.div>
     </div>

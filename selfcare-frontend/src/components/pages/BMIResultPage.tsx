@@ -204,15 +204,10 @@ export default function BMIResultPage({ onBack, onBMRResult, bmi, bmiCategory, h
           </motion.button>
 
           <div className="flex items-center justify-center gap-2 pt-4">
-            <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
-            <motion.div
-              className="h-3 rounded-full bg-emerald-400"
-              style={{ width: '40px' }}
-              initial={{ width: '40px', scaleX: 1 }}
-              animate={{ width: ['40px', '52px', '40px'], scaleX: [1, 1.05, 1] }}
-              transition={{ duration: 1.2, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut' }}
-            />
-            <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+            <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
+            <div className="h-3 rounded-full bg-emerald-400" style={{ width: '40px' }}/>
+            <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+            <div className="w-3 h-3 rounded-full bg-gray-300"></div>
           </div>
         </motion.div>
       </div>

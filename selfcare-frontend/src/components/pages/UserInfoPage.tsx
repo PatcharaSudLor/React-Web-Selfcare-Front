@@ -196,7 +196,7 @@ export default function UserInfoPage({ onBack, onConfirm }: UserInfoPageProps) {
           <motion.button onClick={handleConfirm} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="w-full py-5 rounded-2xl bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold text-lg transition-all shadow-lg shadow-emerald-200 hover:shadow-xl">Confirm</motion.button>
 
           <motion.div className="flex items-center justify-center gap-3 pt-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.7 }}>
-            <motion.div className="w-10 h-3 rounded-full bg-emerald-400" animate={{ width: [40, 50, 40] }} transition={{ duration: 1.5, repeat: Infinity }} />
+            <div className="w-10 h-3 rounded-full bg-emerald-400"  />
             <div className="w-3 h-3 rounded-full bg-gray-300" />
             <div className="w-3 h-3 rounded-full bg-gray-300" />
           </motion.div>

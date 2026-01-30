@@ -280,11 +280,8 @@ export default function BMRResultPage({ onBack, onTDEEResult, gender, height, we
         >
           <div className="w-3 h-3 rounded-full bg-emerald-400" />
           <div className="w-3 h-3 rounded-full bg-emerald-400" />
-          <motion.div
-            className="w-10 h-3 rounded-full bg-emerald-400"
-            animate={{ width: [40, 50, 40] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          />
+          <div className="w-10 h-3 rounded-full bg-emerald-400" />
+          <div className="w-3 h-3 rounded-full bg-gray-300"></div>
         </motion.div>
       </motion.div>
     </div>

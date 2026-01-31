@@ -46,7 +46,7 @@ export default function BMIResultPage({ onBack, onBMRResult, bmi, bmiCategory, h
   };
 
   return (
-    <div className="fixed inset-0 h-screen w-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col overflow-hidden">
+    <div className="fixed inset-0 h-screen w-screen bg-gradient-to-b from-emerald-50 to-white">
       <div className="px-6 py-4 flex items-center">
         <motion.button
           onClick={onBack}
@@ -59,8 +59,8 @@ export default function BMIResultPage({ onBack, onBMRResult, bmi, bmiCategory, h
         </motion.button>
       </div>
 
-      <div className="flex-1 px-8 py-12 overflow-y-auto">
-        <motion.div className="max-w-2xl mx-auto space-y-10" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+      <div className="flex-1 px-8 -mt-12 overflow-y-auto">
+        <motion.div className="max-w-2xl mx-auto space-y-7" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 mb-4">
               <Info className="w-8 h-8 text-emerald-600" />
@@ -73,7 +73,7 @@ export default function BMIResultPage({ onBack, onBMRResult, bmi, bmiCategory, h
             onClick={() => setShowInfo(!showInfo)}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
-            className="mx-auto flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 hover:bg-emerald-200 transition-colors"
+            className="mx-auto flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 hover:bg-emerald-200 transition-colors "
           >
             <Info className="w-4 h-4 text-emerald-600" />
             <span className="text-sm font-medium text-emerald-600">What is BMI?</span>
@@ -96,9 +96,9 @@ export default function BMIResultPage({ onBack, onBMRResult, bmi, bmiCategory, h
                     <X className="w-6 h-6" />
                   </button>
                 </div>
-                <div className="space-y-3 text-gray-600 text-sm">
+                <div className="space-y-3 text-gray-600 text-sm text-left">
                   <p>
-                    <strong className="text-gray-800">Body Mass Index (BMI)</strong> is a simple calculation using a person's height and weight.
+                    <strong className="text-gray-800">Body Mass Index (BMI)</strong> <br/> is a simple calculation using a person's height and weight.
                   </p>
                   <p>
                     Formula: <span className="font-mono bg-gray-100 px-2 py-1 rounded">BMI = weight(kg) / [height(m)]²</span>
@@ -108,7 +108,7 @@ export default function BMIResultPage({ onBack, onBMRResult, bmi, bmiCategory, h
                   </p>
                   <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 mt-4">
                     <p className="text-emerald-800 text-xs">
-                      <strong>Note:</strong> BMI is not a diagnostic tool. It doesn't account for muscle mass, bone density, or overall body composition. Always consult with healthcare professionals for personalized advice.
+                      <strong>Note:</strong> <br/> BMI is not a diagnostic tool. It doesn't account for muscle mass, bone density, or overall body composition. Always consult with healthcare professionals for personalized advice.
                     </p>
                   </div>
                 </div>

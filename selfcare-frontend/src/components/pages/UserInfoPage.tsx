@@ -80,7 +80,7 @@ export default function UserInfoPage({ onBack, onConfirm }: UserInfoPageProps) {
         return;
       }
 
-      const { error } = await supabase.from('users').insert([{ 
+      const { error } = await supabase.from('user_profile').insert([{ 
         user_id: user.id,
         username,
         gender,

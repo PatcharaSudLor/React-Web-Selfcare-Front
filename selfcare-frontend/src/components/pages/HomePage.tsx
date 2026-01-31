@@ -59,7 +59,15 @@ export default function HomePage({
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-2xl pb-24">
+    <div className="fixed inset-0 h-screen w-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col overflow-hidden">
+      {/* Header */}
+      <div className="px-6 py-4 flex items-center relative z-10 bg-gradient-to-b from-emerald-50 to-transparent">
+        <div className="flex-1" />
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 px-4 overflow-y-auto pb-24 pt-12">
+        <div className="max-w-2xl mx-auto space-y-4">
       {/* Welcome Card */}
       <div className="bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-3xl p-6 mb-6 shadow-sm">
         <div className="flex items-start gap-3 mb-4">
@@ -294,6 +302,8 @@ export default function HomePage({
         </div>
         <span className="text-gray-800">Schedule</span>
       </button>
+        </div>
+      </div>
     </div>
   );
 }

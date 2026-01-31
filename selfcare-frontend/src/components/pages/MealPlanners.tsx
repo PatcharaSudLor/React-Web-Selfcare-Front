@@ -73,18 +73,32 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
 
   const isFormComplete = likedMeals.length > 0 && budget;
 
-  return (
-    <div className="container mx-auto px-4 py-6 max-w-2xl pb-24">
-      {/* Header */}
-      <div className="mb-6">
+   return (
+    <div className="fixed inset-0 h-screen w-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col overflow-hidden">
+      {/* Header with Back Button */}
+      <div className="px-6 py-4 bg-white border-b border-gray-100">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 mb-4 transition-colors"
+          className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>Back</span>
+          <span className="text-sm font-medium">Back</span>
         </button>
       </div>
+
+      {/* Content */}
+      <div className="flex-1 px-4 overflow-y-auto pb-24">
+        <div className="max-w-2xl mx-auto pt-4">
+        {/* Back Button Inside */}
+        <div className="mb-6">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="text-sm font-medium">Back</span>
+          </button>
+        </div>
 
       {/* Main Card */}
       <div className="bg-white rounded-3xl shadow-sm p-6">
@@ -175,6 +189,8 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
         >
           Generate meal plan
         </button>
+      </div>
+        </div>
       </div>
     </div>
   );

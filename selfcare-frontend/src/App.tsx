@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import type { UserInfoData } from './components/pages/UserInfoPage'
 import FirstPage from './components/pages/FirstPage'
@@ -6,14 +6,15 @@ import SignUpPage from './components/pages/SignUpPage'
 import LoginPage from './components/pages/LoginPage'
 import UserInfoPage from './components/pages/UserInfoPage'
 import BMIResultPage from './components/pages/BMIResultPage'
-import { useNavigate } from 'react-router-dom'
 import BMRResultPage from './components/pages/BMRResultPage'
 import TDEEResultPage from './components/pages/TDEEResultPage'
 import { HomePage } from './components/pages/HomePage'
+import MainLayout from './components/pages/layout/MainLayout'
 import './App.css'
 
 function AppContent() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [userInfo, setUserInfo] = useState<UserInfoData | null>(null)
 
   const handleLogin = () => {
@@ -53,6 +54,10 @@ function AppContent() {
     navigate('/home');
   };
 
+  const handleLogout = () => {
+    setUserInfo(null);
+    navigate('/');
+  }
 
   return (
     <Routes>
@@ -63,7 +68,10 @@ function AppContent() {
       <Route path="/bmiresults" element={<BMIResultPage onBack={handleBack} onBMRResult={goToBMRResult} bmi={userInfo?.bmi ?? 0} bmiCategory={userInfo?.bmiCategory ?? ''} height={userInfo?.height ?? '0'} weight={userInfo?.weight ?? '0'} />} />
       <Route path="/bmrresults" element={<BMRResultPage onBack={handleBack} onTDEEResult={goToTDEEResult} gender={userInfo?.gender || 'male'} height={userInfo?.height ?? '0'} weight={userInfo?.weight ?? '0'} age={userInfo?.age ?? '0'} />} />
       <Route path="/tdeeresults" element={<TDEEResultPage onBack={handleBack} onHome={goToHome} bmr={userInfo?.bmr ?? 0} />} />
-      <Route path="/home" element={<HomePage username={userInfo?.username} bmi={userInfo?.bmi} bmr={userInfo?.bmr} tdee={userInfo?.tdee}
+
+      {/*Page within MainLayout*/}
+      <Route element={<MainLayout currentPage={location.pathname} onNavigate={(path) => navigate(path)} onLogout={handleLogout}/>}>
+        <Route path="/home" element={<HomePage username={userInfo?.username} bmi={userInfo?.bmi} bmr={userInfo?.bmr} tdee={userInfo?.tdee}
             onNavigateToBMI={() => navigate('/bmiresults')}
             onNavigateToBMR={() => navigate('/bmrresults')}
             onNavigateToTDEE={() => navigate('/tdeeresults')}
@@ -72,10 +80,13 @@ function AppContent() {
             onNavigateToAssistant={() => navigate('/assistant')}
             onNavigateToFavorite={() => navigate('/favorite')}
             onNavigateToSchedule={() => navigate('/schedule')}
+            onLogout={ handleLogout}
           />
         }
-      />
+        />
+      </Route>
     </Routes>
+    
   )
 }
 

@@ -22,6 +22,7 @@ interface HomePageProps {
   onNavigateToBMI?: () => void;
   onNavigateToBMR?: () => void;
   onNavigateToTDEE?: () => void;
+  onLogout?: () => void;
 }
 
 export function HomePage({ 
@@ -36,7 +37,7 @@ export function HomePage({
   onNavigateToSchedule,
   onNavigateToBMI,
   onNavigateToBMR,
-  onNavigateToTDEE
+  onNavigateToTDEE,
 }: HomePageProps) {
   const [currentTip, setCurrentTip] = useState(0);
   const [currentHealthCard, setCurrentHealthCard] = useState(0);

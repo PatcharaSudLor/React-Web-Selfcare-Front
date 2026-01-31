@@ -180,7 +180,21 @@ export default function MealSchedule({ onBack, onSaveToSchedule, mealPlanData }:
   );
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-4xl pb-32">
+    <div className="fixed inset-0 h-screen w-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col overflow-hidden">
+      {/* Header with Back Button */}
+      <div className="px-6 py-4 bg-white border-b border-gray-100">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span className="text-sm font-medium">Back</span>
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 px-4 overflow-y-auto pb-32">
+        <div className="max-w-2xl mx-auto pt-4">
       {/* Main Card */}
       <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
         {/* Header */}
@@ -253,7 +267,7 @@ export default function MealSchedule({ onBack, onSaveToSchedule, mealPlanData }:
 
       {/* Action Buttons */}
       <div className="fixed bottom-20 left-0 right-0 px-4">
-        <div className="container mx-auto max-w-4xl">
+        <div className="container mx-auto max-w-2xl">
           <div className="bg-white rounded-3xl shadow-lg p-4">
             <div className="flex items-center justify-around">
               {/* Back */}
@@ -284,6 +298,8 @@ export default function MealSchedule({ onBack, onSaveToSchedule, mealPlanData }:
               </button>
             </div>
           </div>
+        </div>
+      </div>
         </div>
       </div>
     </div>

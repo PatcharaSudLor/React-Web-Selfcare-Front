@@ -8,14 +8,18 @@ import UserInfoPage from './components/pages/UserInfoPage'
 import BMIResultPage from './components/pages/BMIResultPage'
 import BMRResultPage from './components/pages/BMRResultPage'
 import TDEEResultPage from './components/pages/TDEEResultPage'
-import { HomePage } from './components/pages/HomePage'
+import HomePage from './components/pages/HomePage'
+import MealPlanner from './components/pages/MealPlanners'
 import MainLayout from './components/pages/layout/MainLayout'
+import MealSchedule from './components/pages/MealSchedule'
+import type { MealPlanData } from './components/pages/MealPlanners'
 import './App.css'
 
 function AppContent() {
   const navigate = useNavigate()
   const location = useLocation()
   const [userInfo, setUserInfo] = useState<UserInfoData | null>(null)
+  const [mealPlanData, setMealPlanData] = useState<MealPlanData | null>(null)
 
   const handleLogin = () => {
     navigate('/login')
@@ -84,6 +88,8 @@ function AppContent() {
           />
         }
         />
+        <Route path="/meals" element={<MealPlanner onBack={() => navigate('/home')} onGeneratePlan={(data) => { setMealPlanData(data); navigate('/meals/schedule'); }} />} />
+        <Route path="/meals/schedule" element={<MealSchedule onBack={() => navigate('/meals')} onSaveToSchedule={(s) => { console.log('Saved schedule:', s); }} mealPlanData={mealPlanData ?? { likedMeals: [], allergicFoods: [], budget: '' }} />} />
       </Route>
     </Routes>
     

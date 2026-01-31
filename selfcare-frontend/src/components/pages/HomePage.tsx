@@ -25,7 +25,7 @@ interface HomePageProps {
   onLogout?: () => void;
 }
 
-export function HomePage({ 
+export default function HomePage({ 
   username = 'User',
   bmi,
   bmr,

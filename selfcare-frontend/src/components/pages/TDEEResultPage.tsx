@@ -78,7 +78,7 @@ export default function TDEEResultPage({ onBack, onHome, bmr }: TDEEResultPagePr
   return (
   <div className="fixed inset-0 h-screen w-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col overflow-hidden">
     {/* Header */}
-    <div className="px-6 py-4 flex items-center">
+    <div className="px-6 py-4 flex items-center relative z-10 bg-gradient-to-b from-emerald-50 to-transparent">
       <motion.button
         onClick={onBack}
         whileHover={{ scale: 1.05 }}
@@ -91,9 +91,9 @@ export default function TDEEResultPage({ onBack, onHome, bmr }: TDEEResultPagePr
     </div>
 
     {/* Content */}
-    <div className="flex-1 px-8 py-12 overflow-y-auto pb-24">
+    <div className="flex-1 px-8 -mt-12 overflow-y-auto pb-24">
       <motion.div
-        className="max-w-2xl mx-auto space-y-10"
+        className="max-w-2xl mx-auto space-y-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -142,9 +142,9 @@ export default function TDEEResultPage({ onBack, onHome, bmr }: TDEEResultPagePr
                 </button>
               </div>
 
-              <div className="space-y-4 text-gray-600 text-base">
+              <div className="space-y-4 text-gray-600 text-base text-left">
                 <p>
-                  <strong className="text-gray-800">Total Daily Energy Expenditure (TDEE)</strong>{" "}
+                  <strong className="text-gray-800 ">Total Daily Energy Expenditure (TDEE)</strong> <br />
                   is the total number of calories you burn in a day, including all activities.
                 </p>
 
@@ -361,8 +361,8 @@ export default function TDEEResultPage({ onBack, onHome, bmr }: TDEEResultPagePr
             <span className="text-2xl">💡</span>
             <span>Tip</span>
           </h3>
-          <p className="text-base text-gray-700 leading-relaxed">
-            These calorie goals are estimates. Monitor your progress and adjust as needed. For best results,
+          <p className="text-base text-gray-700 leading-relaxed text-left">
+            These calorie goals are estimates. Monitor your progress and adjust as needed. <br /> For best results,
             combine proper nutrition with regular exercise and adequate sleep.
           </p>
         </motion.div>
@@ -387,10 +387,10 @@ export default function TDEEResultPage({ onBack, onHome, bmr }: TDEEResultPagePr
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.65 }}
         >
-          <motion.div className="w-3 h-3 rounded-full bg-emerald-400"  transition={{ duration: 1.5, repeat: Infinity }}/>
-          <motion.div className="w-3 h-3 rounded-full bg-emerald-400"  transition={{ duration: 1.5, repeat: Infinity }}/>
-          <motion.div className="w-3 h-3 rounded-full bg-emerald-400"  transition={{ duration: 1.5, repeat: Infinity }}/>
-          <motion.div className="w-10 h-3 rounded-full bg-emerald-400" transition={{ duration: 1.5, repeat: Infinity }}/>
+          <motion.div className="w-3 h-3 -mt-6 rounded-full bg-emerald-400"  transition={{ duration: 1.5, repeat: Infinity }}/>
+          <motion.div className="w-3 h-3 -mt-6 rounded-full bg-emerald-400"  transition={{ duration: 1.5, repeat: Infinity }}/>
+          <motion.div className="w-3 h-3 -mt-6 rounded-full bg-emerald-400"  transition={{ duration: 1.5, repeat: Infinity }}/>
+          <motion.div className="w-10 h-3 -mt-6 rounded-full bg-emerald-400" transition={{ duration: 1.5, repeat: Infinity }}/>
         </motion.div>
       </motion.div>
     </div>

@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import Header from './Header'
 import Sidebar from './SideBar'
+import { useUser } from '../../../contexts/UserContext'
 
 interface MainLayoutProps {
     currentPage?: string
@@ -14,10 +15,22 @@ export default function MainLayout({
     onNavigate = () => { },
     onLogout = () => { }
 }: MainLayoutProps) {
+    const navigate = useNavigate()
+    const { clearUserInfo } = useUser()
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
     const handleProfileClick = () => {
         onNavigate('profile')
+        navigate('/profile')
+    }
+
+    const handleLogout = () => {
+        // Clear user context
+        clearUserInfo()
+        // Call parent logout
+        onLogout()
+        // Navigate to login/home
+        navigate('/')
     }
 
     return (
@@ -35,14 +48,12 @@ export default function MainLayout({
                 currentPage={currentPage}
                 onNavigate={(page) => {
                     onNavigate(page)
-                    setIsSidebarOpen(false) // Close sidebar after navigation
+                    setIsSidebarOpen(false)
                 }}
-                onLogout={() => {
-                    onLogout()               // ✅ เรียก logout ตรง ๆ
-                }}
+                onLogout={handleLogout}
             />
 
-            {/* Main Content - No left padding, full width */}
+            {/* Main Content */}
             <main className="pt-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <Outlet />

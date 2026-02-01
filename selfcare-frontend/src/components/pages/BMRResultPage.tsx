@@ -1,18 +1,22 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Info, X, Flame, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useUser } from '../../contexts/UserContext';
 
 interface BMRResultPageProps {
   onBack: () => void;
-  onTDEEResult: (bmr: number) => void;
-  gender: 'male' | 'female';
-  height: string;
-  weight: string;
-  age: string;
 }
 
-export default function BMRResultPage({ onBack, onTDEEResult, gender, height, weight, age }: BMRResultPageProps) {
+export default function BMRResultPage({ onBack }: BMRResultPageProps) {
+  const navigate = useNavigate();
+  const { userInfo, updateUserInfo } = useUser();
   const [showInfo, setShowInfo] = useState(false);
+
+  const gender = userInfo.gender || 'male';
+  const height = userInfo.height || '0';
+  const weight = userInfo.weight || '0';
+  const age = userInfo.age || '0';
 
   // Calculate BMR using Mifflin-St Jeor Equation
   const calculateBMR = () => {
@@ -22,10 +26,8 @@ export default function BMRResultPage({ onBack, onTDEEResult, gender, height, we
 
     let bmr: number;
     if (gender === 'male') {
-      // Men: BMR = (10 × weight in kg) + (6.25 × height in cm) - (5 × age in years) + 5
       bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * ageYears) + 5;
     } else {
-      // Women: BMR = (10 × weight in kg) + (6.25 × height in cm) - (5 × age in years) - 161
       bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * ageYears) - 161;
     }
 
@@ -35,15 +37,17 @@ export default function BMRResultPage({ onBack, onTDEEResult, gender, height, we
   const bmr = calculateBMR();
 
   const getBMRDescription = () => {
-    if (gender === 'male') {
-      return <p>This is the amount of calories your body needs to maintain basic physiological functions like breathing, circulation, and cell production while <br/> at rest.</p>
-    } else {
-      return <p>This is the amount of calories your body needs to maintain basic physiological functions like breathing, circulation, and cell production while <br/> at rest.</p>
-    }
+    return <p>This is the amount of calories your body needs to maintain basic physiological functions like breathing, circulation, and cell production while <br/> at rest.</p>;
+  };
+
+  const handleContinue = () => {
+    // Save BMR to context
+    updateUserInfo({ bmr });
+    navigate('/tdeeresults');
   };
 
   return (
-    <div className="fixed inset-0 h-screen w-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col overflow-hidden">
+    <div className="fixed inset-0 w-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col overflow-y-auto">
       <div className="px-6 py-4 flex items-center relative z-10 bg-gradient-to-b from-emerald-50 to-transparent">
         <motion.button
           onClick={onBack}
@@ -56,7 +60,6 @@ export default function BMRResultPage({ onBack, onTDEEResult, gender, height, we
         </motion.button>
       </div>
 
-      {/* Content */}
       <div className="flex-1 px-8 -mt-12 overflow-y-auto">
         <motion.div
           className="max-w-2xl mx-auto space-y-8"
@@ -64,7 +67,6 @@ export default function BMRResultPage({ onBack, onTDEEResult, gender, height, we
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Title */}
           <div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 mb-4">
               <Flame className="w-8 h-8 text-orange-600" />
@@ -73,7 +75,6 @@ export default function BMRResultPage({ onBack, onTDEEResult, gender, height, we
             <p className="text-gray-500 text-lg">Basal Metabolic Rate</p>
           </div>
 
-          {/* BMR Info Button */}
           <motion.button
             onClick={() => setShowInfo(!showInfo)}
             whileHover={{ scale: 1.03 }}
@@ -84,7 +85,6 @@ export default function BMRResultPage({ onBack, onTDEEResult, gender, height, we
             <span className="text-base font-semibold text-orange-600">What is BMR?</span>
           </motion.button>
 
-          {/* Info Modal */}
           {showInfo && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black bg-opacity-50">
               <motion.div
@@ -166,7 +166,6 @@ export default function BMRResultPage({ onBack, onTDEEResult, gender, height, we
             </div>
           )}
 
-          {/* Your Info Summary */}
           <motion.div
             className="grid grid-cols-2 gap-5"
             initial={{ opacity: 0, x: -20 }}
@@ -197,7 +196,6 @@ export default function BMRResultPage({ onBack, onTDEEResult, gender, height, we
             </div>
           </motion.div>
 
-          {/* BMR Result Card */}
           <motion.div
             className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-3xl p-10 shadow-xl text-white"
             initial={{ opacity: 0, y: 16 }}
@@ -219,7 +217,6 @@ export default function BMRResultPage({ onBack, onTDEEResult, gender, height, we
             </div>
           </motion.div>
 
-          {/* What This Means */}
           <motion.div
             className="bg-white rounded-3xl p-7 border border-orange-200 shadow-sm"
             initial={{ opacity: 0, x: -20 }}
@@ -239,7 +236,6 @@ export default function BMRResultPage({ onBack, onTDEEResult, gender, height, we
             </div>
           </motion.div>
 
-          {/* Fun Facts */}
           <motion.div
             className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-3xl p-7 border border-orange-200"
             initial={{ opacity: 0, x: -20 }}
@@ -266,9 +262,8 @@ export default function BMRResultPage({ onBack, onTDEEResult, gender, height, we
             </ul>
           </motion.div>
 
-          {/* Continue Button */}
           <motion.button
-            onClick={() => onTDEEResult(bmr)}
+            onClick={handleContinue}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             initial={{ opacity: 0, y: 20 }}
@@ -279,7 +274,6 @@ export default function BMRResultPage({ onBack, onTDEEResult, gender, height, we
             Continue to TDEE
           </motion.button>
 
-          {/* Progress Indicator */}
           <motion.div
             className="flex items-center justify-center gap-3 pt-6"
             initial={{ opacity: 0 }}
@@ -295,5 +289,4 @@ export default function BMRResultPage({ onBack, onTDEEResult, gender, height, we
       </div>
     </div>
   );
-
 }

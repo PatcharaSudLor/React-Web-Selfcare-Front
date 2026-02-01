@@ -204,7 +204,7 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                     </div>
 
                     {/* Social Login Buttons - ขยายไอคอนให้ใหญ่มาก */}
-                    <motion.div  variants={item} className="flex justify-center gap-8 lg:gap-10 mt-8">
+                    <motion.div variants={item} className="flex justify-center gap-8 lg:gap-10 mt-8">
                         {/* Google Button */}
                         <button
                             onClick={() => handleSocialLogin('Google')}

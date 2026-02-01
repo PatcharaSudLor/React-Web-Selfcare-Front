@@ -1,4 +1,4 @@
-import { Home, UtensilsCrossed, PlayCircle, Bell, Lightbulb,X,Calendar,Heart,MessageCircle,User,LogOut} from 'lucide-react'
+import { Home, UtensilsCrossed, PlayCircle, Bell, Lightbulb, X, Calendar, Heart, MessageCircle, User, LogOut } from 'lucide-react'
 
 interface SidebarProps {
   isOpen: boolean
@@ -75,10 +75,9 @@ export default function Sidebar({ isOpen, onClose, currentPage, onNavigate, onLo
                   className={`
                     w-full flex items-center gap-3 px-6 py-3
                     transition-all duration-200
-                    ${
-                      isActive
-                        ? 'bg-emerald-50 text-emerald-600 border-r-4 border-emerald-600'
-                        : 'text-gray-700 hover:bg-gray-50'
+                    ${isActive
+                      ? 'bg-emerald-50 text-emerald-600 border-r-4 border-emerald-600'
+                      : 'text-gray-700 hover:bg-gray-50'
                     }
                   `}
                 >
@@ -98,16 +97,19 @@ export default function Sidebar({ isOpen, onClose, currentPage, onNavigate, onLo
               return (
                 <button
                   key={item.id}
-                  onClick={() => handleLogout()}
-                  className={`
-                    w-full flex items-center gap-3 px-6 py-3
-                    transition-colors
-                    ${
-                      isLogout
-                        ? 'text-red-600 hover:bg-red-50'
-                        : 'text-gray-700 hover:bg-gray-50'
+                  onClick={() => {
+                    if (item.id === 'logout') {
+                      handleLogout()
+                    } else {
+                      handleNavigate(item.id) // 👈 profile
                     }
-                  `}
+                  }}
+                  className={`w-full flex items-center gap-3 px-6 py-3 transition-colors
+                    ${isLogout
+                      ? 'text-red-600 hover:bg-red-50'
+                      : 'text-gray-700 hover:bg-gray-50'
+                    }
+                    `}
                 >
                   <Icon className={`w-5 h-5 ${isLogout ? 'text-red-600' : 'text-gray-500'}`} />
                   <span className="font-medium">{item.label}</span>

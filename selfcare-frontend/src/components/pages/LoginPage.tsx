@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../utils/supabase.ts';
 import { motion } from 'framer-motion';
+import type { Provider } from '@supabase/supabase-js';
 
 interface LoginPageProps {
   onBack: () => void;
   onSignUp: () => void;
-  onLoginSuccess: (email: string) => void;
+  onLoginSuccess: (page: string) => void;
 }
 
 /* animation presets */
@@ -66,20 +67,47 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
         return;
       }
 
+      const user = data.user;
+      if (!user) throw new Error('User data not found');
+
+      // ดึง profile
+      const { data: profile, error: profileError } = await supabase
+        .from('user_profile')
+        .select('is_setup_completed')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error(profileError);
+        throw new Error('Failed to load profile');
+      }
+
+      if (!profile) {
+        await supabase.from('user_profile').insert({
+          user_id: user.id,
+          is_setup_completed: false,
+        });
+
+        onLoginSuccess('userinfo');
+        return;
+      }
+
+      //  ตัดสินใจ
+      if (profile?.is_setup_completed) {
+        onLoginSuccess('home');
+      } else {
+        onLoginSuccess('userinfo');
+      }
+
       // Success! Store session if remember me is checked
       if (rememberMe && data.session) {
         localStorage.setItem('selfcare_remember_me', 'true');
         localStorage.setItem('selfcare_user_email', email);
-        localStorage.setItem('selfcare_access_token', data.session.access_token);
       } else {
         // Clear remember me if not checked
         localStorage.removeItem('selfcare_remember_me');
         localStorage.removeItem('selfcare_user_email');
-        localStorage.removeItem('selfcare_access_token');
       }
-
-      console.log('Login successful:', { email, rememberMe });
-      onLoginSuccess(email);
     } catch (err) {
       console.error('Login error:', err);
       setError('An error occurred during login');
@@ -88,10 +116,8 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
     }
   };
 
-  const handleSocialLogin = (provider: string) => {
-    console.log(`Login with ${provider}`);
-    // Implement social login
-    onLoginSuccess(email);
+  const handleSocialLogin = async (provider: Provider) => {
+    await supabase.auth.signInWithOAuth({ provider });
   };
 
   const handleForgotPassword = () => {
@@ -203,6 +229,7 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
             variants={item}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
+            disabled={loading}
             onClick={handleLogin}
             className="w-full py-4 lg:py-5 rounded-full bg-emerald-200 hover:bg-emerald-300 disabled:bg-emerald-100 text-white font-medium text-lg lg:text-xl transition-all shadow-md hover:shadow-lg transform hover:scale-105 disabled:transform-none mt-6"
           >
@@ -222,7 +249,7 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
           {/* Social Login Buttons */}
           <motion.div variants={item} className="flex justify-center gap-8 lg:gap-10 mt-8">
             <button
-              onClick={() => handleSocialLogin('Google')}
+              onClick={() => handleSocialLogin('google')}
               className="w-16 h-16 lg:w-20 lg:h-20 xl:w-20 xl:h-20 rounded-full bg-white border-2 border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all shadow-md hover:shadow-xl transform hover:scale-110"
             >
               <svg className="w-9 h-9 lg:w-11 lg:h-11 xl:w-14 xl:h-14" viewBox="0 0 24 24">
@@ -246,7 +273,7 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
             </button>
 
             <motion.button
-              onClick={() => handleSocialLogin('Facebook')}
+              onClick={() => handleSocialLogin('facebook')}
               className="w-16 h-16 lg:w-20 lg:h-20 xl:w-20 xl:h-20 rounded-full bg-white border-2 border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all shadow-md hover:shadow-xl transform hover:scale-110"
             >
               <svg className="w-9 h-9 lg:w-11 lg:h-11 xl:w-14 xl:h-14" viewBox="0 0 24 24" fill="#1877F2">
@@ -255,7 +282,7 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
             </motion.button>
 
             <motion.button
-              onClick={() => handleSocialLogin('Apple')}
+              onClick={() => handleSocialLogin('apple')}
               className="w-16 h-16 lg:w-20 lg:h-20 xl:w-22 xl:h-22 rounded-full bg-white border-2 border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all shadow-md hover:shadow-xl transform hover:scale-110"
             >
               <svg className="w-9 h-9 lg:w-11 lg:h-11 xl:w-14 xl:h-14" viewBox="0 0 24 24" fill="#000000">

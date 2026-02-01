@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { supabase } from '../../utils/supabase';
 import { ArrowLeft, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useUser } from '../../contexts/UserContext';
+import { useNavigate } from 'react-router-dom'
 
 interface UserInfoPageProps {
   onBack: () => void;
-  onConfirm: (data: UserInfoData) => void;
 }
 
 export interface UserInfoData {
@@ -24,25 +25,27 @@ export interface UserInfoData {
 // Custom Gender Icons
 const MaleIcon = ({ className }: { className?: string }) => (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <circle cx="10" cy="14" r="6" stroke="currentColor" strokeWidth="2" fill="none"/>
-    <path d="M14 5h5v5M19 5l-5.5 5.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <circle cx="10" cy="14" r="6" stroke="currentColor" strokeWidth="2" fill="none" />
+    <path d="M14 5h5v5M19 5l-5.5 5.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 const FemaleIcon = ({ className }: { className?: string }) => (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <circle cx="12" cy="9" r="6" stroke="currentColor" strokeWidth="2" fill="none"/>
-    <path d="M12 15v6M9 18h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <circle cx="12" cy="9" r="6" stroke="currentColor" strokeWidth="2" fill="none" />
+    <path d="M12 15v6M9 18h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
-export default function UserInfoPage({ onBack, onConfirm }: UserInfoPageProps) {
+export default function UserInfoPage({ onBack }: UserInfoPageProps) {
   const [username, setUsername] = useState('');
   const [gender, setGender] = useState<'male' | 'female' | ''>('');
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
   const [age, setAge] = useState('');
   const [bloodType, setBloodType] = useState('');
+  const navigate = useNavigate();
+  const { updateUserInfo } = useUser();
 
   const bloodTypes = ['A', 'B', 'AB', 'O', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
@@ -57,7 +60,7 @@ export default function UserInfoPage({ onBack, onConfirm }: UserInfoPageProps) {
     const weightInKg = parseFloat(weight);
     const bmiValue = weightInKg / (heightInMeters * heightInMeters);
     const bmi = parseFloat(bmiValue.toFixed(1));
-    
+
     let bmiCategory = '';
     if (bmiValue < 18.5) {
       bmiCategory = 'Underweight';
@@ -80,7 +83,7 @@ export default function UserInfoPage({ onBack, onConfirm }: UserInfoPageProps) {
         return;
       }
 
-      const { error } = await supabase.from('user_profile').insert([{ 
+      const { error } = await supabase.from('user_profile').upsert([{
         user_id: user.id,
         username,
         gender,
@@ -104,21 +107,25 @@ export default function UserInfoPage({ onBack, onConfirm }: UserInfoPageProps) {
     }
 
     // Notify parent after successful save
-    onConfirm({
+    // หลัง insert Supabase สำเร็จ
+    updateUserInfo({
       username,
       gender,
       height,
       weight,
       age,
-      bloodType,
       bmi,
       bmiCategory,
     });
+    navigate('/bmiresults');
   };
 
+
+
+
   return (
-    <div className="fixed inset-0 h-screen w-screen bg-gradient-to-b from-emerald-50 to-white ">
-      <div className="px-6 py-4 flex items-center">
+    <div className="fixed inset-0  w-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col overflow-y-auto">
+      <div className="px-6 py-4 flex items-center shrink-0 z-20 bg-transparent">
         <motion.button
           onClick={onBack}
           whileHover={{ scale: 1.05 }}
@@ -130,7 +137,7 @@ export default function UserInfoPage({ onBack, onConfirm }: UserInfoPageProps) {
         </motion.button>
       </div>
 
-      <div className="flex-1 px-8 -mt-12 overflow-y-auto">
+      <div className="flex-1 px-8 -mt-12 overflow-y-auto pb-10">
         <motion.div className="max-w-2xl mx-auto space-y-10" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.5 }}>
           <motion.div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 mb-4">
@@ -196,7 +203,7 @@ export default function UserInfoPage({ onBack, onConfirm }: UserInfoPageProps) {
           <motion.button onClick={handleConfirm} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="w-full py-5 rounded-2xl bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold text-lg transition-all shadow-lg shadow-emerald-200 hover:shadow-xl">Confirm</motion.button>
 
           <motion.div className="flex items-center justify-center gap-3 -mt-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.7 }}>
-            <div className="w-10 h-3 rounded-full bg-emerald-400"  />
+            <div className="w-10 h-3 rounded-full bg-emerald-400" />
             <div className="w-3 h-3 rounded-full bg-gray-300" />
             <div className="w-3 h-3 rounded-full bg-gray-300" />
             <div className="w-3 h-3 rounded-full bg-gray-300" />

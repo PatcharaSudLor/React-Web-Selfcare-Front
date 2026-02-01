@@ -1,18 +1,22 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Info, X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useUser } from '../../contexts/UserContext';
 
 interface BMIResultPageProps {
   onBack: () => void;
-  onBMRResult: () => void;
-  bmi: number;
-  bmiCategory: string;
-  height: string;
-  weight: string;
 }
 
-export default function BMIResultPage({ onBack, onBMRResult, bmi, bmiCategory, height, weight }: BMIResultPageProps) {
+export default function BMIResultPage({ onBack }: BMIResultPageProps) {
+  const navigate = useNavigate();
+  const { userInfo } = useUser();
   const [showInfo, setShowInfo] = useState(false);
+
+  const bmi = userInfo.bmi || 0;
+  const bmiCategory = userInfo.bmiCategory || '';
+  const height = userInfo.height || '0';
+  const weight = userInfo.weight || '0';
 
   const getBMIColor = (bmiValue: number) => {
     if (bmiValue < 18.5) return '#3b82f6'; // Blue - Underweight
@@ -23,8 +27,6 @@ export default function BMIResultPage({ onBack, onBMRResult, bmi, bmiCategory, h
   };
 
   const getBMIPosition = (bmiValue: number) => {
-    // Map BMI to 0-100% position on the scale
-    // Scale: 15 (0%) to 40 (100%)
     const minBMI = 15;
     const maxBMI = 40;
     const position = ((bmiValue - minBMI) / (maxBMI - minBMI)) * 100;
@@ -45,9 +47,13 @@ export default function BMIResultPage({ onBack, onBMRResult, bmi, bmiCategory, h
     }
   };
 
+  const handleContinue = () => {
+    navigate('/bmrresults');
+  };
+
   return (
-    <div className="fixed inset-0 h-screen w-screen bg-gradient-to-b from-emerald-50 to-white">
-      <div className="px-6 py-4 flex items-center">
+    <div className="fixed inset-0 w-screen bg-gradient-to-b from-emerald-50 to-white overflow-y-auto">
+      <div className="px-6 py-4 flex items-center shrink-0 z-20 bg-transparent">
         <motion.button
           onClick={onBack}
           whileHover={{ scale: 1.05 }}
@@ -59,7 +65,7 @@ export default function BMIResultPage({ onBack, onBMRResult, bmi, bmiCategory, h
         </motion.button>
       </div>
 
-      <div className="flex-1 px-8 -mt-12 overflow-y-auto">
+      <div className="flex-1 px-8 -mt-12 overflow-y-auto pb-10">
         <motion.div className="max-w-2xl mx-auto space-y-7" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 mb-4">
@@ -140,7 +146,7 @@ export default function BMIResultPage({ onBack, onBMRResult, bmi, bmiCategory, h
               <p className="text-sm text-gray-500 uppercase tracking-wide">Your BMI</p>
               <div className="flex items-center justify-center gap-4">
                 <span className="text-6xl font-bold" style={{ color: getBMIColor(bmi) }}>
-                  {bmi}
+                  {bmi.toFixed(1)}
                 </span>
                 <div className="text-left">
                   <p className="text-xl font-bold text-gray-800">{bmiCategory}</p>
@@ -192,7 +198,7 @@ export default function BMIResultPage({ onBack, onBMRResult, bmi, bmiCategory, h
           </div>
 
           <motion.button
-            onClick={onBMRResult}
+            onClick={handleContinue}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             initial={{ opacity: 0, y: 10 }}

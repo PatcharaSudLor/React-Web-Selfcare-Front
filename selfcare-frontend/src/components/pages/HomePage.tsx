@@ -1,327 +1,223 @@
 import { useState } from 'react';
-import { Heart, Dumbbell, Utensils, Sparkles, Bookmark, Calendar, ChevronLeft, ChevronRight, Activity, Zap, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Heart, Dumbbell, Utensils, MessageCircle, TrendingUp, ChevronRight, Activity, Flame } from 'lucide-react';
+import { useUser } from '../../contexts/UserContext';
 
 const tips = [
-  'ดื่มน้ำหลังตื่นนอน 1 แก้ว',
-  'ออกกำลังกายอย่างน้อย 30 นาทีต่อวัน',
-  'นอนหลับให้ครบ 7-8 ชั่วโมง',
-  'ทานผักและผลไม้ให้หลากหลาย',
-  'ยืดเหยียดกล้ามเนื้อทุกวัน',
+  {
+    icon: '💧',
+    title: 'ดื่มน้ำให้เพียงพอ',
+    description: 'ดื่มน้ำอย่างน้อย 8 แก้วต่อวัน เพื่อกระตุ้นการเผาผลาญของร่างกายและช่วยในการขับเสีย',
+  },
+  {
+    icon: '🥗',
+    title: 'ทานผักและผลไม้',
+    description: 'รับประทานผักและผลไม้หลากหลายสีอย่างน้อย 5 ส่วนต่อวัน เพื่อวิตามินและแร่ธาตุที่จำเป็น',
+  },
+  {
+    icon: '🏃',
+    title: 'ออกกำลังกายสม่ำเสมอ',
+    description: 'ออกกำลังกายอย่างน้อย 30 นาทีต่อวัน 5 วันต่อสัปดาห์ เพื่อสุขภาพหัวใจและร่างกายที่แข็งแรง',
+  },
+  {
+    icon: '😴',
+    title: 'นอนหลับให้เพียงพอ',
+    description: 'นอนหลับ 7-8 ชั่วโมงต่อคืน เพื่อให้ร่างกายได้พักผ่อนและฟื้นฟูอย่างเต็มที่',
+  },
+  {
+    icon: '🧘',
+    title: 'จัดการความเครียด',
+    description: 'ฝึกสมาธิ โยคะ หรือทำกิจกรรมผ่อนคลาย เพื่อลดความเครียดและเพิ่มความสุข',
+  },
 ];
 
-interface HomePageProps {
-  username?: string;
-  bmi?: number;
-  bmr?: number;
-  tdee?: number;
-  onNavigateToWorkouts?: () => void;
-  onNavigateToMeals?: () => void;
-  onNavigateToAssistant?: () => void;
-  onNavigateToFavorite?: () => void;
-  onNavigateToSchedule?: () => void;
-  onNavigateToBMI?: () => void;
-  onNavigateToBMR?: () => void;
-  onNavigateToTDEE?: () => void;
-  onLogout?: () => void;
-}
+export default function HomePage() {
+  const navigate = useNavigate();
+  const { userInfo } = useUser();
+  const [currentTipIndex, setCurrentTipIndex] = useState(0);
 
-export default function HomePage({ 
-  username = 'User',
-  bmi,
-  bmr,
-  tdee,
-  onNavigateToWorkouts, 
-  onNavigateToMeals, 
-  onNavigateToAssistant,
-  onNavigateToFavorite, 
-  onNavigateToSchedule,
-  onNavigateToBMI,
-  onNavigateToBMR,
-  onNavigateToTDEE,
-}: HomePageProps) {
-  const [currentTip, setCurrentTip] = useState(0);
-  const [currentHealthCard, setCurrentHealthCard] = useState(0);
-
-  const nextTip = () => {
-    setCurrentTip((prev) => (prev + 1) % tips.length);
+  const getBMIStatus = (bmiValue?: number) => {
+    if (!bmiValue) return { text: '-', color: 'text-gray-500' };
+    if (bmiValue < 18.5) return { text: 'ผอม', color: 'text-blue-600' };
+    if (bmiValue < 23) return { text: 'ปกติ ✓', color: 'text-green-600' };
+    if (bmiValue < 25) return { text: 'น้ำหนักเกิน', color: 'text-yellow-600' };
+    return { text: 'อ้วน', color: 'text-red-600' };
   };
 
-  const prevTip = () => {
-    setCurrentTip((prev) => (prev - 1 + tips.length) % tips.length);
-  };
-
-  const nextHealthCard = () => {
-    setCurrentHealthCard((prev) => (prev + 1) % 3);
-  };
-
-  const prevHealthCard = () => {
-    setCurrentHealthCard((prev) => (prev - 1 + 3) % 3);
-  };
+  const bmiStatus = getBMIStatus(userInfo.bmi);
 
   return (
-    <div className="fixed inset-0 h-screen w-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="px-6 py-4 flex items-center relative z-10 bg-gradient-to-b from-emerald-50 to-transparent">
-        <div className="flex-1" />
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 px-4 overflow-y-auto pb-24 pt-12">
-        <div className="max-w-2xl mx-auto space-y-4">
-      {/* Welcome Card */}
-      <div className="bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-3xl p-6 mb-6 shadow-sm">
-        <div className="flex items-start gap-3 mb-4">
-          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-            <Heart className="w-6 h-6 text-emerald-500" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-xl text-gray-800 mb-1">สวัสดี {username}</h2>
-            <p className="text-gray-700">วันนี้กินน้ำครบ 8 แก้วรึยัง?</p>
-          </div>
-        </div>
-
-        {/* Daily Tip */}
-        <div className="bg-white bg-opacity-50 rounded-2xl p-4 relative">
-          <button
-            onClick={prevTip}
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-shadow"
-          >
-            <ChevronLeft className="w-4 h-4 text-gray-600" />
-          </button>
-          
-          <div className="px-8">
-            <p className="text-sm text-gray-600 mb-1">💡 เคล็ดลับวันนี้:</p>
-            <p className="text-gray-800">{tips[currentTip]}</p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
+        <div className="space-y-6">
+          {/* Welcome Card */}
+          <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-8 shadow-lg text-white">
+            <h1 className="text-3xl font-bold mb-2">
+              ยินดีต้อนรับกลับมา, {userInfo.username || 'User'}! 👋
+            </h1>
+            <p className="text-emerald-50 text-lg">
+              พร้อมดูแลสุขภาพของคุณวันนี้แล้วหรือยัง?
+            </p>
           </div>
 
-          <button
-            onClick={nextTip}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-shadow"
-          >
-            <ChevronRight className="w-4 h-4 text-gray-600" />
-          </button>
-
-          {/* Dots indicator */}
-          <div className="flex items-center justify-center gap-1.5 mt-3">
-            {tips.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentTip(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentTip 
-                    ? 'bg-emerald-600 w-6' 
-                    : 'bg-gray-400'
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Health Metrics Swipeable Card */}
-      <div className="mb-6 relative">
-        <div className="overflow-hidden rounded-3xl">
-          {/* Show loading skeleton when data is not ready (0 or undefined) */}
-          {!bmi && !bmr && !tdee ? (
-            currentHealthCard === 0 ? (
-              <MetricCardSkeleton gradient="bg-gradient-to-br from-blue-400 to-blue-500" />
-            ) : currentHealthCard === 1 ? (
-              <MetricCardSkeleton gradient="bg-gradient-to-br from-amber-400 to-orange-500" />
-            ) : (
-              <MetricCardSkeleton gradient="bg-gradient-to-br from-emerald-400 to-teal-500" />
-            )
-          ) : (
-            <>
-              {currentHealthCard === 0 && bmi && bmi > 0 && (
-                <button
-                  onClick={onNavigateToBMI}
-                  className="w-full bg-gradient-to-br from-blue-400 to-blue-500 text-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all active:scale-95"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                        <Activity className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="text-left">
-                        <p className="text-sm text-white text-opacity-90">Body Mass Index</p>
-                        <h3 className="text-2xl font-bold">BMI</h3>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-4xl font-bold">{bmi.toFixed(1)}</p>
-                    </div>
-                  </div>
-                </button>
-              )}
-
-              {currentHealthCard === 1 && bmr && bmr > 0 && (
-                <button
-                  onClick={onNavigateToBMR}
-                  className="w-full bg-gradient-to-br from-amber-400 to-orange-500 text-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all active:scale-95"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                        <Zap className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="text-left">
-                        <p className="text-sm text-white text-opacity-90">Basal Metabolic Rate</p>
-                        <h3 className="text-2xl font-bold">BMR</h3>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-3xl font-bold">{bmr.toFixed(0)}</p>
-                      <p className="text-sm text-white text-opacity-90">kcal/day</p>
-                    </div>
-                  </div>
-                </button>
-              )}
-
-              {currentHealthCard === 2 && tdee && tdee > 0 && (
-                <button
-                  onClick={onNavigateToTDEE}
-                  className="w-full bg-gradient-to-br from-emerald-400 to-teal-500 text-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all active:scale-95"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                        <TrendingUp className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="text-left">
-                        <p className="text-sm text-white text-opacity-90">Total Daily Energy</p>
-                        <h3 className="text-2xl font-bold">TDEE</h3>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-3xl font-bold">{tdee.toFixed(0)}</p>
-                      <p className="text-sm text-white text-opacity-90">kcal/day</p>
-                    </div>
-                  </div>
-                </button>
-              )}
-
-              {/* Show skeleton if current card doesn't have data yet */}
-              {(currentHealthCard === 0 && (!bmi || bmi === 0)) && (
-                <MetricCardSkeleton gradient="bg-gradient-to-br from-blue-400 to-blue-500" />
-              )}
-              {(currentHealthCard === 1 && (!bmr || bmr === 0)) && (
-                <MetricCardSkeleton gradient="bg-gradient-to-br from-amber-400 to-orange-500" />
-              )}
-              {(currentHealthCard === 2 && (!tdee || tdee === 0)) && (
-                <MetricCardSkeleton gradient="bg-gradient-to-br from-emerald-400 to-teal-500" />
-              )}
-            </>
-          )}
-        </div>
-
-        {/* Navigation Arrows */}
-        <button
-          onClick={prevHealthCard}
-          className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all z-10"
-        >
-          <ChevronLeft className="w-5 h-5 text-gray-700" />
-        </button>
-
-        <button
-          onClick={nextHealthCard}
-          className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all z-10"
-        >
-          <ChevronRight className="w-5 h-5 text-gray-700" />
-        </button>
-
-        {/* Dots indicator */}
-        <div className="flex items-center justify-center gap-2 mt-3">
-          {[0, 1, 2].map((index) => (
+          {/* Health Metrics - 3 Cards in Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* BMI Card */}
             <button
-              key={index}
-              onClick={() => setCurrentHealthCard(index)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === currentHealthCard 
-                  ? 'bg-emerald-600 w-6' 
-                  : 'bg-gray-300'
-              }`}
-            />
-          ))}
-        </div>
-      </div>
+              onClick={() => navigate('/bmiresults')}
+              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all active:scale-95 text-left"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-gray-600 font-medium">BMI</span>
+                <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-blue-500" />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <p className="text-4xl font-bold text-gray-900">
+                  {userInfo.bmi ? userInfo.bmi.toFixed(1) : '-'}
+                </p>
+                <p className={`text-sm font-medium ${bmiStatus.color}`}>
+                  {bmiStatus.text}
+                </p>
+              </div>
+            </button>
 
-      {/* Quick Actions Grid */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        {/* Workouts */}
-        <button 
-          onClick={onNavigateToWorkouts}
-          className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all active:scale-95 flex flex-col items-center gap-3 hover:bg-gradient-to-br hover:from-orange-50 hover:to-orange-100"
-        >
-          <div className="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 rounded-full flex items-center justify-center group-hover:from-orange-200 group-hover:to-orange-300 transition-all">
-            <Dumbbell className="w-6 h-6 text-orange-600" />
+            {/* BMR Card */}
+            <button
+              onClick={() => navigate('/bmrresults')}
+              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all active:scale-95 text-left"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-gray-600 font-medium">BMR</span>
+                <div className="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center">
+                  <Flame className="w-5 h-5 text-orange-500" />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <p className="text-4xl font-bold text-gray-900">
+                  {userInfo.bmr ? userInfo.bmr.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '-'}
+                </p>
+                <p className="text-sm text-gray-500">kcal/วัน</p>
+              </div>
+            </button>
+
+            {/* TDEE Card */}
+            <button
+              onClick={() => navigate('/tdeeresults')}
+              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all active:scale-95 text-left"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-gray-600 font-medium">TDEE</span>
+                <div className="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-purple-500" />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <p className="text-4xl font-bold text-gray-900">
+                  {userInfo.tdee ? userInfo.tdee.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '-'}
+                </p>
+                <p className="text-sm text-gray-500">kcal/วัน</p>
+              </div>
+            </button>
           </div>
-          <span className="text-gray-800">Workouts</span>
-        </button>
 
-        {/* Meals */}
-        <button 
-          onClick={onNavigateToMeals}
-          className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all active:scale-95 flex flex-col items-center gap-3 hover:bg-gradient-to-br hover:from-rose-50 hover:to-rose-100"
-        >
-          <div className="w-12 h-12 bg-gradient-to-br from-rose-100 to-rose-200 rounded-full flex items-center justify-center transition-all">
-            <Utensils className="w-6 h-6 text-rose-600" />
+          {/* Daily Health Tips Section */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">เคล็ดลับสุขภาพวันนี้</h2>
+              <button 
+                onClick={() => navigate('/tips')}
+                className="flex items-center gap-1 text-emerald-600 hover:text-emerald-700 font-medium text-sm transition-colors"
+              >
+                ดูทั้งหมด
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Tip Card */}
+            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl flex-shrink-0 shadow-sm">
+                  {tips[currentTipIndex].icon}
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900 mb-1">
+                    {tips[currentTipIndex].title}
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {tips[currentTipIndex].description}
+                  </p>
+                </div>
+              </div>
+
+              {/* Dots Indicator */}
+              <div className="flex items-center justify-center gap-2 mt-4">
+                {tips.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentTipIndex(index)}
+                    className={`h-2 rounded-full transition-all ${
+                      index === currentTipIndex 
+                        ? 'bg-emerald-600 w-6' 
+                        : 'bg-gray-300 w-2'
+                    }`}
+                    aria-label={`Go to tip ${index + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
-          <span className="text-gray-800">Meals</span>
-        </button>
 
-        {/* Assistant */}
-        <button 
-          onClick={onNavigateToAssistant}
-          className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all active:scale-95 flex flex-col items-center gap-3 hover:bg-gradient-to-br hover:from-emerald-50 hover:to-emerald-100"
-        >
-          <div className="w-12 h-12 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-full flex items-center justify-center transition-all">
-            <Sparkles className="w-6 h-6 text-emerald-600" />
-          </div>
-          <span className="text-gray-800">AI Assistant</span>
-        </button>
-
-        {/* Favorite */}
-        <button 
-          onClick={onNavigateToFavorite}
-          className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all active:scale-95 flex flex-col items-center gap-3 hover:bg-gradient-to-br hover:from-pink-50 hover:to-pink-100"
-        >
-          <div className="w-12 h-12 bg-gradient-to-br from-pink-100 to-pink-200 rounded-full flex items-center justify-center transition-all">
-            <Bookmark className="w-6 h-6 text-pink-600" />
-          </div>
-          <span className="text-gray-800">Favorite</span>
-        </button>
-      </div>
-
-      {/* Schedule - Full Width */}
-      <button 
-        onClick={onNavigateToSchedule}
-        className="w-full bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all active:scale-95 flex flex-col items-center gap-3 hover:bg-gradient-to-br hover:from-blue-50 hover:to-blue-100"
-      >
-        <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center transition-all">
-          <Calendar className="w-6 h-6 text-blue-600" />
-        </div>
-        <span className="text-gray-800">Schedule</span>
-      </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Loading skeleton component
-function MetricCardSkeleton({ gradient }: { gradient: string }) {
-  return (
-    <div className={`w-full ${gradient} rounded-3xl p-6 shadow-lg animate-pulse`}>
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-white bg-opacity-30 rounded-full" />
+          {/* Quick Actions Menu */}
           <div>
-            <div className="w-24 h-3 bg-white bg-opacity-30 rounded mb-2" />
-            <div className="w-16 h-6 bg-white bg-opacity-40 rounded" />
+            <h2 className="text-xl font-bold text-gray-900 mb-4">เมนูด่วน</h2>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Workouts */}
+              <button 
+                onClick={() => navigate('/workouts')}
+                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
+              >
+                <div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-3xl flex items-center justify-center">
+                  <Dumbbell className="w-10 h-10 text-emerald-600" />
+                </div>
+                <span className="text-gray-800 font-medium">ออกกำลังกาย</span>
+              </button>
+
+              {/* Meals */}
+              <button 
+                onClick={() => navigate('/meals')}
+                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
+              >
+                <div className="w-20 h-20 bg-gradient-to-br from-amber-100 to-orange-200 rounded-3xl flex items-center justify-center">
+                  <Utensils className="w-10 h-10 text-orange-600" />
+                </div>
+                <span className="text-gray-800 font-medium">รวมเมนูอาหาร</span>
+              </button>
+
+              {/* AI Assistant */}
+              <button 
+                onClick={() => navigate('/assistant')}
+                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
+              >
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-3xl flex items-center justify-center">
+                  <MessageCircle className="w-10 h-10 text-blue-600" />
+                </div>
+                <span className="text-gray-800 font-medium">ผู้ช่วย AI</span>
+              </button>
+
+              {/* Favorite */}
+              <button 
+                onClick={() => navigate('/favorite')}
+                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
+              >
+                <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-rose-200 rounded-3xl flex items-center justify-center">
+                  <Heart className="w-10 h-10 text-pink-600" />
+                </div>
+                <span className="text-gray-800 font-medium">รายการโปรด</span>
+              </button>
+            </div>
           </div>
-        </div>
-        <div className="text-right">
-          <div className="w-20 h-10 bg-white bg-opacity-40 rounded mb-1" />
         </div>
       </div>
     </div>

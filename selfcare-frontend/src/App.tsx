@@ -15,6 +15,7 @@ import type { MealPlanData } from './components/pages/MealPlanners'
 import type { WorkoutPlanData } from './components/pages/WorkoutPlanners'
 import WorkoutPlanner from './components/pages/WorkoutPlanners'
 import WorkoutSchedule from './components/pages/WorkoutSchedule'
+import ProfilePage from './components/pages/ProfilePage'
 import './App.css'
 import { useState } from 'react'
 
@@ -58,9 +59,10 @@ function AppContent() {
       {/* Pages within MainLayout */}
       <Route element={<MainLayout currentPage={location.pathname} onNavigate={(path) => navigate(path)} onLogout={handleLogout}/>}>
         <Route path="/home" element={<HomePage />} />
+        <Route path="/profile" element={<ProfilePage onBack={() => navigate('/home')} profileImage="https://api.dicebear.com/7.x/avataaars/svg?seed=default" onLogout={handleLogout} />} />
         <Route path="/meals" element={<MealPlanner onBack={() => navigate('/home')} onGeneratePlan={(data) => { setMealPlanData(data); navigate('/meals/schedule'); }} />} />
         <Route path="/workouts" element={<WorkoutPlanner onBack={() => navigate('/home')} onGeneratePlan={(data) => { setWorkoutPlanData(data); navigate('/workouts/schedule'); }} />} />
-        <Route path="/workouts/schedule" element={<WorkoutSchedule onBack={() => navigate('/workouts')} onSaveToSchedule={(s) => { console.log('Saved workout schedule:', s); }} selectedTime={workoutPlanData?.selectedTime ?? 30} bodyType={workoutPlanData?.bodyType ?? ''} goal={workoutPlanData?.goal ?? 'maintain'} />} />
+        <Route path="/workouts/schedule" element={<WorkoutSchedule onBack={() => navigate('/workouts')} onSaveToSchedule={(s) => { console.log('Saved workout schedule:', s); }} selectedTime={workoutPlanData?.selectedTime ?? 30} />} />
         <Route path="/meals/schedule" element={<MealSchedule onBack={() => navigate('/meals')} onSaveToSchedule={(s) => { console.log('Saved schedule:', s); }} mealPlanData={mealPlanData ?? { likedMeals: [], allergicFoods: [], budget: '' }} />} />
       </Route>
     </Routes>

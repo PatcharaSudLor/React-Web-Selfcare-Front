@@ -17,7 +17,7 @@ interface DaySchedule {
   color: string;
 }
 
-export default function WorkoutSchedule({ onBack, onSaveToSchedule, selectedTime = 30, goal = 'maintain' }: WorkoutScheduleProps) {
+export default function WorkoutSchedule({ onBack, onSaveToSchedule, selectedTime = 30 }: WorkoutScheduleProps) {
   // Generate schedule based on user preferences
   const schedule: DaySchedule[] = [
     {

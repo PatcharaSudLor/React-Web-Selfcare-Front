@@ -1,7 +1,75 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, Lock, Calendar, Edit2, Eye, EyeOff, Database, ChevronDown } from 'lucide-react';
+import { ArrowLeft, User, Mail, Lock, Calendar, Edit2, ChevronDown } from 'lucide-react';
 import { supabase } from '../../utils/supabase';
 import { useUser } from '../../contexts/UserContext';
+
+function ProfileSkeleton() {
+  return (
+    <div className="fixed inset-0 w-screen
+      bg-gradient-to-b from-emerald-50 to-white
+      flex flex-col overflow-y-auto
+      animate-pulse
+      motion-safe:transition-opacity
+      motion-safe:duration-500
+      motion-safe:ease-out">
+      {/* Header Skeleton */}
+      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-emerald-100/50 shadow-sm">
+        <div className="container mx-auto px-6 py-20 max-w-6xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-gray-200" />
+              <div>
+                <div className="h-6 w-40 bg-gray-200 rounded mb-2" />
+                <div className="h-4 w-56 bg-gray-100 rounded" />
+              </div>
+            </div>
+            <div className="h-10 w-28 bg-gray-200 rounded-lg" />
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Skeleton */}
+      <div className="flex-1 container mx-auto px-6 py-8 max-w-6xl">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+
+          {/* Avatar Skeleton */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-3xl shadow-lg border border-emerald-50 p-8 flex flex-col items-center">
+              <div className="w-48 h-48 rounded-full bg-gray-200 mb-6" />
+              <div className="h-6 w-40 bg-gray-200 rounded mb-2" />
+              <div className="h-4 w-56 bg-gray-100 rounded mb-4" />
+              <div className="flex gap-2">
+                <div className="h-6 w-20 bg-gray-100 rounded-full" />
+                <div className="h-6 w-20 bg-gray-100 rounded-full" />
+              </div>
+            </div>
+          </div>
+
+          {/* Form Skeleton */}
+          <div className="lg:col-span-3">
+            <div className="bg-white rounded-3xl shadow-lg border border-emerald-50 overflow-hidden">
+              <div className="bg-emerald-500 h-16" />
+              <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i}>
+                    <div className="h-4 w-24 bg-gray-200 rounded mb-3" />
+                    <div className="h-12 w-full bg-gray-100 rounded-xl" />
+                  </div>
+                ))}
+              </div>
+
+              <div className="px-8 pb-8">
+                <div className="h-12 w-full bg-gray-200 rounded-xl" />
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 interface ProfilePageProps {
   onBack: () => void;
@@ -11,25 +79,75 @@ interface ProfilePageProps {
   username?: string;
 }
 
-export default function ProfilePage({ onBack, profileImage, onLogout, email = 'youremail@gmail.com', username = 'patchara123' }: ProfilePageProps) {
+export default function ProfilePage({ onBack, profileImage, onLogout }: ProfilePageProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showDatabaseInfo, setShowDatabaseInfo] = useState(false);
-  const [databaseData, setDatabaseData] = useState<any>(null);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(profileImage);
   const [isSaving, setIsSaving] = useState(false);
   const [newPassword, setNewPassword] = useState('');
-  const [currentPassword, _setCurrentPassword] = useState('password123');
   const { updateUserInfo } = useUser();
-  
+  const [originalAvatar, setOriginalAvatar] = useState(profileImage);
+  const [originalFormData, setOriginalFormData] = useState<typeof formData | null>(null);
+
   const [formData, setFormData] = useState({
-    email: email,
-    username: username,
+    email: '',
+    username: '',
     gender: 'Male',
-    age: '22'
+    age: '22',
+    bloodType: 'O'
   });
+
+  {/* Load profile data on mount */ }
+  useEffect(() => {
+    const loadProfile = async () => {
+      setIsLoadingData(true);
+
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        setIsLoadingData(false);
+        return;
+      }
+      const { data, error } = await supabase
+        .from('user_profile')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!error && data) {
+        const loadedData = {
+          email: user.email ?? '',
+          username: data.username ?? '',
+          gender: data.gender
+            ? data.gender.charAt(0).toUpperCase() + data.gender.slice(1)
+            : 'Male',
+          age: data.age ? String(data.age) : '',
+          bloodType: data.blood_type ?? 'O',
+        };
+
+        setFormData(loadedData);
+        setOriginalFormData(loadedData);
+
+        if (data.avatar_url) {
+          const { data: publicData } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(data.avatar_url);
+
+          setPreviewUrl(publicData.publicUrl);
+          setOriginalAvatar(publicData.publicUrl);
+        }
+      }
+      setIsLoadingData(false);
+    }
+    loadProfile();
+  }, []);
+
+  useEffect(() => {
+    if (isEditing) {
+      setNewPassword('');
+    }
+  }, [isEditing]);
+
 
   const handleLogout = () => {
     onLogout();
@@ -39,57 +157,7 @@ export default function ProfilePage({ onBack, profileImage, onLogout, email = 'y
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleViewDatabaseInfo = async () => {
-    setIsLoadingData(true);
-    setShowDatabaseInfo(true);
-    
-    try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        alert('กรุณาเข้าสู่ระบบก่อน');
-        setIsLoadingData(false);
-        return;
-      }
 
-      // Resolve Supabase project and key from environment
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-      const publicAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
-      const resolvedProjectId = supabaseUrl ? new URL(supabaseUrl).hostname.split('.')[0] : undefined;
-
-      if (!resolvedProjectId || !publicAnonKey) {
-        setDatabaseData({ error: 'ไม่สามารถดึงข้อมูลได้', details: 'Missing Supabase configuration' });
-        setIsLoadingData(false);
-        return;
-      }
-
-      // Fetch user data from backend
-      const response = await fetch(
-        `https://${resolvedProjectId}.supabase.co/functions/v1/make-server-bc2f46a2/user-info/${user.id}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setDatabaseData(data);
-        console.log('Database Data:', data);
-      } else {
-        const errorText = await response.text();
-        console.error('Error fetching database info:', errorText);
-        setDatabaseData({ error: 'ไม่สามารถดึงข้อมูลได้', details: errorText });
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      setDatabaseData({ error: 'เกิดข้อผิดพลาด', details: String(error) });
-    }
-    
-    setIsLoadingData(false);
-  };
 
   // Handle file selection and preview
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,7 +172,7 @@ export default function ProfilePage({ onBack, profileImage, onLogout, email = 'y
   useEffect(() => {
     return () => {
       if (previewUrl && previewUrl.startsWith('blob:')) {
-        try { URL.revokeObjectURL(previewUrl); } catch {}
+        try { URL.revokeObjectURL(previewUrl); } catch { }
       }
     };
   }, [previewUrl]);
@@ -119,60 +187,97 @@ export default function ProfilePage({ onBack, profileImage, onLogout, email = 'y
         setIsSaving(false);
         return;
       }
-
-      let avatarUrl = previewUrl;
+      let avatarPath: string | null = originalAvatar || null;
 
       if (selectedFile) {
-        try {
-          const path = `avatars/${user.id}-${Date.now()}-${selectedFile.name}`;
-          // @ts-ignore
-          const { data: uploadData, error: uploadError } = await supabase.storage.from('avatars').upload(path, selectedFile, { upsert: true });
-          if (uploadError) throw uploadError;
-          // get public URL
-          // @ts-ignore
-          const { data: publicData } = supabase.storage.from('avatars').getPublicUrl(path);
-          avatarUrl = publicData?.publicUrl ?? avatarUrl;
-        } catch (err) {
-          console.error('Avatar upload failed:', err);
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
+
+        // ✅ เช็กชนิดไฟล์
+        if (!allowedTypes.includes(selectedFile.type)) {
+          alert('รองรับเฉพาะไฟล์รูปภาพเท่านั้น (png, jpg, webp)');
+          setIsSaving(false);
+          return;
         }
+
+        // ✅ เช็กขนาดไฟล์ (ไม่เกิน 2MB)
+        if (selectedFile.size > 2 * 1024 * 1024) {
+          alert('ไฟล์ต้องมีขนาดไม่เกิน 2MB');
+          setIsSaving(false);
+          return;
+        }
+
+        const fileExt = selectedFile.name.split('.').pop();
+        const filePath = `${user.id}/avatar.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, selectedFile, { upsert: true });
+
+        if (uploadError) {
+          console.error(uploadError);
+          alert('อัปโหลดรูปไม่สำเร็จ');
+          setIsSaving(false);
+          return;
+        }
+
+        avatarPath = filePath; // ✅ เก็บ path
       }
 
+
       // If user wants to change password, update auth first
-      if (newPassword) {
-        try {
-          const { error: pwError } = await supabase.auth.updateUser({ password: newPassword });
-          if (pwError) {
-            console.error('Failed to update password:', pwError);
-            alert('ไม่สามารถเปลี่ยนรหัสผ่านได้');
-            setIsSaving(false);
-            return;
-          }
-        } catch (err) {
-          console.error('Password update error:', err);
+      const trimmedPassword = newPassword.trim();
+
+      if (trimmedPassword.length > 0) {
+        const { error: pwError } = await supabase.auth.updateUser({
+          password: trimmedPassword,
+        });
+
+        if (pwError) {
+          console.error('Failed to update password:', pwError);
           alert('ไม่สามารถเปลี่ยนรหัสผ่านได้');
           setIsSaving(false);
           return;
         }
       }
 
+
       const payload = {
-        user_id: user.id,
-        email: formData.email,
         username: formData.username,
         gender: formData.gender?.toLowerCase?.() ?? formData.gender,
-        age: formData.age,
-        avatar_url: avatarUrl,
+        age: formData.age ? Number(formData.age) : null,
+        blood_type: formData.bloodType,
+        is_setup_completed: true,
       } as any;
 
-      const { error: upsertError } = await supabase.from('user_profile').upsert([payload]);
-      if (upsertError) {
-        console.error('Failed to save profile:', upsertError);
+      // ใส่ email แค่ครั้งแรก หรือถ้ายัง null
+      if (!originalFormData?.email) {
+        payload.email = user.email;
+      }
+
+      // ใส่ avatar เฉพาะเมื่อมีค่า
+      if (avatarPath) {
+        payload.avatar_url = avatarPath;
+      }
+
+      const { error: updateError } = await supabase.from('user_profile').update(payload).eq('user_id', user.id);
+      if (updateError) {
+        console.error('Failed to save profile:', updateError);
         alert('เกิดข้อผิดพลาดขณะบันทึกข้อมูล');
       } else {
         alert('บันทึกข้อมูลเรียบร้อยแล้ว');
         setIsEditing(false);
-        // Ensure UI shows the latest avatar and clear selected file
-        setPreviewUrl(avatarUrl);
+        setOriginalFormData({
+          ...formData,
+          email: user.email ?? '',
+        });
+        if (avatarPath) {
+          const { data: publicData } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(avatarPath);
+
+          setOriginalAvatar(publicData.publicUrl);
+          setPreviewUrl(publicData.publicUrl);
+        }
         setSelectedFile(null);
         setNewPassword('');
         // Update user context so other parts of the app show latest info
@@ -181,6 +286,7 @@ export default function ProfilePage({ onBack, profileImage, onLogout, email = 'y
             username: formData.username,
             gender: (formData.gender || '').toLowerCase() as any,
             age: formData.age,
+            bloodType: formData.bloodType,
           });
         } catch (e) { /* ignore */ }
       }
@@ -191,6 +297,10 @@ export default function ProfilePage({ onBack, profileImage, onLogout, email = 'y
       setIsSaving(false);
     }
   };
+
+  if (isLoadingData) {
+    return <ProfileSkeleton />;
+  }
 
   return (
     <div className="fixed inset-0 w-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col overflow-y-auto">
@@ -254,7 +364,7 @@ export default function ProfilePage({ onBack, profileImage, onLogout, email = 'y
                   <span className="text-2xl"></span> Profile Information
                 </h3>
               </div>
-              
+
               <div className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Email */}
@@ -262,12 +372,12 @@ export default function ProfilePage({ onBack, profileImage, onLogout, email = 'y
                     <label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-3">
                       <Mail className="w-5 h-5 text-emerald-500" /> Email
                     </label>
-                    <input 
-                      type="email" 
-                      value={formData.email} 
-                      onChange={(e) => handleInputChange('email', e.target.value)} 
-                      readOnly={!isEditing} 
-                      className={`w-full px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-medium ${isEditing ? 'border-emerald-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none' : 'border-gray-200 bg-gray-50 cursor-not-allowed text-gray-600'}`} 
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      readOnly
+                      className={`w-full px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-medium`}
                     />
                   </div>
 
@@ -276,12 +386,12 @@ export default function ProfilePage({ onBack, profileImage, onLogout, email = 'y
                     <label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-3">
                       <User className="w-5 h-5 text-emerald-500" /> Username
                     </label>
-                    <input 
-                      type="text" 
-                      value={formData.username} 
-                      onChange={(e) => handleInputChange('username', e.target.value)} 
-                      readOnly={!isEditing} 
-                      className={`w-full px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-medium ${isEditing ? 'border-emerald-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none' : 'border-gray-200 bg-gray-50 cursor-not-allowed text-gray-600'}`} 
+                    <input
+                      type="text"
+                      value={formData.username}
+                      onChange={(e) => handleInputChange('username', e.target.value)}
+                      readOnly={!isEditing}
+                      className={`w-full px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-medium ${isEditing ? 'border-emerald-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none' : 'border-gray-200 bg-gray-50 cursor-not-allowed text-gray-600'}`}
                     />
                   </div>
 
@@ -290,73 +400,105 @@ export default function ProfilePage({ onBack, profileImage, onLogout, email = 'y
                     <label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-3">
                       <Calendar className="w-5 h-5 text-emerald-500" /> Age
                     </label>
-                    <input 
-                      type="number" 
-                      value={formData.age} 
-                      onChange={(e) => handleInputChange('age', e.target.value)} 
-                      readOnly={!isEditing} 
-                      className={`w-full px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-medium ${isEditing ? 'border-emerald-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none' : 'border-gray-200 bg-gray-50 cursor-not-allowed text-gray-600'}`} 
+                    <input
+                      type="number"
+                      value={formData.age}
+                      onChange={(e) => handleInputChange('age', e.target.value)}
+                      readOnly={!isEditing}
+                      className={`w-full px-5 py-3.5 rounded-xl border-2 transition-all duration-200 font-medium ${isEditing ? 'border-emerald-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none' : 'border-gray-200 bg-gray-50 cursor-not-allowed text-gray-600'}`}
                     />
                   </div>
 
-                 {/* Gender */}
-                <div className="md:col-span-1">
-                  <label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-3">
-                    <User className="w-5 h-5 text-emerald-500" /> Gender
-                  </label>
+                  {/* Gender */}
+                  <div className="md:col-span-1">
+                    <label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-3">
+                      <User className="w-5 h-5 text-emerald-500" /> Gender
+                    </label>
 
-                <div className="relative">
-                  <select 
-                    value={formData.gender} 
-                    onChange={(e) => handleInputChange('gender', e.target.value)} 
-                    disabled={!isEditing} 
-                    className={`w-full px-4 py-3.5 pr-12 rounded-xl border-2 transition-all duration-200 font-medium appearance-none
-                    ${isEditing 
-                    ? 'border-emerald-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none' 
-                    : 'border-gray-200 bg-gray-50 cursor-not-allowed text-gray-600'
-                  }`}
-                  >
-                  <option value="Male">Male ♂</option>
-                  <option value="Female">Female ♀</option>
-                  <option value="Other">Other</option>
-                  </select>
+                    <div className="relative">
+                      <select
+                        value={formData.gender}
+                        onChange={(e) => handleInputChange('gender', e.target.value)}
+                        disabled={!isEditing}
+                        className={`w-full px-4 py-3.5 pr-12 rounded-xl border-2 transition-all duration-200 font-medium appearance-none
+                    ${isEditing
+                            ? 'border-emerald-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none'
+                            : 'border-gray-200 bg-gray-50 cursor-not-allowed text-gray-600'
+                          }`}
+                      >
+                        <option value="Male">Male ♂</option>
+                        <option value="Female">Female ♀</option>
+                        <option value="Other">Other</option>
+                      </select>
 
-                  {/* Arrow */}
-                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  </div>
+                      {/* Arrow */}
+                      <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    </div>
                   </div>
 
                   {/* Password Section */}
-                  <div className="md:col-span-2">
+                  <div className="md:col-span-1">
                     <label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-3">
                       <Lock className="w-5 h-5 text-emerald-500" /> Password
                     </label>
                     <div className="flex gap-3 items-center">
-                      <input 
-                        type={showCurrentPassword ? 'text' : 'password'} 
-                        value={showCurrentPassword ? currentPassword : '••••••••'} 
-                        readOnly 
-                        className="flex-1 px-5 py-3.5 rounded-xl border-2 border-gray-200 bg-gray-50 cursor-not-allowed font-medium text-gray-600" 
+                      <input
+                        type="password"
+                        autoComplete="off"
+                        value="••••••••"
+                        readOnly
+                        className="flex-1 px-5 py-3.5 rounded-xl border-2 border-gray-200 bg-gray-50 cursor-not-allowed font-medium text-gray-600"
                       />
-                      <button 
-                        type="button" 
-                        onClick={() => setShowCurrentPassword(!showCurrentPassword)} 
-                        className="px-4 py-3.5 rounded-lg bg-emerald-50 border-2 border-emerald-300 hover:bg-emerald-100 transition-all duration-200"
-                      >
-                        {showCurrentPassword ? <EyeOff className="w-5 h-5 text-emerald-600"/> : <Eye className="w-5 h-5 text-emerald-600"/>}
-                      </button>
                     </div>
                     {isEditing && (
                       <div className="mt-3">
-                        <input 
-                          type="password" 
-                          placeholder="New password (optional)" 
-                          value={newPassword} 
-                          onChange={(e) => setNewPassword(e.target.value)} 
-                          className="w-full px-5 py-3.5 rounded-xl border-2 border-emerald-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none font-medium" 
+                        <input
+                          type="password"
+                          name="new-password"
+                          autoComplete="new-password"
+                          placeholder="New password (optional)"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          className="w-full px-5 py-3.5 rounded-xl border-2 border-emerald-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none font-medium"
                         />
                       </div>
                     )}
+                  </div>
+
+                  {/* Blood Type */}
+                  <div className="md:col-span-1">
+                    <label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-3">
+                      <User className="w-5 h-5 text-emerald-500" /> Blood Type
+                    </label>
+
+                    <div className="relative">
+                      <select
+                        value={formData.bloodType}
+                        onChange={(e) => handleInputChange('bloodType', e.target.value)}
+                        disabled={!isEditing}
+                        className={`w-full px-4 py-3.5 pr-12 rounded-xl border-2 transition-all duration-200 font-medium appearance-none
+                    ${isEditing
+                            ? 'border-emerald-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none'
+                            : 'border-gray-200 bg-gray-50 cursor-not-allowed text-gray-600'
+                          }`}
+                      >
+                        <option value="A">A</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B">B</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB">AB</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O">O</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                      </select>
+
+                      {/* Arrow */}
+                      <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    </div>
                   </div>
                 </div>
 
@@ -364,15 +506,25 @@ export default function ProfilePage({ onBack, profileImage, onLogout, email = 'y
                 <div className="mt-8 space-y-3">
                   {isEditing ? (
                     <div className="flex gap-3">
-                      <button 
-                        onClick={() => { setIsEditing(false); setSelectedFile(null); setPreviewUrl(profileImage); }} 
+                      { /* Cancel Button */}
+                      <button
+                        onClick={() => {
+                          setIsEditing(false);
+                          setSelectedFile(null);
+                          setPreviewUrl(originalAvatar);
+                          if (originalFormData) {
+                            setFormData(originalFormData);
+                          }
+                          setNewPassword('');
+                        }}
                         className="flex-1 py-3.5 px-6 rounded-xl border-2 border-gray-300 hover:bg-gray-50 transition-all duration-200 font-semibold text-gray-700"
                       >
                         Cancel
                       </button>
-                      <button 
-                        onClick={saveProfile} 
-                        disabled={isSaving} 
+                      { /* Save Button */}
+                      <button
+                        onClick={saveProfile}
+                        disabled={isSaving}
                         className="flex-1 py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-700 hover:to-emerald-600 disabled:opacity-60 font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
                       >
                         {isSaving ? 'Saving...' : 'Save Changes'}
@@ -381,20 +533,13 @@ export default function ProfilePage({ onBack, profileImage, onLogout, email = 'y
                   ) : (
                     <>
                       <p className="text-sm text-gray-500 text-center font-medium">💡 Click the pencil icon to start editing</p>
-                      <button 
-                        onClick={() => setIsEditing(true)} 
+                      <button
+                        onClick={() => setIsEditing(true)}
                         className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-700 hover:to-emerald-600 font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
                       >
                         Edit Profile
                       </button>
-                      <button 
-                        onClick={handleViewDatabaseInfo} 
-                        disabled={isLoadingData}
-                        className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 disabled:opacity-60 font-semibold transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
-                      >
-                        <Database className="w-5 h-5" />
-                        {isLoadingData ? 'Loading...' : 'View Database Info'}
-                      </button>
+
                     </>
                   )}
                 </div>
@@ -403,83 +548,6 @@ export default function ProfilePage({ onBack, profileImage, onLogout, email = 'y
           </div>
         </div>
       </div>
-
-        {/* Database Info Modal */}
-      {showDatabaseInfo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col animate-in">
-            {/* Modal Header */}
-            <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 p-8">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-                    <Database className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">Database Information</h2>
-                    <p className="text-emerald-100 text-sm mt-1">Your stored profile data</p>
-                  </div>
-                </div>
-                <button onClick={() => setShowDatabaseInfo(false)} className="text-white hover:bg-white/20 rounded-full p-2 transition-all duration-200 backdrop-blur-sm">
-                  <span className="text-2xl">✕</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto p-8">
-              {isLoadingData ? (
-                <div className="flex items-center justify-center py-16">
-                  <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-emerald-300 border-t-emerald-600 rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-600 font-semibold">Loading data...</p>
-                  </div>
-                </div>
-              ) : databaseData?.error ? (
-                <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-6">
-                  <p className="text-red-700 font-bold text-lg mb-2">❌ {databaseData.error}</p>
-                  <p className="text-sm text-red-600">{databaseData.details}</p>
-                </div>
-              ) : databaseData ? (
-                <div className="space-y-6">
-                  {databaseData.userInfo && (
-                    <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-2 border-emerald-200 rounded-2xl p-6">
-                      <h3 className="text-lg font-bold text-emerald-800 mb-4 flex items-center gap-2">👤 Personal Information</h3>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-white rounded-xl p-4 border border-emerald-100">
-                          <p className="text-xs font-semibold text-gray-500 mb-2 uppercase">Username</p>
-                          <p className="font-bold text-gray-800 text-lg">{databaseData.userInfo.username || '-'}</p>
-                        </div>
-                        <div className="bg-white rounded-xl p-4 border border-emerald-100">
-                          <p className="text-xs font-semibold text-gray-500 mb-2 uppercase">Email</p>
-                          <p className="font-bold text-gray-800 text-sm">{databaseData.userInfo.email || '-'}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  <details className="bg-gray-50 border-2 border-gray-200 rounded-2xl p-6 group">
-                    <summary className="font-bold text-gray-800 cursor-pointer text-lg flex items-center gap-2 group-open:text-emerald-600">
-                      <span>🔧</span> View JSON Data
-                    </summary>
-                    <pre className="mt-4 text-xs text-gray-700 bg-white rounded-xl p-4 overflow-x-auto border border-gray-200 font-mono">{JSON.stringify(databaseData, null, 2)}</pre>
-                  </details>
-                </div>
-              ) : (
-                <div className="text-center py-16">
-                  <p className="text-gray-500 text-lg font-semibold">No data found</p>
-                </div>
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="border-t border-gray-200 p-6 bg-gray-50/50">
-              <button onClick={() => setShowDatabaseInfo(false)} className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white font-semibold transition-all duration-200 shadow-lg hover:shadow-xl">
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+    </div >
+  )
 }

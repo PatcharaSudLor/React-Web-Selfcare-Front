@@ -85,6 +85,7 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
       if (!profile) {
         await supabase.from('user_profile').insert({
           user_id: user.id,
+          email: user.email,
           is_setup_completed: false,
         });
 

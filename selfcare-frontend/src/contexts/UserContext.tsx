@@ -14,6 +14,7 @@ export interface UserInfoData {
   bmiCategory?: string;
   bmr?: number;
   tdee?: number;
+  bloodType?: string;
 }
 
 interface UserContextType {

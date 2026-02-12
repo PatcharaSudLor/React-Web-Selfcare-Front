@@ -89,6 +89,7 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
   const { updateUserInfo } = useUser();
   const [originalAvatar, setOriginalAvatar] = useState(profileImage);
   const [originalFormData, setOriginalFormData] = useState<typeof formData | null>(null);
+  const [storedAvatarPath, setStoredAvatarPath] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -129,12 +130,16 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
         setOriginalFormData(loadedData);
 
         if (data.avatar_url) {
+          setStoredAvatarPath(data.avatar_url);
+
           const { data: publicData } = supabase.storage
             .from('avatars')
             .getPublicUrl(data.avatar_url);
 
-          setPreviewUrl(publicData.publicUrl);
-          setOriginalAvatar(publicData.publicUrl);
+          const bustedUrl = `${publicData.publicUrl}?t=${Date.now()}`;
+
+          setOriginalAvatar(bustedUrl);
+          setPreviewUrl(bustedUrl);
         }
       }
       setIsLoadingData(false);
@@ -187,7 +192,7 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
         setIsSaving(false);
         return;
       }
-      let avatarPath: string | null = originalAvatar || null;
+      let avatarPath: string | null = storedAvatarPath;
 
       if (selectedFile) {
         const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
@@ -275,8 +280,14 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
             .from('avatars')
             .getPublicUrl(avatarPath);
 
-          setOriginalAvatar(publicData.publicUrl);
-          setPreviewUrl(publicData.publicUrl);
+          const bustedUrl = `${publicData.publicUrl}?t=${Date.now()}`;
+
+          setOriginalAvatar(bustedUrl);
+          setPreviewUrl(bustedUrl);
+
+          updateUserInfo({
+            avatarUrl: bustedUrl,
+          });
         }
         setSelectedFile(null);
         setNewPassword('');
@@ -287,6 +298,9 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
             gender: (formData.gender || '').toLowerCase() as any,
             age: formData.age,
             bloodType: formData.bloodType,
+            avatarUrl: avatarPath
+              ? `${supabase.storage.from('avatars').getPublicUrl(avatarPath).data.publicUrl}?t=${Date.now()}`
+              : undefined,
           });
         } catch (e) { /* ignore */ }
       }

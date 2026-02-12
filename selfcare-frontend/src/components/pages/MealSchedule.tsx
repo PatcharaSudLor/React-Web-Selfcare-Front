@@ -193,113 +193,109 @@ export default function MealSchedule({ onBack, onSaveToSchedule, mealPlanData }:
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-4 overflow-y-auto pb-32">
+      <div className="flex-1 px-4 overflow-y-auto pb-6">
         <div className="max-w-2xl mx-auto pt-4">
-      {/* Main Card */}
-      <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
-        {/* Header */}
-        <div className="flex items-center justify-center gap-3 mb-6">
-          <Utensils className="w-6 h-6 text-emerald-600" />
-          <h2 className="text-2xl text-gray-800">Meal Plan</h2>
-          <Utensils className="w-6 h-6 text-emerald-600" />
-        </div>
+          {/* Main Card */}
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
+            {/* Header */}
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <Utensils className="w-6 h-6 text-emerald-600" />
+              <h2 className="text-2xl font-semibold text-gray-800">Meal Plan</h2>
+              <Utensils className="w-6 h-6 text-emerald-600" />
+            </div>
 
-        {/* Budget Info */}
-        <div className="bg-emerald-50 rounded-2xl p-4 mb-6 text-center">
-          <p className="text-sm text-gray-600 mb-1">งบประมาณต่อมื้อ</p>
-          <p className="text-2xl text-emerald-700">฿{budget}</p>
-        </div>
+            {/* Budget Info */}
+            <div className="bg-emerald-50 rounded-2xl p-4 mb-6 text-center">
+              <p className="text-sm text-gray-600 mb-1">งบประมาณต่อมื้อ</p>
+              <p className="text-2xl font-semibold text-emerald-700">฿{budget}</p>
+            </div>
 
-        {/* Weekly Schedule Grid */}
-        <div className="space-y-4">
-          {weekSchedule.map((dayMeals, index) => (
-            <div key={index} className={`rounded-2xl p-4 ${dayMeals.color} border border-gray-200`}>
-              {/* Day Header */}
-              <div className="flex items-center justify-between mb-3">
-                <div className="bg-emerald-500 text-white px-4 py-1.5 rounded-full text-sm font-medium">
-                  {dayMeals.day}
+            {/* Weekly Schedule Grid */}
+            <div className="space-y-4">
+              {weekSchedule.map((dayMeals, index) => (
+                <div key={index} className={`rounded-2xl p-4 ${dayMeals.color} border border-gray-200`}>
+                  {/* Day Header */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="bg-emerald-500 text-white px-4 py-1.5 rounded-full text-sm font-medium">
+                      {dayMeals.day}
+                    </div>
+                    <div className="text-xs font-medium text-gray-600">
+                      รวม ฿{dayMeals.breakfast.price + dayMeals.lunch.price + dayMeals.dinner.price}
+                    </div>
+                  </div>
+
+                  {/* Meals Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <MealCard 
+                      meal={dayMeals.breakfast} 
+                      icon={<Sun className="w-4 h-4 text-yellow-600" />}
+                      timeLabel="เช้า"
+                    />
+                    <MealCard 
+                      meal={dayMeals.lunch} 
+                      icon={<CloudSun className="w-4 h-4 text-orange-600" />}
+                      timeLabel="กลางวัน"
+                    />
+                    <MealCard 
+                      meal={dayMeals.dinner} 
+                      icon={<Moon className="w-4 h-4 text-indigo-600" />}
+                      timeLabel="เย็น"
+                    />
+                  </div>
                 </div>
-                <div className="text-xs text-gray-600">
-                  รวม ฿{dayMeals.breakfast.price + dayMeals.lunch.price + dayMeals.dinner.price}
+              ))}
+            </div>
+
+            {/* Summary */}
+            <div className="mt-6 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-100">
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div>
+                  <p className="text-sm text-gray-600">มื้อทั้งหมด</p>
+                  <p className="text-xl text-gray-800 font-semibold">21 มื้อ</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">งบรวมต่อสัปดาห์</p>
+                  <p className="text-xl text-emerald-700 font-semibold">
+                    ฿{weekSchedule.reduce((total, day) => 
+                      total + day.breakfast.price + day.lunch.price + day.dinner.price, 0
+                    )}
+                  </p>
                 </div>
               </div>
+            </div>
 
-              {/* Meals Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <MealCard 
-                  meal={dayMeals.breakfast} 
-                  icon={<Sun className="w-4 h-4 text-yellow-600" />}
-                  timeLabel="เช้า"
-                />
-                <MealCard 
-                  meal={dayMeals.lunch} 
-                  icon={<CloudSun className="w-4 h-4 text-orange-600" />}
-                  timeLabel="กลางวัน"
-                />
-                <MealCard 
-                  meal={dayMeals.dinner} 
-                  icon={<Moon className="w-4 h-4 text-indigo-600" />}
-                  timeLabel="เย็น"
-                />
+            {/* Action Buttons - ย้ายมาอยู่ใน Card เดียวกัน */}
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="flex items-center justify-around gap-4">
+                {/* Back */}
+                <button
+                  onClick={onBack}
+                  className="flex flex-col items-center gap-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-all rounded-2xl p-3 min-w-[80px]"
+                >
+                  <ArrowLeft className="w-6 h-6" />
+                  <span className="text-sm font-medium">Back</span>
+                </button>
+
+                {/* Save */}
+                <button
+                  onClick={handleSave}
+                  className="flex flex-col items-center gap-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-all rounded-2xl p-3 min-w-[80px]"
+                >
+                  <Calendar className="w-6 h-6" />
+                  <span className="text-sm font-medium">Save</span>
+                </button>
+
+                {/* Share */}
+                <button
+                  onClick={handleShare}
+                  className="flex flex-col items-center gap-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-all rounded-2xl p-3 min-w-[80px]"
+                >
+                  <Share2 className="w-6 h-6" />
+                  <span className="text-sm font-medium">Share</span>
+                </button>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Summary */}
-        <div className="mt-6 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl">
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div>
-              <p className="text-sm text-gray-600">มื้ออาหารทั้งหมด</p>
-              <p className="text-xl text-gray-800 font-medium">21 มื้อ</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">งบรวมต่อสัปดาห์</p>
-              <p className="text-xl text-emerald-700 font-medium">
-                ฿{weekSchedule.reduce((total, day) => 
-                  total + day.breakfast.price + day.lunch.price + day.dinner.price, 0
-                )}
-              </p>
-            </div>
           </div>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="fixed bottom-20 left-0 right-0 px-4">
-        <div className="container mx-auto max-w-2xl">
-          <div className="bg-white rounded-3xl shadow-lg p-4">
-            <div className="flex items-center justify-around">
-              {/* Back */}
-              <button
-                onClick={onBack}
-                className="flex flex-col items-center gap-1 text-gray-600 hover:text-emerald-600 transition-colors min-w-[70px]"
-              >
-                <ArrowLeft className="w-6 h-6" />
-                <span className="text-sm">Back</span>
-              </button>
-
-              {/* Save */}
-              <button
-                onClick={handleSave}
-                className="flex flex-col items-center gap-1 text-gray-600 hover:text-emerald-600 transition-colors min-w-[70px]"
-              >
-                <Calendar className="w-6 h-6" />
-                <span className="text-sm">Save</span>
-              </button>
-
-              {/* Share */}
-              <button
-                onClick={handleShare}
-                className="flex flex-col items-center gap-1 text-gray-600 hover:text-emerald-600 transition-colors min-w-[70px]"
-              >
-                <Share2 className="w-6 h-6" />
-                <span className="text-sm">Share</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
         </div>
       </div>
     </div>

@@ -12,10 +12,10 @@ import MealPlanner from './components/pages/MealPlanners'
 import MainLayout from './components/pages/layout/MainLayout'
 import MealSchedule from './components/pages/MealSchedule'
 import type { MealPlanData } from './components/pages/MealPlanners'
-import type { WorkoutPlanData } from './components/pages/WorkoutPlanners'
 import WorkoutPlanner from './components/pages/WorkoutPlanners'
 import WorkoutSchedule from './components/pages/WorkoutSchedule'
 import ProfilePage from './components/pages/ProfilePage'
+import type { WeeklyWorkoutPlan } from './utils/workoutGenerator'
 import './App.css'
 import { useState } from 'react'
 
@@ -23,7 +23,7 @@ function AppContent() {
   const navigate = useNavigate()
   const location = useLocation()
   const [mealPlanData, setMealPlanData] = useState<MealPlanData | null>(null)
-  const [workoutPlanData, setWorkoutPlanData] = useState<WorkoutPlanData | null>(null)
+  const [workoutPlan, setWorkoutPlanData] = useState<WeeklyWorkoutPlan | null>(null)
 
   const handleLogin = () => {
     navigate('/login')
@@ -57,12 +57,26 @@ function AppContent() {
       <Route path="/tdeeresults" element={<TDEEResultPage onBack={handleBack} />} />
 
       {/* Pages within MainLayout */}
-      <Route element={<MainLayout currentPage={location.pathname} onNavigate={(path) => navigate(path)} onLogout={handleLogout}/>}>
+      <Route element={<MainLayout currentPage={location.pathname} onNavigate={(path) => navigate(path)} onLogout={handleLogout} />}>
         <Route path="/home" element={<HomePage />} />
         <Route path="/profile" element={<ProfilePage onBack={() => navigate('/home')} profileImage="https://api.dicebear.com/7.x/avataaars/svg?seed=default" onLogout={handleLogout} />} />
         <Route path="/meals" element={<MealPlanner onBack={() => navigate('/home')} onGeneratePlan={(data) => { setMealPlanData(data); navigate('/meals/schedule'); }} />} />
         <Route path="/workouts" element={<WorkoutPlanner onBack={() => navigate('/home')} onGeneratePlan={(data) => { setWorkoutPlanData(data); navigate('/workouts/schedule'); }} />} />
-        <Route path="/workouts/schedule" element={<WorkoutSchedule onBack={() => navigate('/workouts')} onSaveToSchedule={(s) => { console.log('Saved workout schedule:', s); }} selectedTime={workoutPlanData?.selectedTime ?? 30} />} />
+        <Route
+          path="/workouts/schedule"
+          element={
+            workoutPlan ? (
+              <WorkoutSchedule
+                onBack={() => navigate('/workouts')}
+                plan={workoutPlan}
+              />
+            ) : (
+              <div className="p-6 text-center">
+                <p>ไม่พบแผนออกกำลังกาย กรุณาสร้างแผนใหม่</p>
+              </div>
+            )
+          }
+        />
         <Route path="/meals/schedule" element={<MealSchedule onBack={() => navigate('/meals')} onSaveToSchedule={(s) => { console.log('Saved schedule:', s); }} mealPlanData={mealPlanData ?? { likedMeals: [], allergicFoods: [], budget: '' }} />} />
       </Route>
     </Routes>

@@ -1,4 +1,6 @@
 import { Menu, Heart, User } from 'lucide-react'
+import { useUser } from '../../../contexts/UserContext'
+
 
 interface HeaderProps {
   onMenuClick: () => void
@@ -6,6 +8,8 @@ interface HeaderProps {
 }
 
 export default function Header({ onMenuClick, onProfileClick }: HeaderProps) {
+  const { userInfo, loading } = useUser();
+  console.log('Header avatarUrl:', userInfo.avatarUrl);
   return (
     <header className="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
       <div className="max-w-screen-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,9 +38,20 @@ export default function Header({ onMenuClick, onProfileClick }: HeaderProps) {
             className="p-2 rounded-full hover:bg-gray-100 transition-colors"
             aria-label="Profile"
           >
-            <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-              <User className="w-5 h-5 text-primary-600" />
+            <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+              {loading ? (
+                <div className="w-full h-full bg-gray-200 animate-pulse" />
+              ) : userInfo.avatarUrl ? (
+                <img
+                  src={userInfo.avatarUrl}
+                  alt="profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User className="w-5 h-5 text-gray-500" />
+              )}
             </div>
+
           </button>
         </div>
       </div>

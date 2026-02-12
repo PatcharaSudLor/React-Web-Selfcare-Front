@@ -15,6 +15,7 @@ export interface UserInfoData {
   bmr?: number;
   tdee?: number;
   bloodType?: string;
+  avatarUrl?: string
 }
 
 interface UserContextType {
@@ -37,6 +38,8 @@ const DEFAULT_USER_INFO: UserInfoData = {
   bmiCategory: undefined,
   bmr: undefined,
   tdee: undefined,
+  bloodType: undefined,
+  avatarUrl: undefined,
 };
 
 export function UserProvider({ children }: { children: ReactNode }) {
@@ -79,6 +82,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         bmiCategory: data.bmiCategory ?? prev.bmiCategory,
         bmr: data.bmr ?? prev.bmr,
         tdee: data.tdee ?? prev.tdee,
+        bloodType: data.bloodType ?? prev.bloodType,
+        avatarUrl: data.avatarUrl ?? prev.avatarUrl,
       };
 
       // Auto-calculate BMI if height and weight are provided
@@ -123,6 +128,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
           .single();
 
         if (!error && data) {
+          let avatarUrl: string | undefined = undefined;
+
+          // ✅ แปลง path → public URL
+          if (data.avatar_url) {
+            const { data: publicData } = supabase.storage
+              .from('avatars')
+              .getPublicUrl(data.avatar_url);
+
+            avatarUrl = `${publicData.publicUrl}?t=${Date.now()}`;
+          }
+
           setUserInfo(prev => ({
             ...prev,
             username: data.username ?? prev.username,
@@ -134,6 +150,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
             bmiCategory: data.bmi_category ?? prev.bmiCategory,
             bmr: data.bmr ?? prev.bmr,
             tdee: data.tdee ?? prev.tdee,
+            bloodType: data.blood_type ?? prev.bloodType,
+            avatarUrl,
           }));
         }
       } catch (e) {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Dumbbell, Utensils, MessageCircle, TrendingUp, ChevronRight, Activity, Flame } from 'lucide-react';
+import { Heart, Dumbbell, Utensils, MessageCircle, TrendingUp, ChevronRight, Activity, Flame, PlayCircle } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
 
 const tips = [
@@ -182,6 +182,17 @@ export default function HomePage() {
                   <Dumbbell className="w-10 h-10 text-emerald-600" />
                 </div>
                 <span className="text-gray-800 font-medium">ออกกำลังกาย</span>
+              </button>
+
+              {/* Videos */}
+              <button
+                onClick={() => navigate('/workouts/videos?part=upper-body')}
+                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
+              >
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-sky-200 rounded-3xl flex items-center justify-center">
+                  <PlayCircle className="w-10 h-10 text-sky-600" />
+                </div>
+                <span className="text-gray-800 font-medium">วิดีโอ</span>
               </button>
 
               {/* Meals */}

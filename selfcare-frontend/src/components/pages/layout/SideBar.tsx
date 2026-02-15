@@ -9,18 +9,18 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  { id: 'home', label: 'Home', icon: Home },
-  { id: 'recipe', label: 'Recipes', icon: UtensilsCrossed },
-  { id: 'video', label: 'Videos', icon: PlayCircle },
-  { id: 'alerts', label: 'Alerts', icon: Bell },
-  { id: 'tips', label: 'Tips', icon: Lightbulb },
-  { id: 'schedule', label: 'Schedule', icon: Calendar },
-  { id: 'favorite', label: 'Favorite', icon: Heart },
-  { id: 'assistant', label: 'Assistant', icon: MessageCircle },
+  { id: 'home', path: '/home', label: 'Home', icon: Home },
+  { id: 'recipe', path: '/meals', label: 'Recipes', icon: UtensilsCrossed },
+  { id: 'video', path: '/workouts/videos?part=upper-body', label: 'Videos', icon: PlayCircle },
+  { id: 'alerts', path: '/alerts', label: 'Alerts', icon: Bell },
+  { id: 'tips', path: '/tips', label: 'Tips', icon: Lightbulb },
+  { id: 'schedule', path: '/workouts/schedule', label: 'Schedule', icon: Calendar },
+  { id: 'favorite', path: '/favorite', label: 'Favorite', icon: Heart },
+  { id: 'assistant', path: '/assistant', label: 'Assistant', icon: MessageCircle },
 ]
 
 const bottomItems = [
-  { id: 'profile', label: 'Profile', icon: User },
+  { id: 'profile', path: '/profile', label: 'Profile', icon: User },
   { id: 'logout', label: 'Logout', icon: LogOut },
 ]
 
@@ -66,12 +66,13 @@ export default function Sidebar({ isOpen, onClose, currentPage, onNavigate, onLo
           <div className="flex-1 py-4 overflow-y-auto">
             {menuItems.map((item) => {
               const Icon = item.icon
-              const isActive = currentPage === item.id
+              const itemBase = (item.path || '').split('?')[0]
+              const isActive = currentPage === item.path || currentPage === itemBase
 
               return (
                 <button
                   key={item.id}
-                  onClick={() => handleNavigate(item.id)}
+                  onClick={() => handleNavigate(item.path)}
                   className={`
                     w-full flex items-center gap-3 px-6 py-3
                     transition-all duration-200
@@ -101,7 +102,7 @@ export default function Sidebar({ isOpen, onClose, currentPage, onNavigate, onLo
                     if (item.id === 'logout') {
                       handleLogout()
                     } else {
-                      handleNavigate(item.id) // 👈 profile
+                      handleNavigate((item as any).path || item.id)
                     }
                   }}
                   className={`w-full flex items-center gap-3 px-6 py-3 transition-colors

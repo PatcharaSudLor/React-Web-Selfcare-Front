@@ -22,6 +22,34 @@ const item = {
     show: { opacity: 1, y: 0 },
 };
 
+function getPasswordStrength(password: string) {
+    let score = 0;
+
+    if (password.length >= 8) score++;
+    if (/[a-z]/.test(password)) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+
+    return score; // 0 - 4
+}
+
+function getStrengthLabel(score: number) {
+    switch (score) {
+        case 0:
+        case 1:
+            return { label: 'Weak', color: 'bg-red-500', text: 'text-red-600' };
+        case 2:
+            return { label: 'Fair', color: 'bg-yellow-500', text: 'text-yellow-600' };
+        case 3:
+            return { label: 'Good', color: 'bg-blue-500', text: 'text-blue-600' };
+        case 4:
+            return { label: 'Strong', color: 'bg-green-500', text: 'text-green-600' };
+        default:
+            return { label: '', color: '', text: '' };
+    }
+}
+
+
 export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -29,6 +57,17 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+
+    const strength = getPasswordStrength(password);
+    const strengthInfo = getStrengthLabel(strength);
+    const hasLower = /[a-z]/.test(password);
+    const hasUpper = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasLength = password.length >= 8;
+
+    const isStrong = hasLower && hasUpper && hasNumber && hasLength;
+
+
 
     const validateEmail = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -50,8 +89,8 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
             return;
         }
 
-        if (password.length < 6) {
-            setError('Password must be at least 6 characters');
+        if (password.length < 8) {
+            setError('Password must be at least 8 characters');
             return;
         }
 
@@ -137,26 +176,72 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                         <label className="block text-left text-sm lg:text-base text-gray-500 mb-3 ml-6">
                             Password
                         </label>
+
+                        {/* INPUT WRAPPER (relative แค่ส่วนนี้) */}
                         <div className="relative">
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="••••••••"
-                                className="w-full px-5 lg:px-6 py-4 lg:py-5 rounded-full border-2 border-gray-300 focus:outline-none focus:border-emerald-400 transition-colors text-gray-700 text-base lg:text-lg pr-14"
+                                className="w-full px-5 lg:px-6 py-4 lg:py-5 rounded-full
+               border-2 border-gray-300 focus:outline-none
+               focus:border-emerald-400 transition-colors
+               text-gray-700 text-base lg:text-lg pr-14"
                             />
+
+                            {/* 👁 Eye — อิง input เท่านั้น */}
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                className="absolute right-5 top-1/2 -translate-y-1/2
+               text-gray-400 hover:text-gray-600"
                             >
                                 {showPassword ? (
-                                    <EyeOff className="w-6 h-6 lg:w-5 lg:h-5 rounded-full" />
+                                    <EyeOff className="w-6 h-6 lg:w-5 lg:h-5" />
                                 ) : (
-                                    <Eye className="w-6 h-6 lg:w-5 lg:h-5 rounded-full" />
+                                    <Eye className="w-6 h-6 lg:w-5 lg:h-5" />
                                 )}
                             </button>
                         </div>
+
+                        {/* HELPERS — อยู่นอก relative */}
+                        <div className="mt-2 min-h-[72px]">
+                            {password && (
+                                <>
+                                    {/* Strength bar */}
+                                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full transition-all duration-300 ${strengthInfo.color}`}
+                                            style={{ width: `${(strength / 4) * 100}%` }}
+                                        />
+                                    </div>
+
+                                    <p className={`mt-1 text-xs font-semibold ${strengthInfo.text}`}>
+                                        {strengthInfo.label}
+                                    </p>
+                                </>
+                            )}
+
+                            {password !== '' && (
+                                <ul
+                                    className={`mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs transition-all duration-300
+      ${isStrong ? 'opacity-0 max-h-0 overflow-hidden' : 'opacity-100 max-h-20'}`}
+                                >
+                                    <li className={hasLower ? 'text-emerald-600' : 'text-gray-400'}>✓ lowercase</li>
+                                    <li className={hasUpper ? 'text-emerald-600' : 'text-gray-400'}>✓ uppercase</li>
+                                    <li className={hasNumber ? 'text-emerald-600' : 'text-gray-400'}>✓ number</li>
+                                    <li className={hasLength ? 'text-emerald-600' : 'text-gray-400'}>✓ 8+ chars</li>
+                                </ul>
+                            )}
+
+                            {isStrong && (
+                                <p className="mt-2 text-xs font-semibold text-emerald-600">
+                                    ✓ Strong password
+                                </p>
+                            )}
+                        </div>
+
                     </motion.div>
 
                     {/* Terms Checkbox */}
@@ -187,7 +272,7 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={handleSignUp}
-                        disabled={loading}
+                        disabled={strength < 4 || loading}
                         className="w-full py-4 lg:py-5 rounded-full bg-emerald-200 hover:bg-emerald-300 disabled:bg-emerald-100 text-white font-medium text-lg lg:text-xl transition-all shadow-md hover:shadow-lg transform hover:scale-105 disabled:transform-none mt-6"
                     >
                         {loading ? 'Signing up...' : 'Sign up'}
@@ -230,25 +315,6 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                             </svg>
                         </button>
 
-                        {/* Facebook Button */}
-                        <motion.button
-                            onClick={() => handleSocialLogin('Facebook')}
-                            className="w-16 h-16 lg:w-20 lg:h-20 xl:w-20 xl:h-20 rounded-full bg-white border-2 border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all shadow-md hover:shadow-xl transform hover:scale-110"
-                        >
-                            <svg className="w-9 h-9 lg:w-11 lg:h-11 xl:w-14 xl:h-14" viewBox="0 0 24 24" fill="#1877F2">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                            </svg>
-                        </motion.button>
-
-                        {/* Apple Button */}
-                        <motion.button
-                            onClick={() => handleSocialLogin('Apple')}
-                            className="w-16 h-16 lg:w-20 lg:h-20 xl:w-20 xl:h-20 rounded-full bg-white border-2 border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all shadow-md hover:shadow-xl transform hover:scale-110"
-                        >
-                            <svg className="w-9 h-9 lg:w-11 lg:h-11 xl:w-14 xl:h-14" viewBox="0 0 24 24" fill="#000000">
-                                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-                            </svg>
-                        </motion.button>
                     </motion.div>
 
                     {/* Login Link - ขยายขนาด */}

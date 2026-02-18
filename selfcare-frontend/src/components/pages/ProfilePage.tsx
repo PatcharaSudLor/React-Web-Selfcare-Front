@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, Lock, Calendar, Edit2, ChevronDown } from 'lucide-react';
+import { ArrowLeft, User, Mail, Lock, Calendar, Edit2, ChevronDown, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../utils/supabase';
 import { useUser } from '../../contexts/UserContext';
 
@@ -90,6 +90,10 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
   const [originalAvatar, setOriginalAvatar] = useState(profileImage);
   const [originalFormData, setOriginalFormData] = useState<typeof formData | null>(null);
   const [storedAvatarPath, setStoredAvatarPath] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   const [formData, setFormData] = useState({
     email: '',
@@ -233,18 +237,29 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
       const trimmedPassword = newPassword.trim();
 
       if (trimmedPassword.length > 0) {
+        if (trimmedPassword.length < 8) {
+          setPasswordError('Password must be at least 8 characters');
+          setIsSaving(false);
+          return;
+        }
+
+        if (trimmedPassword !== confirmPassword) {
+          setPasswordError('Passwords do not match');
+          setIsSaving(false);
+          return;
+        }
+
         const { error: pwError } = await supabase.auth.updateUser({
           password: trimmedPassword,
         });
 
         if (pwError) {
-          console.error('Failed to update password:', pwError);
+          console.error(pwError);
           alert('ไม่สามารถเปลี่ยนรหัสผ่านได้');
           setIsSaving(false);
           return;
         }
       }
-
 
       const payload = {
         username: formData.username,
@@ -327,7 +342,7 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
                 <ArrowLeft className="w-6 h-6" />
               </button>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">My Profile</h1>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent text-left">My Profile</h1>
                 <p className="text-sm text-gray-500 mt-1">Manage and customize your account</p>
               </div>
             </div>
@@ -464,17 +479,66 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
                         className="flex-1 px-5 py-3.5 rounded-xl border-2 border-gray-200 bg-gray-50 cursor-not-allowed font-medium text-gray-600"
                       />
                     </div>
-                    {isEditing && (
-                      <div className="mt-3">
+                    {isEditing && !isChangingPassword && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setIsChangingPassword(true)}
+                          className="mt-3 block text-left text-sm font-semibold text-emerald-600
+                                     hover:text-emerald-700 hover:underline transition"
+                        >
+                          Change password
+                        </button>
+
+                      </>
+                    )}
+                    {isEditing && isChangingPassword && (
+                      <div className="mt-3 relative">
                         <input
-                          type="password"
+                          type={showPassword ? 'text' : 'password'}
                           name="new-password"
-                          autoComplete="new-password"
+                          autoComplete="off"
                           placeholder="New password (optional)"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                           className="w-full px-5 py-3.5 rounded-xl border-2 border-emerald-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none font-medium"
                         />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(prev => !prev)}
+                          className="absolute right-2 top-7 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="w-5 h-5" />
+                          ) : (
+                            <Eye className="w-5 h-5" />
+                          )}
+                        </button>
+                        {/* Helper text */}
+                        <p className="mt-2 text-xs text-gray-500 text-left">
+                          🔒 Password must be at least 8 characters
+                        </p>
+                        {/* Confirm Password */}
+                        <div className="mt-3">
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            autoComplete="off"
+                            placeholder="Confirm new password"
+                            value={confirmPassword}
+                            onChange={(e) => {
+                              setConfirmPassword(e.target.value);
+                              setPasswordError('');
+                            }}
+                            className="w-full px-5 py-3.5 rounded-xl border-2 border-emerald-300 bg-white
+                   focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none font-medium"
+                          />
+                        </div>
+                        {/* Error Message */}
+                        {passwordError && (
+                          <p className="mt-2 text-sm text-red-500 font-medium">
+                            {passwordError}
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>
@@ -514,54 +578,61 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
                       <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     </div>
                   </div>
-                </div>
 
-                {/* Action Buttons */}
-                <div className="mt-8 space-y-3">
-                  {isEditing ? (
-                    <div className="flex gap-3">
-                      { /* Cancel Button */}
-                      <button
-                        onClick={() => {
-                          setIsEditing(false);
-                          setSelectedFile(null);
-                          setPreviewUrl(originalAvatar);
-                          if (originalFormData) {
-                            setFormData(originalFormData);
-                          }
-                          setNewPassword('');
-                        }}
-                        className="flex-1 py-3.5 px-6 rounded-xl border-2 border-gray-300 hover:bg-gray-50 transition-all duration-200 font-semibold text-gray-700"
-                      >
-                        Cancel
-                      </button>
-                      { /* Save Button */}
-                      <button
-                        onClick={saveProfile}
-                        disabled={isSaving}
-                        className="flex-1 py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-700 hover:to-emerald-600 disabled:opacity-60 font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
-                      >
-                        {isSaving ? 'Saving...' : 'Save Changes'}
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-sm text-gray-500 text-center font-medium">💡 Click the pencil icon to start editing</p>
-                      <button
-                        onClick={() => setIsEditing(true)}
-                        className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-700 hover:to-emerald-600 font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
-                      >
-                        Edit Profile
-                      </button>
+                  {/* Action Buttons */}
+                  <div className="md:col-span-2 w-full mt-8">
+                    {isEditing ? (
+                      <div className="flex gap-3">
+                        {/* Cancel Button */}
+                        <button
+                          onClick={() => {
+                            setIsEditing(false);
+                            setIsChangingPassword(false);
+                            setConfirmPassword('');
+                            setPasswordError('');
+                            setSelectedFile(null);
+                            setPreviewUrl(originalAvatar);
+                            if (originalFormData) {
+                              setFormData(originalFormData);
+                            }
+                            setNewPassword('');
+                          }}
+                          className="flex-1 py-3.5 px-6 rounded-xl border-2 border-gray-300 hover:bg-gray-50 transition-all duration-200 font-semibold text-gray-700"
+                        >
+                          Cancel
+                        </button>
 
-                    </>
-                  )}
+                        {/* Save Button */}
+                        <button
+                          onClick={saveProfile}
+                          disabled={isSaving}
+                          className="flex-1 py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-700 hover:to-emerald-600 disabled:opacity-60 font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+                        >
+                          {isSaving ? 'Saving...' : 'Save Changes'}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="w-full flex flex-col gap-3">
+                        {/* 👆 ข้อความอยู่ด้านบนปุ่ม */}
+                        <p className="text-sm text-gray-500 text-center font-medium">
+                          💡 Click the pencil icon to start editing
+                        </p>
+
+                        <button
+                          onClick={() => setIsEditing(true)}
+                          className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-700 hover:to-emerald-600 font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+                        >
+                          Edit Profile
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </div >
     </div >
   )
 }

@@ -32,6 +32,11 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // forgot-password state
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotMessage, setForgotMessage] = useState('');
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -121,9 +126,28 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
     await supabase.auth.signInWithOAuth({ provider });
   };
 
-  const handleForgotPassword = () => {
-    console.log('Forgot password clicked');
-    // Implement forgot password flow
+  const handleForgotPassword = async () => {
+    // clear any message
+    setForgotMessage('');
+
+    if (!forgotEmail) {
+      setForgotMessage('Please enter your email');
+      return;
+    }
+    if (!validateEmail(forgotEmail)) {
+      setForgotMessage('Please enter a valid email address');
+      return;
+    }
+
+    setLoading(true);
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(forgotEmail);
+    setLoading(false);
+
+    if (resetError) {
+      setForgotMessage(resetError.message);
+    } else {
+      setForgotMessage('If an account exists for that email, you’ll receive a reset link.');
+    }
   };
 
   return (
@@ -210,12 +234,50 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
               </label>
             </motion.div>
             <button
-              onClick={handleForgotPassword}
+              onClick={() => setShowForgot(true)}
               className="text-sm text-gray-600 hover:text-gray-800"
             >
               Forgot password?
             </button>
           </motion.div>
+
+          {/* forgot password modal */}
+          {showForgot && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+              <div className="bg-white rounded-lg w-full max-w-sm p-6">
+                <h2 className="text-xl font-semibold mb-4">Reset password</h2>
+                <input
+                  type="email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  placeholder="Your email"
+                  className="w-full px-4 py-2 mb-3 border rounded"
+                />
+                {forgotMessage && (
+                  <p className="text-sm text-red-600 mb-2">{forgotMessage}</p>
+                )}
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={handleForgotPassword}
+                    disabled={loading}
+                    className="w-full py-2 bg-emerald-400 text-white rounded disabled:bg-emerald-200"
+                  >
+                    {loading ? 'Sending...' : 'Send reset link'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowForgot(false);
+                      setForgotEmail('');
+                      setForgotMessage('');
+                    }}
+                    className="w-full py-2 text-center text-gray-600"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Error Message */}
           {error && (

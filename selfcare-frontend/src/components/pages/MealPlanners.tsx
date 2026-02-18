@@ -9,6 +9,7 @@ interface MealPlannerProps {
 
 export interface MealPlanData {
   likedMeals: string[];
+  excludedProteins: string[]; 
   allergicFoods: string[];
   budget: string;
 }
@@ -39,6 +40,7 @@ const mealTypes: MealType[] = [
 const allergyTypes: AllergyType[] = [
   { id: 'pork', label: 'Pork', labelTh: 'หมู', icon: '🐷' },
   { id: 'beef', label: 'Beef', labelTh: 'เนื้อ', icon: '🐄' },
+    { id: 'chicken', label: 'Chicken', labelTh: 'ไก่', icon: '🐔' },
   { id: 'nuts', label: 'Nuts', labelTh: 'ถั่ว', icon: '🥜' },
   { id: 'seafood', label: 'Seafood', labelTh: 'อาหารทะเล', icon: '🦐' },
   { id: 'dairy', label: 'Dairy', labelTh: 'นม', icon: '🥛' },
@@ -61,16 +63,27 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
       prev.includes(allergyId) ? prev.filter((id) => id !== allergyId) : [...prev, allergyId]
     );
   };
+  const [excludedProteins, setExcludedProteins] = useState<string[]>([]);
+  const toggleProtein = (proteinId: string) => {
+  setExcludedProteins((prev) =>
+    prev.includes(proteinId)
+      ? prev.filter((id) => id !== proteinId)
+      : [...prev, proteinId]
+  );
+};
 
+  
   const handleGeneratePlan = () => {
     if (likedMeals.length > 0) {
       onGeneratePlan({
         likedMeals,
         allergicFoods,
+        excludedProteins,   
         budget,
       });
     }
   };
+
 
   const isFormComplete = likedMeals.length > 0 && budget;
 
@@ -152,6 +165,41 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
                 ))}
               </div>
             </div>
+            {/* Excluded Proteins */}
+            <div className="mb-8">
+              <h3 className="text-gray-800 font-semibold mb-1 flex items-center gap-2">
+                <span className="text-orange-500 text-xl">•</span>
+             Excluded Proteins
+             </h3>
+             <p className="text-sm text-left text-gray-500 mb-4 ml-4">
+              Select proteins you want to avoid (optional)
+             </p>
+
+             <div className="grid grid-cols-3 gap-3">
+              {allergyTypes
+                .filter(a => ['pork','chicken','beef','seafood','eggs','dairy','nuts'].includes(a.id)) // 👈 เอาเฉพาะโปรตีน
+                .map((protein) => (
+             <button
+                key={protein.id}
+                onClick={() => toggleProtein(protein.id)}
+                className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all hover:shadow-md ${
+                excludedProteins.includes(protein.id)
+                ? 'border-orange-500 bg-orange-50 shadow-sm'
+                : 'border-gray-200 hover:border-orange-300 bg-white'
+              }`}
+        >
+                 <span className="text-3xl">{protein.icon}</span>
+                 <span className={`text-sm font-medium ${
+                   excludedProteins.includes(protein.id)
+                    ? 'text-orange-700'
+                    : 'text-gray-600'
+              }`}>
+                {protein.labelTh}
+                  </span>
+                   </button>
+             ))}
+                  </div>
+                    </div>
 
             {/* Budget */}
             <div className="mb-8">

@@ -12,6 +12,7 @@ interface Meal {
   nameTh: string;
   price: number;
   type: string;
+  protein: string;
   excludeAllergies: string[];
   image?: string;
 }
@@ -28,66 +29,66 @@ interface DayMeals {
 // Database of meals
 const mealDatabase: Meal[] = [
   // Rice-based meals
-  { name: 'Fried Rice', nameTh: 'ข้าวผัด', price: 50, type: 'rice', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400' },
-  { name: 'Rice with Omelette', nameTh: 'ข้าวไข่เจียว', price: 45, type: 'rice', excludeAllergies: ['eggs'], image: 'https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=400' },
-  { name: 'Chicken Rice', nameTh: 'ข้าวมันไก่', price: 60, type: 'rice', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400' },
-  { name: 'Pork Rice', nameTh: 'ข้าวหมูแดง', price: 55, type: 'rice', excludeAllergies: ['pork'], image: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?w=400' },
+  { name: 'Fried Rice', nameTh: 'ข้าวผัด', price: 50, type: 'rice', protein: 'eggs', excludeAllergies: [] , image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400' },
+  { name: 'Rice with Omelette', nameTh: 'ข้าวไข่เจียว', price: 45, type: 'rice', protein: 'eggs', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=400' },
+  { name: 'Chicken Rice', nameTh: 'ข้าวมันไก่', price: 60, type: 'rice', protein: 'chicken', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400' },
+  { name: 'Pork Rice', nameTh: 'ข้าวหมูแดง', price: 55, type: 'rice', protein: 'pork', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?w=400' },
   
   // Noodle-based meals
-  { name: 'Pad Thai', nameTh: 'ผัดไทย', price: 60, type: 'noodles', excludeAllergies: ['seafood'], image: 'https://images.unsplash.com/photo-1559314809-0d155014e29e?w=400' },
-  { name: 'Tom Yum Noodle', nameTh: 'ก้วยเตี๋ยวต้มยำ', price: 65, type: 'noodles', excludeAllergies: ['seafood'], image: 'https://images.unsplash.com/photo-1569562211093-4ed0d0758f12?w=400' },
-  { name: 'Chicken Noodle', nameTh: 'ก้วยเตี๋ยวไก่', price: 50, type: 'noodles', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=400' },
+  { name: 'Pad Thai', nameTh: 'ผัดไทย', price: 60, type: 'noodles', protein: 'seafood', excludeAllergies: ['seafood'], image: 'https://images.unsplash.com/photo-1559314809-0d155014e29e?w=400' },
+  { name: 'Tom Yum Noodle', nameTh: 'ก้วยเตี๋ยวต้มยำ', price: 65, type: 'noodles', protein: 'seafood', excludeAllergies: ['seafood'], image: 'https://images.unsplash.com/photo-1569562211093-4ed0d0758f12?w=400' },
+  { name: 'Chicken Noodle', nameTh: 'ก้วยเตี๋ยวไก่', price: 50, type: 'noodles', protein: 'chicken', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=400' },
   
   // Steak meals
-  { name: 'Beef Steak', nameTh: 'สเต็กเนื้อ', price: 150, type: 'steak', excludeAllergies: ['beef'], image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400' },
-  { name: 'Pork Steak', nameTh: 'สเต็กหมู', price: 120, type: 'steak', excludeAllergies: ['pork'], image: 'https://images.unsplash.com/photo-1432139509613-5c4255815697?w=400' },
-  { name: 'Chicken Steak', nameTh: 'สเต็กไก่', price: 100, type: 'steak', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400' },
+  { name: 'Beef Steak', nameTh: 'สเต็กเนื้อ', price: 150, type: 'steak', protein: 'beef', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400' },
+  { name: 'Pork Steak', nameTh: 'สเต็กหมู', price: 120, type: 'steak', protein: 'pork', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1432139509613-5c4255815697?w=400' },
+  { name: 'Chicken Steak', nameTh: 'สเต็กไก่', price: 100, type: 'steak', protein: 'chicken', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400' },
   
   // Soup meals
-  { name: 'Tom Yum Soup', nameTh: 'ต้มยำกุ้ง', price: 80, type: 'soup', excludeAllergies: ['seafood'], image: 'https://images.unsplash.com/photo-1562565652-a0d8f0c59eb4?w=400' },
-  { name: 'Chicken Soup', nameTh: 'ซุปไก่', price: 60, type: 'soup', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400' },
-  { name: 'Vegetable Soup', nameTh: 'ซุปผัก', price: 50, type: 'soup', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1588566565463-180a5b2090d2?w=400' },
+  { name: 'Tom Yum Soup', nameTh: 'ต้มยำกุ้ง', price: 80, type: 'soup', protein:'seafood', excludeAllergies: ['seafood'], image: 'https://images.unsplash.com/photo-1562565652-a0d8f0c59eb4?w=400' },
+  { name: 'Chicken Soup', nameTh: 'ซุปไก่', price: 60, type: 'soup', protein:'chicken', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400' },
+  { name: 'Vegetable Soup', nameTh: 'ซุปผัก', price: 50, type: 'soup', protein:'vegetables', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1588566565463-180a5b2090d2?w=400' },
   
   // Bread meals
-  { name: 'Sandwich', nameTh: 'แซนวิช', price: 55, type: 'bread', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400' },
-  { name: 'Toast with Eggs', nameTh: 'ขนมปังไข่', price: 45, type: 'bread', excludeAllergies: ['eggs'], image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400' },
-  { name: 'Burger', nameTh: 'เบอร์เกอร์', price: 80, type: 'bread', excludeAllergies: ['beef'], image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400' },
+  { name: 'Sandwich', nameTh: 'แซนวิช', price: 55, type: 'bread', protein: 'eggs', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400' },
+  { name: 'Toast with Eggs', nameTh: 'ขนมปังไข่', price: 45, type: 'bread', protein: 'eggs', excludeAllergies: ['eggs'], image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400' },
+  { name: 'Burger', nameTh: 'เบอร์เกอร์', price: 80, type: 'bread', protein: 'beef', excludeAllergies: ['beef'], image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400' },
   
   // Salad meals
-  { name: 'Caesar Salad', nameTh: 'ซีซาร์สลัด', price: 90, type: 'salad', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400' },
-  { name: 'Chicken Salad', nameTh: 'สลัดไก่', price: 85, type: 'salad', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?w=400' },
-  { name: 'Seafood Salad', nameTh: 'สลัดซีฟู้ด', price: 100, type: 'salad', excludeAllergies: ['seafood'], image: 'https://images.unsplash.com/photo-1559847844-5315695dadae?w=400' },
+  { name: 'Caesar Salad', nameTh: 'ซีซาร์สลัด', price: 90, type: 'salad', protein: 'chicken', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400' },
+  { name: 'Chicken Salad', nameTh: 'สลัดไก่', price: 85, type: 'salad', protein: 'chicken', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?w=400' },
+  { name: 'Seafood Salad', nameTh: 'สลัดซีฟู้ด', price: 100, type: 'salad', protein: 'seafood', excludeAllergies: [], image: 'https://images.unsplash.com/photo-1559847844-5315695dadae?w=400' },
 ];
 
 export default function MealSchedule({ onBack, onSaveToSchedule, mealPlanData }: MealScheduleProps) {
-  const { likedMeals, allergicFoods, budget } = mealPlanData;
+  const { likedMeals, allergicFoods, budget, excludedProteins } = mealPlanData;
   const budgetNumber = parseInt(budget) || 100;
 
   // Filter meals based on preferences
   const getFilteredMeals = (): Meal[] => {
-    return mealDatabase.filter((meal) => {
-      // Check if meal type is liked
-      if (!likedMeals.includes(meal.type)) return false;
-      
-      // Check if meal is within budget
-      if (meal.price > budgetNumber) return false;
-      
-      // Check if meal contains allergies
-      const hasAllergy = meal.excludeAllergies.some((allergy) => 
-        allergicFoods.includes(allergy)
-      );
-      if (hasAllergy) return false;
-      
-      return true;
-    });
-  };
+  return mealDatabase.filter((meal) => {
+    
+    if (!likedMeals.includes(meal.type)) return false;
+    if (meal.price > budgetNumber) return false;
+
+    const hasAllergy = meal.excludeAllergies.some((allergy) =>
+      allergicFoods.includes(allergy)
+    );
+    if (hasAllergy) return false;
+
+   const hasExcludedProtein = excludedProteins?.includes(meal.protein);
+if (hasExcludedProtein) return false;
+
+    return true;
+  });
+};
 
   const filteredMeals = getFilteredMeals();
 
   // Generate random meal for a specific meal time
   const getRandomMeal = (seed: number): Meal => {
     if (filteredMeals.length === 0) {
-      return { name: 'No meal available', nameTh: 'ไม่มีเมนู', price: 0, type: '', excludeAllergies: [] };
+      return { name: 'No meal available', nameTh: 'ไม่มีเมนู', price: 0, type: '', protein: '', excludeAllergies: [] };
     }
     const index = seed % filteredMeals.length;
     return filteredMeals[index];

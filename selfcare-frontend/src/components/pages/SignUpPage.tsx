@@ -53,7 +53,11 @@ function getStrengthLabel(score: number) {
 export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -66,8 +70,6 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
     const hasLength = password.length >= 8;
 
     const isStrong = hasLower && hasUpper && hasNumber && hasLength;
-
-
 
     const validateEmail = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -89,8 +91,13 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
             return;
         }
 
-        if (password.length < 8) {
-            setError('Password must be at least 8 characters');
+        if (!isStrong) {
+            setError('Password is too weak');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setError('Passwords do not match');
             return;
         }
 
@@ -126,15 +133,17 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
     };
 
     return (
-        // Container หลัก - เต็มหน้าจอ
-        <motion.div className="fixed inset-0 h-screen w-screen bg-white flex flex-col overflow-hidden"
+        <motion.div
+            className="fixed inset-0 h-screen w-screen bg-white flex flex-col overflow-y-auto"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}>
+            animate={{ opacity: 1 }}
+        >
 
-            {/* Header - ขยายขนาด */}
-            <motion.div className="px-8 lg:px-12 py-6 lg:py-8"
+            <motion.div
+                className="px-8 lg:px-12 py-6 lg:py-8"
                 initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}>
+                animate={{ x: 0, opacity: 1 }}
+            >
                 <button
                     onClick={onBack}
                     className="flex items-center gap-3 text-emerald-400 hover:text-emerald-500 transition-colors"
@@ -144,21 +153,22 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                 </button>
             </motion.div>
 
-            {/* Content - ขยายความกว้าง */}
-            <div className="flex-1 flex flex-col items-center justify-center px-6 pb-12">
-                <motion.div className="w-full max-w-lg lg:max-w-xl space-y-8"
+            <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 md:py-16">
+                <motion.div
+                    className="w-full max-w-lg lg:max-w-xl space-y-6"
                     variants={container}
                     initial="hidden"
-                    animate="show">
+                    animate="show"
+                >
 
-                    {/* Title - ขยายขนาด */}
-                    <motion.h1 className="text-4xl lg:text-5xl text-center text-emerald-300 mb-10" variants={item}>
+                    <motion.h1
+                        className="text-4xl lg:text-5xl text-center text-emerald-300 mb-6"
+                        variants={item}
+                    >
                         Get started
                     </motion.h1>
 
-                    {/* Email Input */}
                     <motion.div variants={item}>
-                        {/* Label ชิดซ้าย - ไม่มี px-4 */}
                         <label className="block text-left text-sm lg:text-base text-gray-500 mb-3 ml-6">
                             Email address
                         </label>
@@ -171,31 +181,24 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                         />
                     </motion.div>
 
-                    {/* Password Input */}
                     <motion.div variants={item}>
                         <label className="block text-left text-sm lg:text-base text-gray-500 mb-3 ml-6">
                             Password
                         </label>
 
-                        {/* INPUT WRAPPER (relative แค่ส่วนนี้) */}
                         <div className="relative">
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="••••••••"
-                                className="w-full px-5 lg:px-6 py-4 lg:py-5 rounded-full
-               border-2 border-gray-300 focus:outline-none
-               focus:border-emerald-400 transition-colors
-               text-gray-700 text-base lg:text-lg pr-14"
+                                className="w-full px-5 lg:px-6 py-4 lg:py-5 rounded-full border-2 border-gray-300 focus:outline-none focus:border-emerald-400 transition-colors text-gray-700 text-base lg:text-lg pr-14"
                             />
 
-                            {/* 👁 Eye — อิง input เท่านั้น */}
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-5 top-1/2 -translate-y-1/2
-               text-gray-400 hover:text-gray-600"
+                                className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                             >
                                 {showPassword ? (
                                     <EyeOff className="w-6 h-6 lg:w-5 lg:h-5" />
@@ -205,11 +208,46 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                             </button>
                         </div>
 
-                        {/* HELPERS — อยู่นอก relative */}
-                        <div className="mt-2 min-h-[72px]">
+                     <div className="mt-1" />
+
+                    </motion.div>
+
+                    <motion.div variants={item}>
+                        <label className="block text-left text-sm lg:text-base text-gray-500 mb-3 ml-6">
+                            Confirm Password
+                        </label>
+
+                        <div className="relative">
+                            <input
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                placeholder="••••••••"
+                                className={`w-full px-5 lg:px-6 py-4 lg:py-5 rounded-full border-2 transition-colors pr-14 text-gray-700 text-base lg:text-lg ${
+                                    confirmPassword
+                                        ? password === confirmPassword
+                                            ? 'border-emerald-400 focus:outline-none focus:border-emerald-400'
+                                            : 'border-red-400 focus:outline-none focus:border-red-400'
+                                        : 'border-gray-300 focus:outline-none focus:border-emerald-400'
+                                }`}
+                            />
+
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            >
+                                {showConfirmPassword ? (
+                                    <EyeOff className="w-6 h-6" />
+                                ) : (
+                                    <Eye className="w-6 h-6" />
+                                )}
+                            </button>
+                        </div>
+
+                        <div className="mt-3 min-h-[40px]">
                             {password && (
                                 <>
-                                    {/* Strength bar */}
                                     <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                                         <div
                                             className={`h-full transition-all duration-300 ${strengthInfo.color}`}
@@ -220,32 +258,34 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                                     <p className={`mt-1 text-xs font-semibold ${strengthInfo.text}`}>
                                         {strengthInfo.label}
                                     </p>
+
+                                    <ul className={`mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs transition-all duration-300`}> 
+                                        <li className={hasLower ? 'text-emerald-600' : 'text-gray-400'}>✓ lowercase</li>
+                                        <li className={hasUpper ? 'text-emerald-600' : 'text-gray-400'}>✓ uppercase</li>
+                                        <li className={hasNumber ? 'text-emerald-600' : 'text-gray-400'}>✓ number</li>
+                                        <li className={hasLength ? 'text-emerald-600' : 'text-gray-400'}>✓ 8+ chars</li>
+                                    </ul>
                                 </>
                             )}
 
-                            {password !== '' && (
-                                <ul
-                                    className={`mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs transition-all duration-300
-      ${isStrong ? 'opacity-0 max-h-0 overflow-hidden' : 'opacity-100 max-h-20'}`}
-                                >
-                                    <li className={hasLower ? 'text-emerald-600' : 'text-gray-400'}>✓ lowercase</li>
-                                    <li className={hasUpper ? 'text-emerald-600' : 'text-gray-400'}>✓ uppercase</li>
-                                    <li className={hasNumber ? 'text-emerald-600' : 'text-gray-400'}>✓ number</li>
-                                    <li className={hasLength ? 'text-emerald-600' : 'text-gray-400'}>✓ 8+ chars</li>
-                                </ul>
+                            {confirmPassword && (
+                                <p className={`text-xs font-semibold mt-3 ${password === confirmPassword ? 'text-emerald-600' : 'text-red-500'}`}>
+                                    {password === confirmPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
+                                </p>
                             )}
 
-                            {isStrong && (
+                            {isStrong && confirmPassword && (
                                 <p className="mt-2 text-xs font-semibold text-emerald-600">
                                     ✓ Strong password
                                 </p>
                             )}
                         </div>
-
                     </motion.div>
 
-                    {/* Terms Checkbox */}
-                    <motion.div variants={item} className="flex items-center gap-3 ml-2">
+                    <motion.div
+                        variants={item}
+                        className="flex items-center gap-3 ml-2"
+                    >
                         <input
                             type="checkbox"
                             id="terms"
@@ -258,28 +298,33 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                         </label>
                     </motion.div>
 
-                    {/* Error Message */}
                     {error && (
-                        <motion.div animate={{ x: [0, -6, 6, -4, 4, 0] }}
-                            transition={{ duration: 0.4 }} className="bg-red-50 border-2 border-red-200 text-red-600 px-5 py-3 lg:py-4 rounded-full text-sm lg:text-base text-center">
+                        <motion.div
+                            animate={{ x: [0, -6, 6, -4, 4, 0] }}
+                            transition={{ duration: 0.4 }}
+                            className="bg-red-50 border-2 border-red-200 text-red-600 px-5 py-3 lg:py-4 rounded-full text-sm lg:text-base text-center"
+                        >
                             {error}
                         </motion.div>
                     )}
 
-                    {/* Sign Up Button - ขยายขนาด */}
                     <motion.button
                         variants={item}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={handleSignUp}
-                        disabled={strength < 4 || loading}
+                        disabled={
+                            !isStrong ||
+                            password !== confirmPassword ||
+                            !agreedToTerms ||
+                            loading
+                        }
                         className="w-full py-4 lg:py-5 rounded-full bg-emerald-200 hover:bg-emerald-300 disabled:bg-emerald-100 text-white font-medium text-lg lg:text-xl transition-all shadow-md hover:shadow-lg transform hover:scale-105 disabled:transform-none mt-6"
                     >
                         {loading ? 'Signing up...' : 'Sign up'}
                     </motion.button>
 
-                    {/* Divider */}
-                    <div className="relative my-8 lg:my-10">
+                    <div className="relative my-6 lg:my-8">
                         <div className="absolute inset-0 flex items-center">
                             <div className="w-full border-t-2 border-gray-300"></div>
                         </div>
@@ -288,9 +333,10 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                         </div>
                     </div>
 
-                    {/* Social Login Buttons - ขยายไอคอนให้ใหญ่มาก */}
-                    <motion.div variants={item} className="flex justify-center gap-8 lg:gap-10 mt-8">
-                        {/* Google Button */}
+                    <motion.div
+                        variants={item}
+                        className="flex justify-center gap-8 lg:gap-10"
+                    >
                         <button
                             onClick={() => handleSocialLogin('Google')}
                             className="w-16 h-16 lg:w-20 lg:h-20 xl:w-20 xl:h-20 rounded-full bg-white border-2 border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all shadow-md hover:shadow-xl transform hover:scale-110"
@@ -317,8 +363,10 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
 
                     </motion.div>
 
-                    {/* Login Link - ขยายขนาด */}
-                    <motion.p variants={item} className="text-center text-base lg:text-lg text-gray-500 mt-8">
+                    <motion.p
+                        variants={item}
+                        className="text-center text-base lg:text-lg text-gray-500 mt-6 pb-8"
+                    >
                         If you have account?{' '}
                         <button
                             onClick={onLogin}

@@ -551,81 +551,100 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
                       </>
                     )}
                     {isEditing && isChangingPassword && (
-                      <div className="mt-3 relative">
-                        <input
-                          type={showPassword ? 'text' : 'password'}
-                          name="new-password"
-                          autoComplete="new-password"
-                          placeholder="New password (optional)"
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
-                          className="w-full px-5 py-3.5 rounded-xl border-2 border-emerald-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none font-medium"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(prev => !prev)}
-                          className="absolute right-2 top-7 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                        >
-                          {showPassword ? (
-                            <EyeOff className="w-5 h-5" />
-                          ) : (
-                            <Eye className="w-5 h-5" />
-                          )}
-                        </button>
-                        {/* PASSWORD HELPERS (จองพื้นที่ไว้) */}
+                      <div>
+                        <div className="relative ">
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            name="new-password"
+                            autoComplete="new-password"
+                            placeholder="New password (optional)"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            className="w-full px-5 py-3.5 rounded-xl border-2 border-emerald-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none font-medium"
+                          />
+
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(prev => !prev)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                          >
+                            {showPassword ? (
+                              <EyeOff className="w-5 h-5" />
+                            ) : (
+                              <Eye className="w-5 h-5" />
+                            )}
+                          </button>
+                        </div>
 
                         {newPassword && (
                           <div className="mt-2 min-h-[72px] transition-all duration-300">
-                            <>
-                              {/* Strength bar */}
-                              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                  className={`h-full transition-all duration-300 ${strengthInfo.color}`}
-                                  style={{ width: `${(strength / 4) * 100}%` }}
-                                />
-                              </div>
+                            {/* Strength bar */}
+                            <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full transition-all duration-300 ${strengthInfo.color}`}
+                                style={{ width: `${(strength / 4) * 100}%` }}
+                              />
+                            </div>
 
-                              <p className={`mt-1 text-xs font-semibold ${strengthInfo.text}`}>
-                                {strengthInfo.label}
+                            <p className={`mt-1 text-xs font-semibold ${strengthInfo.text}`}>
+                              {strengthInfo.label}
+                            </p>
+
+                            {/* Checklist */}
+                            <ul
+                              className={`mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs transition-all ${
+                                isStrongPassword ? 'opacity-0 max-h-0 overflow-hidden' : 'opacity-100 max-h-20'
+                              }`}
+                            >
+                              <li className={hasLower ? 'text-emerald-600' : 'text-gray-400'}>
+                                ✓ lowercase
+                              </li>
+                              <li className={hasUpper ? 'text-emerald-600' : 'text-gray-400'}>
+                                ✓ uppercase
+                              </li>
+                              <li className={hasNumber ? 'text-emerald-600' : 'text-gray-400'}>
+                                ✓ number
+                              </li>
+                              <li className={hasLength ? 'text-emerald-600' : 'text-gray-400'}>
+                                ✓ 8+ chars
+                              </li>
+                            </ul>
+
+                            {isStrongPassword && (
+                              <p className="mt-2 text-xs text-left font-semibold text-emerald-600">
+                                ✓ Strong password
                               </p>
-
-                              {/* Checklist */}
-                              <ul
-                                className={`mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs transition-all
-              ${isStrongPassword ? 'opacity-0 max-h-0 overflow-hidden' : 'opacity-100 max-h-20'}`}
-                              >
-                                <li className={hasLower ? 'text-emerald-600' : 'text-gray-400'}>✓ lowercase</li>
-                                <li className={hasUpper ? 'text-emerald-600' : 'text-gray-400'}>✓ uppercase</li>
-                                <li className={hasNumber ? 'text-emerald-600' : 'text-gray-400'}>✓ number</li>
-                                <li className={hasLength ? 'text-emerald-600' : 'text-gray-400'}>✓ 8+ chars</li>
-                              </ul>
-
-                              {isStrongPassword && (
-                                <p className="mt-2 text-xs text-left font-semibold text-emerald-600">
-                                  ✓ Strong password
-                                </p>
-                              )}
-                            </>
+                            )}
                           </div>
                         )}
 
-
                         {/* Confirm Password */}
-                        <div className="mt-3">
+                        <div className="relative">
                           <input
                             type={showPassword ? 'text' : 'password'}
                             name="confirm-password"
-                            autoComplete="new-password"
                             placeholder="Confirm new password"
                             value={confirmPassword}
                             onChange={(e) => {
                               setConfirmPassword(e.target.value);
                               setPasswordError('');
                             }}
-                            className="w-full px-5 py-3.5 rounded-xl border-2 border-emerald-300 bg-white
-                   focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none font-medium"
+                            className="w-full px-5 py-3.5 rounded-xl border-2 border-emerald-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none font-medium"
                           />
+
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(prev => !prev)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          >
+                            {showPassword ? (
+                              <EyeOff className="w-5 h-5" />
+                            ) : (
+                              <Eye className="w-5 h-5" />
+                            )}
+                          </button>
                         </div>
+
                         {/* Error Message */}
                         {passwordError && (
                           <p className="mt-2 text-sm text-red-500 font-medium">
@@ -725,7 +744,7 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
             </div>
           </div>
         </div>
-      </div >
-    </div >
-  )
+      </div>
+    </div>
+  );
 }

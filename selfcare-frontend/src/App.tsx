@@ -8,6 +8,7 @@ import BMIResultPage from './components/pages/BMIResultPage'
 import BMRResultPage from './components/pages/BMRResultPage'
 import TDEEResultPage from './components/pages/TDEEResultPage'
 import HomePage from './components/pages/HomePage'
+import ResetPasswordPage from './components/pages/ResetPasswordPage'
 import MealPlanner from './components/pages/MealPlanners'
 import MainLayout from './components/pages/layout/MainLayout'
 import MealSchedule from './components/pages/MealSchedule'
@@ -82,6 +83,7 @@ function AppContent() {
       <Route path="/" element={<FirstPage onLogin={handleLogin} onSignUp={handleSignUp} />} />
       <Route path="/signup" element={<SignUpPage onBack={handleBack} onLogin={handleLogin} />} />
       <Route path="/login" element={<LoginPage onBack={handleBack} onSignUp={handleSignUp} onLoginSuccess={handleLoginSuccess} />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/userinfo" element={<UserInfoPage onBack={handleBack} />} />
       <Route path="/bmiresults" element={<BMIResultPage onBack={handleBack} />} />
       <Route path="/bmrresults" element={<BMRResultPage onBack={handleBack} />} />

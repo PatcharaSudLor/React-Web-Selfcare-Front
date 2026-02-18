@@ -70,6 +70,30 @@ function ProfileSkeleton() {
   );
 }
 
+function getPasswordStrength(password: string) {
+  let score = 0;
+  if (password.length >= 8) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  return score; // 0-4
+}
+
+function getStrengthLabel(score: number) {
+  switch (score) {
+    case 0:
+    case 1:
+      return { label: 'Weak', color: 'bg-red-500', text: 'text-red-600' };
+    case 2:
+      return { label: 'Fair', color: 'bg-yellow-500', text: 'text-yellow-600' };
+    case 3:
+      return { label: 'Good', color: 'bg-blue-500', text: 'text-blue-600' };
+    case 4:
+      return { label: 'Strong', color: 'bg-emerald-500', text: 'text-emerald-600' };
+    default:
+      return { label: '', color: '', text: '' };
+  }
+}
 
 interface ProfilePageProps {
   onBack: () => void;
@@ -94,6 +118,18 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const strength = getPasswordStrength(newPassword);
+  const strengthInfo = getStrengthLabel(strength);
+
+  const hasLower = /[a-z]/.test(newPassword);
+  const hasUpper = /[A-Z]/.test(newPassword);
+  const hasNumber = /[0-9]/.test(newPassword);
+  const hasLength = newPassword.length >= 8;
+
+  const isStrongPassword =
+    hasLower && hasUpper && hasNumber && hasLength;
+
+  
 
   const [formData, setFormData] = useState({
     email: '',
@@ -232,13 +268,12 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
         avatarPath = filePath; // ✅ เก็บ path
       }
 
-
       // If user wants to change password, update auth first
       const trimmedPassword = newPassword.trim();
 
-      if (trimmedPassword.length > 0) {
-        if (trimmedPassword.length < 8) {
-          setPasswordError('Password must be at least 8 characters');
+      if (isActuallyChangingPassword) {
+        if (!isStrongPassword) {
+          setPasswordError('Password must be Strong');
           setIsSaving(false);
           return;
         }
@@ -254,7 +289,6 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
         });
 
         if (pwError) {
-          console.error(pwError);
           alert('ไม่สามารถเปลี่ยนรหัสผ่านได้');
           setIsSaving(false);
           return;
@@ -326,6 +360,30 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
       setIsSaving(false);
     }
   };
+
+  const isProfileChanged = () => {
+    if (!originalFormData) return false;
+
+    return (
+      formData.username !== originalFormData.username ||
+      formData.gender !== originalFormData.gender ||
+      formData.age !== originalFormData.age ||
+      formData.bloodType !== originalFormData.bloodType ||
+      selectedFile !== null
+    );
+  };
+
+  const isActuallyChangingPassword =
+    isChangingPassword && newPassword.trim().length > 0;
+
+  const canSave =
+    // 1️⃣ แก้ profile อย่างเดียว (ไม่แตะ password)
+    (isProfileChanged() && !isActuallyChangingPassword)
+
+    ||
+
+    // 2️⃣ เปลี่ยน password (ต้อง strong)
+    (isActuallyChangingPassword && isStrongPassword);
 
   if (isLoadingData) {
     return <ProfileSkeleton />;
@@ -497,7 +555,7 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
                         <input
                           type={showPassword ? 'text' : 'password'}
                           name="new-password"
-                          autoComplete="off"
+                          autoComplete="new-password"
                           placeholder="New password (optional)"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
@@ -514,15 +572,50 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
                             <Eye className="w-5 h-5" />
                           )}
                         </button>
-                        {/* Helper text */}
-                        <p className="mt-2 text-xs text-gray-500 text-left">
-                          🔒 Password must be at least 8 characters
-                        </p>
+                        {/* PASSWORD HELPERS (จองพื้นที่ไว้) */}
+
+                        {newPassword && (
+                          <div className="mt-2 min-h-[72px] transition-all duration-300">
+                            <>
+                              {/* Strength bar */}
+                              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full transition-all duration-300 ${strengthInfo.color}`}
+                                  style={{ width: `${(strength / 4) * 100}%` }}
+                                />
+                              </div>
+
+                              <p className={`mt-1 text-xs font-semibold ${strengthInfo.text}`}>
+                                {strengthInfo.label}
+                              </p>
+
+                              {/* Checklist */}
+                              <ul
+                                className={`mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs transition-all
+              ${isStrongPassword ? 'opacity-0 max-h-0 overflow-hidden' : 'opacity-100 max-h-20'}`}
+                              >
+                                <li className={hasLower ? 'text-emerald-600' : 'text-gray-400'}>✓ lowercase</li>
+                                <li className={hasUpper ? 'text-emerald-600' : 'text-gray-400'}>✓ uppercase</li>
+                                <li className={hasNumber ? 'text-emerald-600' : 'text-gray-400'}>✓ number</li>
+                                <li className={hasLength ? 'text-emerald-600' : 'text-gray-400'}>✓ 8+ chars</li>
+                              </ul>
+
+                              {isStrongPassword && (
+                                <p className="mt-2 text-xs text-left font-semibold text-emerald-600">
+                                  ✓ Strong password
+                                </p>
+                              )}
+                            </>
+                          </div>
+                        )}
+
+
                         {/* Confirm Password */}
                         <div className="mt-3">
                           <input
                             type={showPassword ? 'text' : 'password'}
-                            autoComplete="off"
+                            name="confirm-password"
+                            autoComplete="new-password"
                             placeholder="Confirm new password"
                             value={confirmPassword}
                             onChange={(e) => {
@@ -605,7 +698,7 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
                         {/* Save Button */}
                         <button
                           onClick={saveProfile}
-                          disabled={isSaving}
+                          disabled={isSaving || !canSave}
                           className="flex-1 py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-700 hover:to-emerald-600 disabled:opacity-60 font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
                         >
                           {isSaving ? 'Saving...' : 'Save Changes'}

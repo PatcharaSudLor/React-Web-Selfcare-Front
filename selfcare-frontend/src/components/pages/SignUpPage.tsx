@@ -8,7 +8,6 @@ interface SignUpPageProps {
     onLogin: () => void;
 }
 
-/* animation presets */
 const container = {
     hidden: { opacity: 0 },
     show: {
@@ -153,7 +152,7 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                 </button>
             </motion.div>
 
-            <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 md:py-16">
+            <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 md:py-3">
                 <motion.div
                     className="w-full max-w-lg lg:max-w-xl space-y-6"
                     variants={container}
@@ -208,7 +207,7 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                             </button>
                         </div>
 
-                     <div className="mt-1" />
+                        <div className="mt-1" />
 
                     </motion.div>
 
@@ -223,13 +222,12 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 placeholder="••••••••"
-                                className={`w-full px-5 lg:px-6 py-4 lg:py-5 rounded-full border-2 transition-colors pr-14 text-gray-700 text-base lg:text-lg ${
-                                    confirmPassword
+                                className={`w-full px-5 lg:px-6 py-4 lg:py-5 rounded-full border-2 transition-colors pr-14 text-gray-700 text-base lg:text-lg ${confirmPassword
                                         ? password === confirmPassword
                                             ? 'border-emerald-400 focus:outline-none focus:border-emerald-400'
                                             : 'border-red-400 focus:outline-none focus:border-red-400'
                                         : 'border-gray-300 focus:outline-none focus:border-emerald-400'
-                                }`}
+                                    }`}
                             />
 
                             <button
@@ -244,42 +242,55 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                                 )}
                             </button>
                         </div>
+                        {password && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                transition={{ duration: 0.25 }}
+                                className="mt-3 overflow-hidden"
+                            >
+                                {/* Strength bar */}
+                                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div
+                                        className={`h-full transition-all duration-300 ${strengthInfo.color}`}
+                                        style={{ width: `${(strength / 4) * 100}%` }}
+                                    />
+                                </div>
 
-                        <div className="mt-3 min-h-[40px]">
-                            {password && (
-                                <>
-                                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                                        <div
-                                            className={`h-full transition-all duration-300 ${strengthInfo.color}`}
-                                            style={{ width: `${(strength / 4) * 100}%` }}
-                                        />
-                                    </div>
+                                <p className={`mt-1 text-xs font-semibold ${strengthInfo.text}`}>
+                                    {strengthInfo.label}
+                                </p>
 
-                                    <p className={`mt-1 text-xs font-semibold ${strengthInfo.text}`}>
-                                        {strengthInfo.label}
+                                {/* Checklist */}
+                                <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                                    <li className={hasLower ? 'text-emerald-600' : 'text-gray-400'}>✓ lowercase</li>
+                                    <li className={hasUpper ? 'text-emerald-600' : 'text-gray-400'}>✓ uppercase</li>
+                                    <li className={hasNumber ? 'text-emerald-600' : 'text-gray-400'}>✓ number</li>
+                                    <li className={hasLength ? 'text-emerald-600' : 'text-gray-400'}>✓ 8+ chars</li>
+                                </ul>
+
+                                {/* Match status */}
+                                {confirmPassword && (
+                                    <p
+                                        className={`text-xs font-semibold mt-3 ${password === confirmPassword
+                                                ? 'text-emerald-600'
+                                                : 'text-red-500'
+                                            }`}
+                                    >
+                                        {password === confirmPassword
+                                            ? '✓ Passwords match'
+                                            : '✗ Passwords do not match'}
                                     </p>
+                                )}
 
-                                    <ul className={`mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs transition-all duration-300`}> 
-                                        <li className={hasLower ? 'text-emerald-600' : 'text-gray-400'}>✓ lowercase</li>
-                                        <li className={hasUpper ? 'text-emerald-600' : 'text-gray-400'}>✓ uppercase</li>
-                                        <li className={hasNumber ? 'text-emerald-600' : 'text-gray-400'}>✓ number</li>
-                                        <li className={hasLength ? 'text-emerald-600' : 'text-gray-400'}>✓ 8+ chars</li>
-                                    </ul>
-                                </>
-                            )}
+                                {isStrong && confirmPassword && (
+                                    <p className="mt-2 text-xs font-semibold text-emerald-600">
+                                        ✓ Strong password
+                                    </p>
+                                )}
+                            </motion.div>
+                        )}
 
-                            {confirmPassword && (
-                                <p className={`text-xs font-semibold mt-3 ${password === confirmPassword ? 'text-emerald-600' : 'text-red-500'}`}>
-                                    {password === confirmPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
-                                </p>
-                            )}
-
-                            {isStrong && confirmPassword && (
-                                <p className="mt-2 text-xs font-semibold text-emerald-600">
-                                    ✓ Strong password
-                                </p>
-                            )}
-                        </div>
                     </motion.div>
 
                     <motion.div

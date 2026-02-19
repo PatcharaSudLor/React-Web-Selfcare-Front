@@ -5,8 +5,11 @@ import SignUpPage from './components/pages/SignUpPage'
 import LoginPage from './components/pages/LoginPage'
 import UserInfoPage from './components/pages/UserInfoPage'
 import BMIResultPage from './components/pages/BMIResultPage'
+import BMIViewPage from './components/pages/BMIViewPage'
 import BMRResultPage from './components/pages/BMRResultPage'
+import BMRViewPage from './components/pages/BMRViewPage'
 import TDEEResultPage from './components/pages/TDEEResultPage'
+import TDEEViewPage from './components/pages/TDEEViewPage'
 import HomePage from './components/pages/HomePage'
 import ResetPasswordPage from './components/pages/ResetPasswordPage'
 import MealPlanner from './components/pages/MealPlanners'
@@ -88,6 +91,9 @@ function AppContent() {
       <Route path="/bmiresults" element={<BMIResultPage onBack={handleBack} />} />
       <Route path="/bmrresults" element={<BMRResultPage onBack={handleBack} />} />
       <Route path="/tdeeresults" element={<TDEEResultPage onBack={handleBack} />} />
+      <Route path="/bmiviews" element={<BMIViewPage /> } />
+      <Route path="/bmrviews" element={<BMRViewPage /> } />
+      <Route path="/tdeeviews" element={<TDEEViewPage /> } />
 
       {/* Pages within MainLayout */}
       <Route element={<MainLayout currentPage={location.pathname} onNavigate={(path) => navigate(path)} onLogout={handleLogout} />}>
@@ -110,6 +116,7 @@ function AppContent() {
             )
           }
         />
+      
         <Route path="/meals/schedule" element={<MealSchedule onBack={() => navigate('/meals')} onSaveToSchedule={(s) => { console.log('Saved schedule:', s); }} mealPlanData={mealPlanData ?? { likedMeals: [], allergicFoods: [], budget: '' }} />} />
         <Route path="/workouts/videos" element={<WorkoutVideosWrapper />} />
         <Route path="/tips" element={<TipsPage onSelectTip={handleSelectTip} bookmarkedTips={bookmarkedTips} onToggleBookmark={handleToggleBookmark} />} />

@@ -9,7 +9,6 @@ interface MealPlannerProps {
 
 export interface MealPlanData {
   likedMeals: string[];
-  excludedProteins: string[]; 
   allergicFoods: string[];
   budget: string;
 }
@@ -78,7 +77,6 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
       onGeneratePlan({
         likedMeals,
         allergicFoods,
-        excludedProteins,   
         budget,
       });
     }

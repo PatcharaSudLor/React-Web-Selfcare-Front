@@ -64,7 +64,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* BMI Card */}
             <button
-              onClick={() => navigate('/bmiresults')}
+              onClick={() => navigate('/bmiviews')}
               className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all active:scale-95 text-left"
             >
               <div className="flex items-center justify-between mb-4">

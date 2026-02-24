@@ -23,6 +23,7 @@ import ProfilePage from './components/pages/ProfilePage'
 import TipsPage from './components/pages/TipsPage'
 import type { Tip } from './components/pages/TipsPage'
 import TipDetailPage from './components/pages/TipDetailPage'
+import AlertPage from './components/pages/AlertPage'
 import type { WeeklyWorkoutPlan } from './utils/workoutGenerator'
 import './App.css'
 import { useState } from 'react'
@@ -98,6 +99,7 @@ function AppContent() {
       {/* Pages within MainLayout */}
       <Route element={<MainLayout currentPage={location.pathname} onNavigate={(path) => navigate(path)} onLogout={handleLogout} />}>
         <Route path="/home" element={<HomePage />} />
+        <Route path="/alerts" element={<AlertPage />} />
         <Route path="/profile" element={<ProfilePage onBack={() => navigate('/home')} profileImage="https://api.dicebear.com/7.x/avataaars/svg?seed=default" onLogout={handleLogout} />} />
         <Route path="/meals" element={<MealPlanner onBack={() => navigate('/home')} onGeneratePlan={(data) => { setMealPlanData(data); navigate('/meals/schedule'); }} />} />
         <Route path="/workouts" element={<WorkoutPlanner onBack={() => navigate('/home')} onGeneratePlan={(data) => { setWorkoutPlanData(data); navigate('/workouts/schedule'); }} />} />

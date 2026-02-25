@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../utils/supabase';
 import { motion } from 'framer-motion';
+import type { Provider } from '@supabase/supabase-js';
 
 interface SignUpPageProps {
     onBack: () => void;
@@ -53,6 +54,7 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [socialLoading, setSocialLoading] = useState<Provider | null>(null);
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -126,9 +128,29 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
         }
     };
 
-    const handleSocialLogin = (provider: string) => {
-        console.log(`Sign up with ${provider}`);
-        // TODO: Implement social login
+    // ─── Google / Social OAuth ───────────────────────────────────────────────
+    const handleSocialLogin = async (provider: Provider) => {
+        setError('');
+        setSocialLoading(provider);
+        try {
+            const { error: oauthError } = await supabase.auth.signInWithOAuth({
+                provider,
+                options: {
+                    // หลัง Google ยืนยันตัวตน จะ redirect กลับมาที่ origin ของ app
+                    redirectTo: window.location.origin, // ✅ จะดึง URL จริงของ Codespace ให้อัตโนมัติ
+                },
+            });
+            if (oauthError) {
+                setError(oauthError.message);
+                setSocialLoading(null);
+            }
+            // ถ้าสำเร็จ browser จะ redirect ไป Google แล้วกลับมา
+            // onAuthStateChange ใน useAuthRedirect จะจัดการ routing ต่อ
+        } catch (err) {
+            console.error('Social sign up error:', err);
+            setError('An error occurred. Please try again.');
+            setSocialLoading(null);
+        }
     };
 
     return (
@@ -223,10 +245,10 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 placeholder="••••••••"
                                 className={`w-full px-5 lg:px-6 py-4 lg:py-5 rounded-full border-2 transition-colors pr-14 text-gray-700 text-base lg:text-lg ${confirmPassword
-                                        ? password === confirmPassword
-                                            ? 'border-emerald-400 focus:outline-none focus:border-emerald-400'
-                                            : 'border-red-400 focus:outline-none focus:border-red-400'
-                                        : 'border-gray-300 focus:outline-none focus:border-emerald-400'
+                                    ? password === confirmPassword
+                                        ? 'border-emerald-400 focus:outline-none focus:border-emerald-400'
+                                        : 'border-red-400 focus:outline-none focus:border-red-400'
+                                    : 'border-gray-300 focus:outline-none focus:border-emerald-400'
                                     }`}
                             />
 
@@ -273,8 +295,8 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                                 {confirmPassword && (
                                     <p
                                         className={`text-xs font-semibold mt-3 ${password === confirmPassword
-                                                ? 'text-emerald-600'
-                                                : 'text-red-500'
+                                            ? 'text-emerald-600'
+                                            : 'text-red-500'
                                             }`}
                                     >
                                         {password === confirmPassword
@@ -349,7 +371,8 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                         className="flex justify-center gap-8 lg:gap-10"
                     >
                         <button
-                            onClick={() => handleSocialLogin('Google')}
+                            onClick={() => handleSocialLogin('google')}
+                            disabled={socialLoading !== null || loading}
                             className="w-16 h-16 lg:w-20 lg:h-20 xl:w-20 xl:h-20 rounded-full bg-white border-2 border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all shadow-md hover:shadow-xl transform hover:scale-110"
                         >
                             <svg className="w-9 h-9 lg:w-11 lg:h-11 xl:w-14 xl:h-14" viewBox="0 0 24 24">

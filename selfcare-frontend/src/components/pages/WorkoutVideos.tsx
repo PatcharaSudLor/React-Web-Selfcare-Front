@@ -33,58 +33,51 @@ interface Video {
   duration: string;
   level: string;
   thumbnail: string;
-  instructor: string;
+  description: string;
+  youtubeLink: string;
 }
 
 // Mock data สำหรับวิดีโอ
 const videosByBodyPart: Record<string, Video[]> = {
   'upper-body': [
-    { id: '1', title: 'ท่าออกกำลังกายไหล่และหลังสำหรับมือใหม่', duration: '15 นาที', level: 'ง่าย', thumbnail: 'https://images.unsplash.com/photo-1756212279739-151869a36cfa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชแนน' },
-    { id: '2', title: 'เสริมสร้างกล้ามเนื้อส่วนบนระดับกลาง', duration: '20 นาที', level: 'ปานกลาง', thumbnail: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชบีม' },
-    { id: '3', title: 'ท่ายากสำหรับส่วนบนแข็งแรง', duration: '25 นาที', level: 'ยาก', thumbnail: 'https://images.unsplash.com/photo-1623874514711-0f321325f318?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชปอนด์' },
-    { id: '4', title: 'ไหล่แน่นใน 10 นาที', duration: '10 นาที', level: 'ง่าย', thumbnail: 'https://images.unsplash.com/photo-1603575448360-1b9e5b7f8c6a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชมาย' },
-    { id: '5', title: 'เวทเทรนนิ่งสำหรับหน้าอกและไหล่', duration: '30 นาที', level: 'ปานกลาง', thumbnail: 'https://images.unsplash.com/photo-1517960463706-9d8c2a3b6c6b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชกอล์ฟ' },
-    { id: '6', title: 'HIIT ส่วนบน (ไม่มีอุปกรณ์)', duration: '18 นาที', level: 'ยาก', thumbnail: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชปาล์ม' },
-    { id: '7', title: 'ปรับท่าโพสท์และท่าเสริมความแข็งแรง', duration: '22 นาที', level: 'ปานกลาง', thumbnail: 'https://images.unsplash.com/photo-1526403224749-989f1a8c8b51?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชโอ๊ต' },
-    { id: '8', title: 'คูลดาวน์และยืดกล้ามเนื้อส่วนบน', duration: '12 นาที', level: 'ง่าย', thumbnail: 'https://images.unsplash.com/photo-1505935428862-770b6f24f629?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชเมย์' },
-    { id: '9', title: 'กล้ามเนื้อหลังแข็งแรง (ระดับกลาง)', duration: '28 นาที', level: 'ปานกลาง', thumbnail: 'https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชเคน' },
-    { id: '10', title: 'Power Upper: ความท้าทาย 30 นาที', duration: '30 นาที', level: 'ยาก', thumbnail: 'https://images.unsplash.com/photo-1549576490-b0b4831ef60a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชโจ' },
+    { id: '1', title: 'MadFit - 15 MIN UPPER BODY WORKOUT (No Equipment)', duration: '15 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/gC_L9qAHVJ8/hqdefault.jpg', description: 'คลิปนี้เน้นไหล่ แขน และหลังส่วนบนแบบไม่ใช้อุปกรณ์ เหมาะสำหรับผู้เริ่มต้นถึงระดับกลาง', youtubeLink: 'https://www.youtube.com/watch?v=gC_L9qAHVJ8' },
+    { id: '2', title: 'MadFit - 20 MIN UPPER BODY DUMBBELL WORKOUT', duration: '20 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/U0bhE67HuDY/hqdefault.jpg', description: 'เวิร์กเอาต์กล้ามเนื้อช่วงบนด้วยดัมเบลที่ทำตามง่ายและค่อยๆ เพิ่มความท้าทายได้', youtubeLink: 'https://www.youtube.com/watch?v=U0bhE67HuDY' },
+    { id: '3', title: 'FitnessBlender - Beginner Upper Body Workout', duration: '16 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/X3-gKPNyrTA/hqdefault.jpg', description: 'โปรแกรมฝึกช่วงบนแบบพื้นฐาน จังหวะชัดเจนและปลอดภัยสำหรับคนเริ่มต้น', youtubeLink: 'https://www.youtube.com/watch?v=X3-gKPNyrTA' },
+    { id: '4', title: 'HASfit - Dumbbell Upper Body Workout', duration: '22 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/qEwKCR5JCog/hqdefault.jpg', description: 'ฝึกอก หลัง ไหล่ และแขนด้วยท่ามาตรฐานที่อธิบายชัดเจน เหมาะกับการสร้างพื้นฐาน', youtubeLink: 'https://www.youtube.com/watch?v=qEwKCR5JCog' },
+    { id: '5', title: 'Pamela Reif - Upper Body Workout', duration: '10 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/eozdVDA78K0/hqdefault.jpg', description: 'คลิปโฟกัสช่วงบนที่เน้นความกระชับและความแข็งแรงในเวลาสั้นๆ', youtubeLink: 'https://www.youtube.com/watch?v=eozdVDA78K0' },
+    { id: '6', title: 'MadFit - 10 MIN UPPER BODY WORKOUT (No Equipment)', duration: '10 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/0A3EgOztptQ/hqdefault.jpg', description: 'โฟกัสอก ไหล่ แขน และหลังส่วนบนแบบไม่ใช้อุปกรณ์ เหมาะวันฝึกสั้นแต่เข้มข้น', youtubeLink: 'https://www.youtube.com/watch?v=0A3EgOztptQ' },
+    { id: '7', title: 'Chloe Ting - 10 MIN ARM WORKOUT', duration: '10 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/j64BBgBGNIU/hqdefault.jpg', description: 'เน้นกระชับต้นแขนและหัวไหล่ด้วยท่าพื้นฐาน ทำตามง่ายสำหรับผู้เริ่มต้น', youtubeLink: 'https://www.youtube.com/watch?v=j64BBgBGNIU' },
+    { id: '8', title: 'MadFit - 15 MIN UPPER BODY (NO REPEATS)', duration: '15 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/Eml2xnoLpYE/hqdefault.jpg', description: 'โปรแกรมช่วงบนแบบไม่ซ้ำท่า ช่วยกระตุ้นกล้ามเนื้อแขน ไหล่ และหลังหลายมุม', youtubeLink: 'https://www.youtube.com/watch?v=Eml2xnoLpYE' },
   ],
   core: [
-    { id: '11', title: 'ท้องแบนสำหรับผู้เริ่มต้น', duration: '10 นาที', level: 'ง่าย', thumbnail: 'https://images.unsplash.com/photo-1593308610775-48f0102f1722?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชมายด์' },
-    { id: '12', title: 'Six Pack ระดับกลาง', duration: '15 นาที', level: 'ปานกลาง', thumbnail: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชกอล์ฟ' },
-    { id: '13', title: 'Core แกร่งระดับสูง', duration: '20 นาที', level: 'ยาก', thumbnail: 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชเคน' },
-    { id: '14', title: 'Pilates เบาๆ สำหรับแกนกลาง', duration: '25 นาที', level: 'ปานกลาง', thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชแอ๊ป' },
-    { id: '15', title: 'Plank Challenge 5 นาที', duration: '5 นาที', level: 'ยาก', thumbnail: 'https://images.unsplash.com/photo-1554306296-1f8f0f9e04b5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชบีม' },
-    { id: '16', title: 'Abs & Mobility', duration: '18 นาที', level: 'ปานกลาง', thumbnail: 'https://images.unsplash.com/photo-1546484959-fb4f3f538b8b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชมาย' },
-    { id: '17', title: 'เวิร์กเอาท์แกนกลางแบบวงจร', duration: '22 นาที', level: 'ยาก', thumbnail: 'https://images.unsplash.com/photo-1526403224749-989f1a8c8b51?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชปอนด์' },
-    { id: '18', title: 'Core สำหรับนักวิ่ง', duration: '12 นาที', level: 'ง่าย', thumbnail: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชเคน' },
-    { id: '19', title: 'Six Pack Advanced', duration: '30 นาที', level: 'ยาก', thumbnail: 'https://images.unsplash.com/photo-1526403224749-989f1a8c8b51?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชโจ' },
-    { id: '20', title: 'Stability & Balance Core', duration: '16 นาที', level: 'ปานกลาง', thumbnail: 'https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชเมย์' },
+    { id: '11', title: 'Chloe Ting - Get Abs in 2 Weeks (Abs Workout)', duration: '10 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/2pLT-olgUJs/hqdefault.jpg', description: 'คลิปหน้าท้องยอดนิยมที่เน้นแกนกลางลำตัวและทำตามได้ที่บ้านโดยไม่ใช้อุปกรณ์', youtubeLink: 'https://www.youtube.com/watch?v=2pLT-olgUJs' },
+    { id: '12', title: 'Pamela Reif - 10 MIN AB WORKOUT', duration: '10 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/AnYl6Nk9GOA/hqdefault.jpg', description: 'เวิร์กเอาต์หน้าท้อง 10 นาทีแบบต่อเนื่อง เหมาะกับผู้เริ่มต้นที่อยากเพิ่มความฟิตแกนกลาง', youtubeLink: 'https://www.youtube.com/watch?v=AnYl6Nk9GOA' },
+    { id: '13', title: 'Pamela Reif - 10 MIN SIXPACK WORKOUT', duration: '10 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/lCg_gh_fppI/hqdefault.jpg', description: 'คลิปแกนกลางระดับต้นถึงกลางที่ช่วยพัฒนาความทนทานของกล้ามท้องอย่างมีระบบ', youtubeLink: 'https://www.youtube.com/watch?v=lCg_gh_fppI' },
+    { id: '14', title: 'Emi Wong - 10 MIN ABS WORKOUT', duration: '10 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/Q-vuR4PJh2c/hqdefault.jpg', description: 'ท่าหน้าท้องที่ไม่ซับซ้อนและกระชับเวลา เหมาะสำหรับฝึกประจำวัน', youtubeLink: 'https://www.youtube.com/watch?v=Q-vuR4PJh2c' },
+    { id: '15', title: 'Blogilates - Beginner Abs Workout', duration: '12 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/DHD1-2P94DI/hqdefault.jpg', description: 'คลิปบริหารหน้าท้องสำหรับมือใหม่ เน้นคุมฟอร์มและหายใจให้ถูกจังหวะ', youtubeLink: 'https://www.youtube.com/watch?v=DHD1-2P94DI' },
+    { id: '16', title: 'Emi Wong - 10 MIN LOWER ABS WORKOUT', duration: '10 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/gOkCJ57IvNg/hqdefault.jpg', description: 'เจาะหน้าท้องล่างด้วยท่ายกขาและคุมเชิงกราน เหมาะสำหรับเสริมความมั่นคงของแกนกลาง', youtubeLink: 'https://www.youtube.com/watch?v=gOkCJ57IvNg' },
+    { id: '17', title: 'POPSUGAR - 10 Minute Ab Workout', duration: '10 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/IODxDxX7oi4/hqdefault.jpg', description: 'คลิปหน้าท้องแบบโค้ชนำจังหวะชัด เหมาะกับคนที่ต้องการ core session สั้นแต่ครบ', youtubeLink: 'https://www.youtube.com/watch?v=IODxDxX7oi4' },
+    { id: '18', title: 'MadFit - 12 MIN STANDING ABS WORKOUT', duration: '12 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/Hk5xQwM8Hf8/hqdefault.jpg', description: 'ฝึกแกนกลางแบบยืน ลดแรงกดหลังล่าง และเหมาะกับวันที่ไม่อยากนอนเล่นท่าบนพื้น', youtubeLink: 'https://www.youtube.com/watch?v=Hk5xQwM8Hf8' },
   ],
   legs: [
-    { id: '21', title: 'ขาสวยสำหรับมือใหม่', duration: '15 นาที', level: 'ง่าย', thumbnail: 'https://images.unsplash.com/photo-1595554919383-e6af8ed85d0a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชปาล์ม' },
-    { id: '22', title: 'ขาแข็งแรงระดับกลาง', duration: '20 นาที', level: 'ปานกลาง', thumbnail: 'https://images.unsplash.com/photo-1434682881908-b43d0467b798?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชโอ๊ต' },
-    { id: '23', title: 'ท่ายากสำหรับขาทรงพลัง', duration: '25 นาที', level: 'ยาก', thumbnail: 'https://images.unsplash.com/photo-1434608519344-49d77a699e1d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชโจ' },
-    { id: '24', title: 'Glute Activation', duration: '14 นาที', level: 'ง่าย', thumbnail: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชแอ๊ป' },
-    { id: '25', title: 'Strength Legs Circuit', duration: '30 นาที', level: 'ยาก', thumbnail: 'https://images.unsplash.com/photo-1517960463706-9d8c2a3b6c6b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชปาล์ม' },
-    { id: '26', title: 'เลคเดย์: ขาโฟกัส', duration: '28 นาที', level: 'ปานกลาง', thumbnail: 'https://images.unsplash.com/photo-1549576490-b0b4831ef60a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชกอล์ฟ' },
-    { id: '27', title: 'Lunges & Plyo', duration: '20 นาที', level: 'ยาก', thumbnail: 'https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชโอ๊ต' },
-    { id: '28', title: 'Lower Body Mobility', duration: '12 นาที', level: 'ง่าย', thumbnail: 'https://images.unsplash.com/photo-1505935428862-770b6f24f629?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชเมย์' },
-    { id: '29', title: 'Hamstring & Quad Focus', duration: '18 นาที', level: 'ปานกลาง', thumbnail: 'https://images.unsplash.com/photo-1603575448360-1b9e5b7f8c6a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชเคน' },
-    { id: '30', title: 'Pro Leg Strength', duration: '35 นาที', level: 'ยาก', thumbnail: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชโจ' },
+    { id: '21', title: 'Chloe Ting - Slim Thigh Workout', duration: '10 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/oAPCPjnU1wA/hqdefault.jpg', description: 'เวิร์กเอาต์ขาและต้นขาที่ทำได้ในพื้นที่จำกัด เหมาะกับผู้เริ่มต้นถึงกลาง', youtubeLink: 'https://www.youtube.com/watch?v=oAPCPjnU1wA' },
+    { id: '22', title: 'MadFit - 15 MIN LEG WORKOUT (No Equipment)', duration: '15 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/xo1VInw-SKc/hqdefault.jpg', description: 'คลิปโฟกัสกล้ามขาโดยไม่ใช้อุปกรณ์ เหมาะสำหรับฝึกความแข็งแรงพื้นฐาน', youtubeLink: 'https://www.youtube.com/watch?v=xo1VInw-SKc' },
+    { id: '23', title: 'Pamela Reif - 12 MIN LEG WORKOUT', duration: '12 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/8qDDtm6BOfw/hqdefault.jpg', description: 'โปรแกรมกระชับขาแบบเข้มข้นระยะสั้น ช่วยเพิ่มความทนทานของช่วงล่าง', youtubeLink: 'https://www.youtube.com/watch?v=8qDDtm6BOfw' },
+    { id: '24', title: 'FitnessBlender - Lower Body Workout for Beginners', duration: '20 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/1f8yoFFdkcY/hqdefault.jpg', description: 'คลิปฝึกขาและสะโพกที่คุมจังหวะได้ง่าย ลดแรงกระแทกและเหมาะกับมือใหม่', youtubeLink: 'https://www.youtube.com/watch?v=1f8yoFFdkcY' },
+    { id: '25', title: 'HASfit - Leg Workout at Home', duration: '25 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/9XfYqT0M-fg/hqdefault.jpg', description: 'เวิร์กเอาต์ขาที่ครอบคลุมต้นขา หน้า-หลังขา และก้น พร้อมคำแนะนำท่าชัดเจน', youtubeLink: 'https://www.youtube.com/watch?v=9XfYqT0M-fg' },
+    { id: '26', title: 'Pamela Reif - 15 MIN LEG WORKOUT', duration: '15 นาที', level: 'ยาก', thumbnail: 'https://i.ytimg.com/vi/H8kBcmS3vQY/hqdefault.jpg', description: 'เน้น squat และ lunge ต่อเนื่องเพื่อกระตุ้นต้นขาและสะโพก เหมาะกับคนที่ต้องการความเข้มขึ้น', youtubeLink: 'https://www.youtube.com/watch?v=H8kBcmS3vQY' },
+    { id: '27', title: 'Emi Wong - 10 MIN LEGS WORKOUT', duration: '10 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/YdB1HMCldJY/hqdefault.jpg', description: 'โปรแกรมขาสำหรับทำที่บ้านแบบไม่ซับซ้อน ช่วยสร้างพื้นฐานแรงขาได้ดี', youtubeLink: 'https://www.youtube.com/watch?v=YdB1HMCldJY' },
+    { id: '28', title: 'Chloe Ting - Lower Body Workout', duration: '12 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/ZiDgJEt3x1U/hqdefault.jpg', description: 'เจาะกล้ามเนื้อช่วงล่างโดยเน้นต้นขาและก้น ช่วยเพิ่มความทนทานและความกระชับ', youtubeLink: 'https://www.youtube.com/watch?v=ZiDgJEt3x1U' },
   ],
   stretching: [
-    { id: '31', title: 'ยืดเหยียดเบื้องต้นผ่อนคลาย', duration: '10 นาที', level: 'ง่าย', thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชนิ้ว' },
-    { id: '32', title: 'ยืดกล้ามเนื้อแบบครบวงจร', duration: '15 นาที', level: 'ปานกลาง', thumbnail: 'https://images.unsplash.com/photo-1603988363607-e1e4a66962c6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชเมย์' },
-    { id: '33', title: 'ยืดเหยียดขั้นสูงเพิ่มความยืดหยุ่น', duration: '20 นาที', level: 'ยาก', thumbnail: 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชเอิร์น' },
-    { id: '34', title: 'Yoga Stretch Flow', duration: '22 นาที', level: 'ปานกลาง', thumbnail: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชมายด์' },
-    { id: '35', title: 'Shoulder & Neck Release', duration: '12 นาที', level: 'ง่าย', thumbnail: 'https://images.unsplash.com/photo-1514404641122-7b3c6b7f3b1f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชปอนด์' },
-    { id: '36', title: 'Full Body Flexibility', duration: '30 นาที', level: 'ยาก', thumbnail: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชบีม' },
-    { id: '37', title: 'Post-Workout Stretch', duration: '15 นาที', level: 'ง่าย', thumbnail: 'https://images.unsplash.com/photo-1526403224749-989f1a8c8b51?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชเมย์' },
-    { id: '38', title: 'Deep Mobility Routine', duration: '25 นาที', level: 'ปานกลาง', thumbnail: 'https://images.unsplash.com/photo-1508873696983-2dfd5898f08a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชเคน' },
-    { id: '39', title: 'Flexibility for Runners', duration: '18 นาที', level: 'ปานกลาง', thumbnail: 'https://images.unsplash.com/photo-1546484959-fb4f3f538b8b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชปาล์ม' },
-    { id: '40', title: 'Gentle Stretch & Breathe', duration: '10 นาที', level: 'ง่าย', thumbnail: 'https://images.unsplash.com/photo-1505935428862-770b6f24f629?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400', instructor: 'โค้ชนิ้ว' },
+    { id: '31', title: 'Yoga With Adriene - Yoga For Complete Beginners', duration: '20 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/v7AYKMP6rOE/hqdefault.jpg', description: 'โยคะยืดเหยียดพื้นฐานทั้งตัวที่นุ่มนวล เหมาะมากสำหรับเริ่มต้นและวันพักฟื้น', youtubeLink: 'https://www.youtube.com/watch?v=v7AYKMP6rOE' },
+    { id: '32', title: 'Yoga With Adriene - Morning Yoga Flow', duration: '12 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/4pKly2JojMw/hqdefault.jpg', description: 'คลิปยืดเหยียดตอนเช้าเพื่อปลุกร่างกายและเพิ่มความคล่องตัวก่อนเริ่มวัน', youtubeLink: 'https://www.youtube.com/watch?v=4pKly2JojMw' },
+    { id: '33', title: 'Yoga With Adriene - Yoga for Back Pain', duration: '17 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/Ho9em79_0qg/hqdefault.jpg', description: 'ท่ายืดเน้นหลังและสะโพก ช่วยคลายความตึงจากการนั่งนานและฟื้นฟูการเคลื่อนไหว', youtubeLink: 'https://www.youtube.com/watch?v=Ho9em79_0qg' },
+    { id: '34', title: 'Yoga With Adriene - Yoga for Neck and Shoulders', duration: '18 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/sTANio_2E0Q/hqdefault.jpg', description: 'คลิปยืดคอและไหล่แบบอ่อนโยน ลดอาการตึงจากการทำงานหน้าจอได้ดี', youtubeLink: 'https://www.youtube.com/watch?v=sTANio_2E0Q' },
+    { id: '35', title: 'MadFit - 10 MIN FULL BODY STRETCH', duration: '10 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/lD9ZDwlHmNA/hqdefault.jpg', description: 'คูลดาวน์ยืดทั้งตัวหลังออกกำลังกาย ช่วยลดอาการตึงและเพิ่มช่วงการเคลื่อนไหว', youtubeLink: 'https://www.youtube.com/watch?v=lD9ZDwlHmNA' },
+    { id: '36', title: 'Pamela Reif - 10 MIN POST-WORKOUT STRETCH', duration: '10 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/qULTwquOuT4/hqdefault.jpg', description: 'ชุดยืดเหยียดหลังออกกำลังกายที่ช่วยคลายตึงกล้ามเนื้อขา สะโพก และหลังส่วนล่าง', youtubeLink: 'https://www.youtube.com/watch?v=qULTwquOuT4' },
+    { id: '37', title: 'Emi Wong - 12 MIN FULL BODY STRETCH ROUTINE', duration: '12 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/g_tea8ZNk5A/hqdefault.jpg', description: 'ยืดทั้งตัวแบบไม่ใช้อุปกรณ์ โฟกัสคอ ไหล่ หลัง และสะโพกสำหรับฟื้นตัวประจำวัน', youtubeLink: 'https://www.youtube.com/watch?v=g_tea8ZNk5A' },
+    { id: '38', title: 'Growingannanas - 15 MIN COOL DOWN STRETCH', duration: '15 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/ml6cT4AZdqI/hqdefault.jpg', description: 'คูลดาวน์เน้นการยืดหลังขา สะโพก และแนวหลัง เพื่อช่วยให้ร่างกายฟื้นตัวหลังวันฝึกหนัก', youtubeLink: 'https://www.youtube.com/watch?v=ml6cT4AZdqI' },
   ],
 };
 
@@ -166,9 +159,15 @@ export default function WorkoutVideos({ bodyPart, onBack }: WorkoutVideosProps) 
               {videos.map((video) => (
                 <div
                   key={video.id}
-                  className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer group border border-gray-100"
+                  className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow group border border-gray-100"
                 >
-                  <div className="relative aspect-video overflow-hidden">
+                  <a
+                    href={video.youtubeLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative aspect-video overflow-hidden block"
+                    aria-label={`เปิดวิดีโอ ${video.title} บน YouTube`}
+                  >
                     <ImageWithFallback
                       src={video.thumbnail}
                       alt={video.title}
@@ -186,7 +185,7 @@ export default function WorkoutVideos({ bodyPart, onBack }: WorkoutVideosProps) 
                         {video.level}
                       </span>
                     </div>
-                  </div>
+                  </a>
 
                   <div className="p-4">
                     <h3 className="mb-1 line-clamp-2 text-gray-800 group-hover:text-emerald-600 transition-colors text-sm font-medium">
@@ -205,7 +204,15 @@ export default function WorkoutVideos({ bodyPart, onBack }: WorkoutVideosProps) 
                     </div>
 
                     <div className="pt-2 border-t border-gray-100">
-                      <p className="text-sm text-gray-600">โดย {video.instructor}</p>
+                      <p className="text-sm text-gray-600">{video.description}</p>
+                      <a
+                        href={video.youtubeLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block mt-2 text-sm font-medium text-emerald-600 hover:text-emerald-700"
+                      >
+                        ไปยังวิดีโอ YouTube
+                      </a>
                     </div>
                   </div>
                 </div>

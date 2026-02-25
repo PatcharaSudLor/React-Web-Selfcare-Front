@@ -14,7 +14,7 @@ const menuItems = [
   { id: 'video', path: '/workouts/videos?part=upper-body', label: 'Videos', icon: PlayCircle },
   { id: 'alerts', path: '/alerts', label: 'Alerts', icon: Bell },
   { id: 'tips', path: '/tips', label: 'Tips', icon: Lightbulb },
-  { id: 'schedule', path: '/workouts/schedule', label: 'Schedule', icon: Calendar },
+  { id: 'schedule', path: '/schedule', label: 'Schedule', icon: Calendar },
   { id: 'favorite', path: '/favorite', label: 'Favorite', icon: Heart },
   { id: 'assistant', path: '/assistant', label: 'Assistant', icon: MessageCircle },
 ]

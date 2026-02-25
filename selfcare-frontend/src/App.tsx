@@ -233,7 +233,7 @@ function AppContent() {
 
     const bodyPart = { id: partId, name: nameMap[partId] ?? partId }
 
-    return <WorkoutVideos bodyPart={bodyPart} onBack={() => nav('/workouts')} />
+    return <WorkoutVideos bodyPart={bodyPart} onBack={() => nav('/home')} />
   }
 
   return (

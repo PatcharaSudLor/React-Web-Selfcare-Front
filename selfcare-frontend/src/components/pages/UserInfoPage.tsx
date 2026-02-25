@@ -93,6 +93,8 @@ export default function UserInfoPage({ onBack }: UserInfoPageProps) {
         blood_type: bloodType,
         bmi,
         bmi_category: bmiCategory,
+        is_setup_completed: true,   // ✅ เพิ่มบรรทัดนี้
+
       }]);
 
       if (error) {

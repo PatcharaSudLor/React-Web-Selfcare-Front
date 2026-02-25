@@ -64,6 +64,28 @@ export default function MealSchedule({ onBack, onSaveToSchedule, mealPlanData }:
   const { likedMeals, allergicFoods, budget, excludedProteins } = mealPlanData;
   const budgetNumber = parseInt(budget) || 100;
 
+  const weekDays = [
+    { day: 'Monday', dayTh: 'จันทร์' },
+    { day: 'Tuesday', dayTh: 'อังคาร' },
+    { day: 'Wednesday', dayTh: 'พุธ' },
+    { day: 'Thursday', dayTh: 'พฤหัสบดี' },
+    { day: 'Friday', dayTh: 'ศุกร์' },
+    { day: 'Saturday', dayTh: 'เสาร์' },
+    { day: 'Sunday', dayTh: 'อาทิตย์' },
+  ] as const;
+
+  const dayColorMap: Record<string, string> = {
+    Monday: 'bg-yellow-50',
+    Tuesday: 'bg-pink-50',
+    Wednesday: 'bg-green-50',
+    Thursday: 'bg-orange-50',
+    Friday: 'bg-blue-50',
+    Saturday: 'bg-purple-50',
+    Sunday: 'bg-red-50',
+  };
+
+  const dayOrder: string[] = weekDays.map((day) => day.day);
+
   // Filter meals based on preferences
   const getFilteredMeals = (): Meal[] => {
   return mealDatabase.filter((meal) => {
@@ -94,65 +116,19 @@ if (hasExcludedProtein) return false;
     return filteredMeals[index];
   };
 
-  // Generate weekly schedule
-  const weekSchedule: DayMeals[] = [
-    {
-      day: 'Monday',
-      dayTh: 'จันทร์',
-      breakfast: getRandomMeal(0),
-      lunch: getRandomMeal(1),
-      dinner: getRandomMeal(2),
-      color: 'bg-pink-50',
-    },
-    {
-      day: 'Tuesday',
-      dayTh: 'อังคาร',
-      breakfast: getRandomMeal(3),
-      lunch: getRandomMeal(4),
-      dinner: getRandomMeal(5),
-      color: 'bg-purple-50',
-    },
-    {
-      day: 'Wednesday',
-      dayTh: 'พุธ',
-      breakfast: getRandomMeal(6),
-      lunch: getRandomMeal(7),
-      dinner: getRandomMeal(8),
-      color: 'bg-blue-50',
-    },
-    {
-      day: 'Thursday',
-      dayTh: 'พฤหัสบดี',
-      breakfast: getRandomMeal(9),
-      lunch: getRandomMeal(10),
-      dinner: getRandomMeal(11),
-      color: 'bg-green-50',
-    },
-    {
-      day: 'Friday',
-      dayTh: 'ศุกร์',
-      breakfast: getRandomMeal(12),
-      lunch: getRandomMeal(13),
-      dinner: getRandomMeal(14),
-      color: 'bg-yellow-50',
-    },
-    {
-      day: 'Saturday',
-      dayTh: 'เสาร์',
-      breakfast: getRandomMeal(15),
-      lunch: getRandomMeal(16),
-      dinner: getRandomMeal(17),
-      color: 'bg-orange-50',
-    },
-    {
-      day: 'Sunday',
-      dayTh: 'อาทิตย์',
-      breakfast: getRandomMeal(18),
-      lunch: getRandomMeal(19),
-      dinner: getRandomMeal(20),
-      color: 'bg-red-50',
-    },
-  ];
+  // Generate weekly schedule by day order with fixed color mapping
+  const weekSchedule: DayMeals[] = weekDays.map(({ day, dayTh }, index) => ({
+    day,
+    dayTh,
+    breakfast: getRandomMeal(index * 3),
+    lunch: getRandomMeal(index * 3 + 1),
+    dinner: getRandomMeal(index * 3 + 2),
+    color: dayColorMap[day] ?? 'bg-gray-50',
+  }));
+
+  const sortedWeekSchedule = [...weekSchedule].sort(
+    (a, b) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day)
+  );
 
   const handleSave = () => {
     if (onSaveToSchedule) {
@@ -213,7 +189,7 @@ if (hasExcludedProtein) return false;
 
             {/* Weekly Schedule Grid */}
             <div className="space-y-4">
-              {weekSchedule.map((dayMeals, index) => (
+              {sortedWeekSchedule.map((dayMeals, index) => (
                 <div key={index} className={`rounded-2xl p-4 ${dayMeals.color} border border-gray-200`}>
                   {/* Day Header */}
                   <div className="flex items-center justify-between mb-3">

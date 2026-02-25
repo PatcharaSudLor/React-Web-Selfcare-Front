@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, BookOpen, Clock, TrendingUp, Bookmark } from 'lucide-react';
+import { Search, Clock, TrendingUp } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 export interface Tip {
@@ -506,7 +506,7 @@ const tips: Tip[] = [
 
 ];
 
-export default function TipsPage({ onSelectTip, bookmarkedTips, onToggleBookmark }: TipsPageProps) {
+export default function TipsPage({ onSelectTip }: TipsPageProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -529,9 +529,6 @@ export default function TipsPage({ onSelectTip, bookmarkedTips, onToggleBookmark
     return matchesCategory && matchesSearch;
   });
 
-  const isBookmarked = (tipId: string) => {
-    return bookmarkedTips.some(t => t.id === tipId);
-  };
   return (
   <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white pt-2 pb-16">
     <div className="max-w-6xl mx-auto px-6">

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Droplets, Dumbbell, Moon, Apple, Smile, Sparkles, Heart } from 'lucide-react';
-import { div } from 'framer-motion/m';
 
 interface Alert {
   id: string;

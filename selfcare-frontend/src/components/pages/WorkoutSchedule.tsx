@@ -5,9 +5,10 @@ import type { WeeklyWorkoutPlan } from '../../utils/workoutGenerator';
 interface WorkoutScheduleProps {
   onBack: () => void;
   plan: WeeklyWorkoutPlan;
+  onSaveToSchedule?: (schedule: { day: string; dayTh: string; workout: string; duration: string; exercises: string[]; color: string }[]) => void;
 }
 
-export default function WorkoutSchedule({ onBack, plan }: WorkoutScheduleProps) {
+export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: WorkoutScheduleProps) {
   // Generate schedule based on user preferences
   const schedule = plan.days.map(day => ({
     day: day.day,
@@ -20,24 +21,42 @@ export default function WorkoutSchedule({ onBack, plan }: WorkoutScheduleProps) 
 
 
   const handleSave = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (onSaveToSchedule) {
+      const localSchedule = schedule.map((item) => ({
+        day: item.day,
+        dayTh: item.dayTh,
+        workout: item.workout,
+        duration: `${item.duration} นาที`,
+        exercises: item.exercises.length === 0
+          ? ['Recovery / Stretching']
+          : item.exercises.map((exercise) => `${exercise.name} (${exercise.sets} x ${exercise.reps})`),
+        color: dayCardColorMap[item.day] ?? 'border-gray-200 bg-gray-50',
+      }));
 
-    const payload = schedule.map(item => ({
-      user_id: user.id,
-      day: item.day,
-      day_th: item.dayTh,
-      workout: item.workout,
-      duration: item.duration,
-      exercises: item.exercises,
-    }));
+      onSaveToSchedule(localSchedule);
+    }
 
-    await supabase
-      .from('workout_schedules')
-      .delete()
-      .eq('user_id', user.id);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const payload = schedule.map(item => ({
+          user_id: user.id,
+          day: item.day,
+          day_th: item.dayTh,
+          workout: item.workout,
+          duration: item.duration,
+          exercises: item.exercises,
+        }));
 
-    await supabase.from('workout_schedules').insert(payload);
+        await supabase
+          .from('workout_schedules')
+          .delete()
+          .eq('user_id', user.id);
+
+        await supabase.from('workout_schedules').insert(payload);
+      }
+    } catch {}
+
     alert('บันทึกลงตารางเรียบร้อยแล้ว!');
   };
 
@@ -47,24 +66,24 @@ export default function WorkoutSchedule({ onBack, plan }: WorkoutScheduleProps) 
 
   // สีพาสเทลประจำวัน - ป้าย Day Label
   const dayLabelColorMap: Record<string, string> = {
-    Monday: 'bg-blue-400 text-white',
-    Tuesday: 'bg-teal-400 text-white',
-    Wednesday: 'bg-amber-400 text-white',
-    Thursday: 'bg-purple-400 text-white',
-    Friday: 'bg-rose-400 text-white',
-    Saturday: 'bg-orange-400 text-white',
-    Sunday: 'bg-slate-400 text-white',
+    Monday: 'bg-yellow-400 text-white',
+    Tuesday: 'bg-pink-400 text-white',
+    Wednesday: 'bg-green-400 text-white',
+    Thursday: 'bg-orange-400 text-white',
+    Friday: 'bg-sky-400 text-white',
+    Saturday: 'bg-purple-400 text-white',
+    Sunday: 'bg-red-400 text-white',
   };
 
   // สีพาสเทลประจำวัน - กล่อง Workout
   const dayCardColorMap: Record<string, string> = {
-    Monday: 'border-blue-200 bg-blue-50',
-    Tuesday: 'border-teal-200 bg-teal-50',
-    Wednesday: 'border-amber-200 bg-amber-50',
-    Thursday: 'border-purple-200 bg-purple-50',
-    Friday: 'border-rose-200 bg-rose-50',
-    Saturday: 'border-orange-200 bg-orange-50',
-    Sunday: 'border-slate-200 bg-slate-50',
+    Monday: 'border-yellow-200 bg-yellow-50',
+    Tuesday: 'border-pink-200 bg-pink-50',
+    Wednesday: 'border-green-200 bg-green-50',
+    Thursday: 'border-orange-200 bg-orange-50',
+    Friday: 'border-sky-200 bg-sky-50',
+    Saturday: 'border-purple-200 bg-purple-50',
+    Sunday: 'border-red-200 bg-red-50',
   };
 
 

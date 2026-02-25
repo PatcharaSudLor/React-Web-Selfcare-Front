@@ -26,6 +26,7 @@ import TipDetailPage from './components/pages/TipDetailPage'
 import AlertPage from './components/pages/AlertPage'
 import { SchedulePage } from './components/pages/SchedulePage'
 import type { WeeklyWorkoutPlan } from './utils/workoutGenerator'
+import { useAuthRedirect } from './utils/useAuthRedirect';
 import './App.css'
 import { useEffect, useState } from 'react'
 
@@ -89,6 +90,9 @@ function AppContent() {
   const [bookmarkedTips, setBookmarkedTips] = useState<Tip[]>([])
   const [workoutSchedules, setWorkoutSchedules] = useState<SavedWorkoutDay[][]>([])
   const [mealSchedules, setMealSchedules] = useState<SavedMealDay[][]>([])
+  
+  useAuthRedirect();
+
 
   useEffect(() => {
     const storedWorkoutSchedules = localStorage.getItem(WORKOUT_SCHEDULES_STORAGE_KEY)
@@ -246,9 +250,9 @@ function AppContent() {
       <Route path="/bmiresults" element={<BMIResultPage onBack={handleBack} />} />
       <Route path="/bmrresults" element={<BMRResultPage onBack={handleBack} />} />
       <Route path="/tdeeresults" element={<TDEEResultPage onBack={handleBack} />} />
-      <Route path="/bmiviews" element={<BMIViewPage /> } />
-      <Route path="/bmrviews" element={<BMRViewPage /> } />
-      <Route path="/tdeeviews" element={<TDEEViewPage /> } />
+      <Route path="/bmiviews" element={<BMIViewPage />} />
+      <Route path="/bmrviews" element={<BMRViewPage />} />
+      <Route path="/tdeeviews" element={<TDEEViewPage />} />
 
       {/* Pages within MainLayout */}
       <Route element={<MainLayout currentPage={location.pathname} onNavigate={(path) => navigate(path)} onLogout={handleLogout} />}>
@@ -309,7 +313,7 @@ function AppContent() {
             )
           }
         />
-      
+
         <Route
           path="/meals/schedule"
           element={

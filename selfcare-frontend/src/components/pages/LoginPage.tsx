@@ -32,7 +32,7 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+  const [socialLoading, setSocialLoading] = useState<Provider | null>(null);
   // forgot-password state
   const [showForgot, setShowForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
@@ -122,8 +122,29 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
     }
   };
 
+  // ─── Google / Social OAuth ───────────────────────────────────────────────
+  // NOTE: routing หลัง OAuth จะถูกจัดการโดย useAuthRedirect ใน App
+  // onLoginSuccess ที่นี่จะไม่ถูกเรียกสำหรับ OAuth flow
   const handleSocialLogin = async (provider: Provider) => {
-    await supabase.auth.signInWithOAuth({ provider });
+    setError('');
+    setSocialLoading(provider);
+    try {
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: window.location.origin, // ✅ จะดึง URL จริงของ Codespace ให้อัตโนมัติ
+        },
+      });
+      if (oauthError) {
+        setError(oauthError.message);
+        setSocialLoading(null);
+      }
+      // ถ้าสำเร็จ browser redirect ไป Google → กลับมา → onAuthStateChange จัดการ
+    } catch (err) {
+      console.error('Social login error:', err);
+      setError('An error occurred. Please try again.');
+      setSocialLoading(null);
+    }
   };
 
   const handleForgotPassword = async () => {
@@ -313,6 +334,7 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
           <motion.div variants={item} className="flex justify-center gap-8 lg:gap-10 mt-8">
             <button
               onClick={() => handleSocialLogin('google')}
+              disabled={socialLoading !== null || loading}
               className="w-16 h-16 lg:w-20 lg:h-20 xl:w-20 xl:h-20 rounded-full bg-white border-2 border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all shadow-md hover:shadow-xl transform hover:scale-110"
             >
               <svg className="w-9 h-9 lg:w-11 lg:h-11 xl:w-14 xl:h-14" viewBox="0 0 24 24">
@@ -334,7 +356,7 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
                 />
               </svg>
             </button>
-            
+
           </motion.div>
 
           {/* Sign Up Link */}

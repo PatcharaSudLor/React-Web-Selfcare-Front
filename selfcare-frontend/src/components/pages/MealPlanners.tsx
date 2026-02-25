@@ -11,6 +11,7 @@ export interface MealPlanData {
   likedMeals: string[];
   allergicFoods: string[];
   budget: string;
+  excludedProteins?: string[];
 }
 
 type MealType = {
@@ -39,7 +40,7 @@ const mealTypes: MealType[] = [
 const allergyTypes: AllergyType[] = [
   { id: 'pork', label: 'Pork', labelTh: 'หมู', icon: '🐷' },
   { id: 'beef', label: 'Beef', labelTh: 'เนื้อ', icon: '🐄' },
-    { id: 'chicken', label: 'Chicken', labelTh: 'ไก่', icon: '🐔' },
+  { id: 'chicken', label: 'Chicken', labelTh: 'ไก่', icon: '🐔' },
   { id: 'nuts', label: 'Nuts', labelTh: 'ถั่ว', icon: '🥜' },
   { id: 'seafood', label: 'Seafood', labelTh: 'อาหารทะเล', icon: '🦐' },
   { id: 'dairy', label: 'Dairy', labelTh: 'นม', icon: '🥛' },
@@ -78,6 +79,7 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
         likedMeals,
         allergicFoods,
         budget,
+        excludedProteins,
       });
     }
   };

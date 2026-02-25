@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom'
 import { UserProvider } from './contexts/UserContext'
 import FirstPage from './components/pages/FirstPage'
 import SignUpPage from './components/pages/SignUpPage'
@@ -24,9 +24,62 @@ import TipsPage from './components/pages/TipsPage'
 import type { Tip } from './components/pages/TipsPage'
 import TipDetailPage from './components/pages/TipDetailPage'
 import AlertPage from './components/pages/AlertPage'
+import { SchedulePage } from './components/pages/SchedulePage'
 import type { WeeklyWorkoutPlan } from './utils/workoutGenerator'
 import './App.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
+interface SavedWorkoutDay {
+  day: string;
+  dayTh: string;
+  workout: string;
+  duration: string;
+  exercises: string[];
+  color: string;
+}
+
+interface SavedMeal {
+  name: string;
+  nameTh: string;
+  price: number;
+  type: string;
+  excludeAllergies: string[];
+  image?: string;
+}
+
+interface SavedMealDay {
+  day: string;
+  dayTh: string;
+  breakfast: SavedMeal;
+  lunch: SavedMeal;
+  dinner: SavedMeal;
+  color: string;
+}
+
+const WORKOUT_SCHEDULES_STORAGE_KEY = 'savedWorkoutSchedules'
+const MEAL_SCHEDULES_STORAGE_KEY = 'savedMealSchedules'
+const WORKOUT_PLAN_STORAGE_KEY = 'savedWorkoutPlan'
+const MEAL_PLAN_STORAGE_KEY = 'savedMealPlanData'
+
+const parseDurationToNumber = (duration: string): number => {
+  const matched = duration.match(/\d+/)
+  return matched ? Number(matched[0]) : 0
+}
+
+const mapSavedScheduleToPlan = (savedSchedule: SavedWorkoutDay[]): WeeklyWorkoutPlan => {
+  return {
+    days: savedSchedule.map((day) => ({
+      day: day.day,
+      focus: day.workout,
+      duration: parseDurationToNumber(day.duration),
+      exercises: day.exercises.map((exerciseText) => ({
+        name: exerciseText,
+        sets: 3,
+        reps: '10-12',
+      })),
+    })),
+  }
+}
 
 function AppContent() {
   const navigate = useNavigate()
@@ -34,6 +87,71 @@ function AppContent() {
   const [mealPlanData, setMealPlanData] = useState<MealPlanData | null>(null)
   const [workoutPlan, setWorkoutPlanData] = useState<WeeklyWorkoutPlan | null>(null)
   const [bookmarkedTips, setBookmarkedTips] = useState<Tip[]>([])
+  const [workoutSchedules, setWorkoutSchedules] = useState<SavedWorkoutDay[][]>([])
+  const [mealSchedules, setMealSchedules] = useState<SavedMealDay[][]>([])
+
+  useEffect(() => {
+    const storedWorkoutSchedules = localStorage.getItem(WORKOUT_SCHEDULES_STORAGE_KEY)
+    const storedMealSchedules = localStorage.getItem(MEAL_SCHEDULES_STORAGE_KEY)
+    const storedWorkoutPlan = localStorage.getItem(WORKOUT_PLAN_STORAGE_KEY)
+    const storedMealPlan = localStorage.getItem(MEAL_PLAN_STORAGE_KEY)
+
+    if (storedWorkoutSchedules) {
+      try {
+        setWorkoutSchedules(JSON.parse(storedWorkoutSchedules))
+      } catch {
+        setWorkoutSchedules([])
+      }
+    }
+
+    if (storedMealSchedules) {
+      try {
+        setMealSchedules(JSON.parse(storedMealSchedules))
+      } catch {
+        setMealSchedules([])
+      }
+    }
+
+    if (storedWorkoutPlan) {
+      try {
+        setWorkoutPlanData(JSON.parse(storedWorkoutPlan))
+      } catch {
+        setWorkoutPlanData(null)
+      }
+    }
+
+    if (storedMealPlan) {
+      try {
+        setMealPlanData(JSON.parse(storedMealPlan))
+      } catch {
+        setMealPlanData(null)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem(WORKOUT_SCHEDULES_STORAGE_KEY, JSON.stringify(workoutSchedules))
+  }, [workoutSchedules])
+
+  useEffect(() => {
+    localStorage.setItem(MEAL_SCHEDULES_STORAGE_KEY, JSON.stringify(mealSchedules))
+  }, [mealSchedules])
+
+  useEffect(() => {
+    if (mealPlanData) {
+      localStorage.setItem(MEAL_PLAN_STORAGE_KEY, JSON.stringify(mealPlanData))
+    } else {
+      localStorage.removeItem(MEAL_PLAN_STORAGE_KEY)
+    }
+  }, [mealPlanData])
+
+  useEffect(() => {
+    if (workoutPlan) {
+      localStorage.setItem(WORKOUT_PLAN_STORAGE_KEY, JSON.stringify(workoutPlan))
+    } else {
+      localStorage.removeItem(WORKOUT_PLAN_STORAGE_KEY)
+    }
+  }, [workoutPlan])
 
   const handleLogin = () => {
     navigate('/login')
@@ -64,7 +182,43 @@ function AppContent() {
     setBookmarkedTips((prev) => (prev.some(t => t.id === tip.id) ? prev.filter(t => t.id !== tip.id) : [...prev, tip]))
   }
 
+  const handleSaveWorkoutSchedule = (schedule: SavedWorkoutDay[]) => {
+    setWorkoutSchedules([schedule])
+  }
+
+  const handleSaveMealSchedule = (schedule: SavedMealDay[]) => {
+    setMealSchedules([schedule])
+  }
+
+  const handleDeleteWorkoutSchedule = (index: number) => {
+    setWorkoutSchedules((prev) => {
+      const updated = prev.filter((_, i) => i !== index)
+      if (updated.length === 0) {
+        setWorkoutPlanData(null)
+      }
+      return updated
+    })
+  }
+
+  const handleDeleteMealSchedule = (index: number) => {
+    setMealSchedules((prev) => {
+      const updated = prev.filter((_, i) => i !== index)
+      if (updated.length === 0) {
+        setMealPlanData(null)
+      }
+      return updated
+    })
+  }
+
   // Wrapper to parse query param and pass a bodyPart to WorkoutVideos
+  const currentWorkoutPlan: WeeklyWorkoutPlan | null = workoutPlan
+    ?? (workoutSchedules.length > 0 ? mapSavedScheduleToPlan(workoutSchedules[0]) : null)
+
+  const currentMealPlanData: MealPlanData | null = mealPlanData
+
+  const hasSavedWorkoutSchedule = workoutSchedules.length > 0
+  const hasSavedMealSchedule = mealSchedules.length > 0
+
   function WorkoutVideosWrapper() {
     const nav = useNavigate()
     const loc = useLocation()
@@ -101,25 +255,87 @@ function AppContent() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/alerts" element={<AlertPage />} />
         <Route path="/profile" element={<ProfilePage onBack={() => navigate('/home')} profileImage="https://api.dicebear.com/7.x/avataaars/svg?seed=default" onLogout={handleLogout} />} />
-        <Route path="/meals" element={<MealPlanner onBack={() => navigate('/home')} onGeneratePlan={(data) => { setMealPlanData(data); navigate('/meals/schedule'); }} />} />
-        <Route path="/workouts" element={<WorkoutPlanner onBack={() => navigate('/home')} onGeneratePlan={(data) => { setWorkoutPlanData(data); navigate('/workouts/schedule'); }} />} />
+        <Route
+          path="/meals"
+          element={
+            hasSavedMealSchedule && currentMealPlanData ? (
+              <MealSchedule
+                onBack={() => navigate('/home')}
+                onSaveToSchedule={handleSaveMealSchedule}
+                mealPlanData={currentMealPlanData}
+              />
+            ) : (
+              <MealPlanner
+                onBack={() => navigate('/home')}
+                onGeneratePlan={(data) => {
+                  setMealPlanData(data)
+                  navigate('/meals/schedule')
+                }}
+              />
+            )
+          }
+        />
+        <Route
+          path="/workouts"
+          element={
+            hasSavedWorkoutSchedule && currentWorkoutPlan ? (
+              <WorkoutSchedule
+                onBack={() => navigate('/home')}
+                plan={currentWorkoutPlan}
+                onSaveToSchedule={handleSaveWorkoutSchedule}
+              />
+            ) : (
+              <WorkoutPlanner
+                onBack={() => navigate('/home')}
+                onGeneratePlan={(data) => {
+                  setWorkoutPlanData(data)
+                  navigate('/workouts/schedule')
+                }}
+              />
+            )
+          }
+        />
         <Route
           path="/workouts/schedule"
           element={
-            workoutPlan ? (
+            currentWorkoutPlan ? (
               <WorkoutSchedule
                 onBack={() => navigate('/workouts')}
-                plan={workoutPlan}
+                plan={currentWorkoutPlan}
+                onSaveToSchedule={handleSaveWorkoutSchedule}
               />
             ) : (
-              <div className="p-6 text-center">
-                <p>ไม่พบแผนออกกำลังกาย กรุณาสร้างแผนใหม่</p>
-              </div>
+              <Navigate to="/workouts" replace />
             )
           }
         />
       
-        <Route path="/meals/schedule" element={<MealSchedule onBack={() => navigate('/meals')} onSaveToSchedule={(s) => { console.log('Saved schedule:', s); }} mealPlanData={mealPlanData ?? { likedMeals: [], allergicFoods: [], budget: '' }} />} />
+        <Route
+          path="/meals/schedule"
+          element={
+            currentMealPlanData ? (
+              <MealSchedule
+                onBack={() => navigate('/meals')}
+                onSaveToSchedule={handleSaveMealSchedule}
+                mealPlanData={currentMealPlanData}
+              />
+            ) : (
+              <Navigate to="/meals" replace />
+            )
+          }
+        />
+        <Route
+          path="/schedule"
+          element={
+            <SchedulePage
+              onBack={() => navigate('/home')}
+              workoutSchedules={workoutSchedules}
+              mealSchedules={mealSchedules}
+              onDeleteWorkoutSchedule={handleDeleteWorkoutSchedule}
+              onDeleteMealSchedule={handleDeleteMealSchedule}
+            />
+          }
+        />
         <Route path="/workouts/videos" element={<WorkoutVideosWrapper />} />
         <Route path="/tips" element={<TipsPage onSelectTip={handleSelectTip} bookmarkedTips={bookmarkedTips} onToggleBookmark={handleToggleBookmark} />} />
         <Route path="/tips/detail" element={<TipDetailPage onBack={() => navigate('/tips')} />} />

@@ -64,16 +64,16 @@ const videosByBodyPart: Record<string, Video[]> = {
     { id: '20', title: 'Blogilates - 10 MIN ABS WORKOUT', duration: '10 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/1919eTCoESo/hqdefault.jpg', description: 'เวิร์กเอาต์หน้าท้องสำหรับฝึกประจำวัน เน้นฟอร์มชัดและทำตามง่าย', youtubeLink: 'https://www.youtube.com/watch?v=1919eTCoESo' },
   ],
   legs: [
-    { id: '21', title: 'Chloe Ting - Slim Thigh Workout', duration: '10 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/oAPCPjnU1wA/hqdefault.jpg', description: 'เวิร์กเอาต์ขาและต้นขาที่ทำได้ในพื้นที่จำกัด เหมาะกับผู้เริ่มต้นถึงกลาง', youtubeLink: 'https://www.youtube.com/watch?v=oAPCPjnU1wA' },
-    { id: '22', title: 'MadFit - 15 MIN LEG WORKOUT (No Equipment)', duration: '15 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/xo1VInw-SKc/hqdefault.jpg', description: 'คลิปโฟกัสกล้ามขาโดยไม่ใช้อุปกรณ์ เหมาะสำหรับฝึกความแข็งแรงพื้นฐาน', youtubeLink: 'https://www.youtube.com/watch?v=xo1VInw-SKc' },
-    { id: '23', title: 'Pamela Reif - 12 MIN LEG WORKOUT', duration: '12 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/8qDDtm6BOfw/hqdefault.jpg', description: 'โปรแกรมกระชับขาแบบเข้มข้นระยะสั้น ช่วยเพิ่มความทนทานของช่วงล่าง', youtubeLink: 'https://www.youtube.com/watch?v=8qDDtm6BOfw' },
+    { id: '21', title: 'Chloe Ting - Slim Thigh Workout', duration: '20 นาที', level: 'ยาก', thumbnail: 'https://i.ytimg.com/vi/oAPCPjnU1wA/hqdefault.jpg', description: 'เวิร์กเอาต์ขาและต้นขาที่ทำได้ในพื้นที่จำกัด เหมาะกับผู้เริ่มต้นถึงกลาง', youtubeLink: 'https://www.youtube.com/watch?v=oAPCPjnU1wA' },
+    { id: '22', title: '10 MIN LEG/BOOTY/THIGH WORKOUT (No Equipment Killer Legs)', duration: '12 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/FJA3R7n_594/hqdefault.jpg', description: 'คลิปโฟกัสกล้ามขาโดยไม่ใช้อุปกรณ์ เหมาะสำหรับฝึกความแข็งแรงพื้นฐาน', youtubeLink: 'https://www.youtube.com/watch?v=FJA3R7n_594' },
+    { id: '23', title: '30 MIN LEG WORKOUT - Lower Body, GLUTES and THIGHS - With Weights Home Workout', duration: '30 นาที', level: 'ยาก', thumbnail: 'https://i.ytimg.com/vi/3MpUrM_z_Ws/hqdefault.jpg', description: 'โปรแกรมกระชับขาแบบเข้มข้นระยะสั้น ช่วยเพิ่มความทนทานของช่วงล่าง', youtubeLink: 'https://www.youtube.com/watch?v=3MpUrM_z_Ws' },
     { id: '24', title: 'FitnessBlender - Lower Body Workout for Beginners', duration: '20 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/1f8yoFFdkcY/hqdefault.jpg', description: 'คลิปฝึกขาและสะโพกที่คุมจังหวะได้ง่าย ลดแรงกระแทกและเหมาะกับมือใหม่', youtubeLink: 'https://www.youtube.com/watch?v=1f8yoFFdkcY' },
-    { id: '25', title: 'MadFit - 10 MIN INNER THIGH WORKOUT', duration: '10 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/4xBq4t8P8hM/hqdefault.jpg', description: 'เน้นต้นขาด้านในโดยเฉพาะ ช่วยกระชับขาและเพิ่มความมั่นคงของช่วงล่าง', youtubeLink: 'https://www.youtube.com/watch?v=4xBq4t8P8hM' },
-    { id: '26', title: 'Juice & Toya - 15 MIN Booty + Thigh Workout', duration: '15 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/5r9Q0H8Yf5I/hqdefault.jpg', description: 'ฝึกต้นขาและสะโพกแบบต่อเนื่อง ช่วยเพิ่มแรงช่วงล่างและความกระชับ', youtubeLink: 'https://www.youtube.com/watch?v=5r9Q0H8Yf5I' },
-    { id: '27', title: 'Emi Wong - 10 MIN LEGS WORKOUT', duration: '10 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/YdB1HMCldJY/hqdefault.jpg', description: 'โปรแกรมขาสำหรับทำที่บ้านแบบไม่ซับซ้อน ช่วยสร้างพื้นฐานแรงขาได้ดี', youtubeLink: 'https://www.youtube.com/watch?v=YdB1HMCldJY' },
+    { id: '25', title: '10 MIN STANDING LEGS PILATES - Butt, Thighs & Calves / flowy, slow & intense I No Equipment', duration: '10 นาที', level: 'ง่าย', thumbnail: 'https://i.ytimg.com/vi/rNWBdTgTj0Q/hqdefault.jpg', description: 'เน้นต้นขาด้านในโดยเฉพาะ ช่วยกระชับขาและเพิ่มความมั่นคงของช่วงล่าง', youtubeLink: 'https://www.youtube.com/watch?v=rNWBdTgTj0Q' },
+    { id: '26', title: '15 MIN LEGS + BOOTY with Weights - Lower Body Home Workout with Dumbbell', duration: '15 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/Z2yT7SvzI3E/hqdefault.jpg', description: 'ฝึกต้นขาและสะโพกแบบต่อเนื่อง ช่วยเพิ่มแรงช่วงล่างและความกระชับ', youtubeLink: 'https://www.youtube.com/watch?v=Z2yT7SvzI3E' },
+    { id: '27', title: '30 Min LEG WORKOUT FROM HELL (Quads, Calves, Hamstrings & Glutes) + Cool Down', duration: '30 นาที', level: 'ยาก', thumbnail: 'https://i.ytimg.com/vi/vK_DQYimccw/hqdefault.jpg', description: 'โปรแกรมขาสำหรับทำที่บ้านแบบไม่ซับซ้อน ช่วยสร้างพื้นฐานแรงขาได้ดี', youtubeLink: 'https://www.youtube.com/watch?v=vK_DQYimccw' },
     { id: '28', title: 'Chloe Ting - Lower Body Workout', duration: '12 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/ZiDgJEt3x1U/hqdefault.jpg', description: 'เจาะกล้ามเนื้อช่วงล่างโดยเน้นต้นขาและก้น ช่วยเพิ่มความทนทานและความกระชับ', youtubeLink: 'https://www.youtube.com/watch?v=ZiDgJEt3x1U' },
-    { id: '29', title: 'MadFit - 15 MIN LEG/BUTT/THIGH WORKOUT', duration: '15 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/Q1fL6M8Hn4A/hqdefault.jpg', description: 'โฟกัสขา ก้น และต้นขาโดยตรง เหมาะกับการเสริมความแข็งแรงช่วงล่าง', youtubeLink: 'https://www.youtube.com/watch?v=Q1fL6M8Hn4A' },
-    { id: '30', title: 'Caroline Girvan - 20 MIN LEGS & GLUTES', duration: '20 นาที', level: 'ยาก', thumbnail: 'https://i.ytimg.com/vi/jLUN6othGBM/hqdefault.jpg', description: 'เวิร์กเอาต์ขาและสะโพกเข้มข้นสำหรับผู้ที่ต้องการความท้าทายเพิ่มขึ้น', youtubeLink: 'https://www.youtube.com/watch?v=jLUN6othGBM' },
+    { id: '29', title: '30 Mins Dumbbell Workout For Stronger Legs!', duration: '30 นาที', level: 'ยาก', thumbnail: 'https://i.ytimg.com/vi/7dEkOdcE6Vw/hqdefault.jpg', description: 'โฟกัสขา ก้น และต้นขาโดยตรง เหมาะกับการเสริมความแข็งแรงช่วงล่าง', youtubeLink: 'https://www.youtube.com/watch?v=7dEkOdcE6Vw' },
+    { id: '30', title: 'Caroline Girvan - 15 MIN LEGS & GLUTES', duration: '15 นาที', level: 'ยาก', thumbnail: 'https://i.ytimg.com/vi/jLUN6othGBM/hqdefault.jpg', description: 'เวิร์กเอาต์ขาและสะโพกเข้มข้นสำหรับผู้ที่ต้องการความท้าทายเพิ่มขึ้น', youtubeLink: 'https://www.youtube.com/watch?v=jLUN6othGBM' },
     { id: '31', title: '10 ท่านอน ลดขาเบียด Slim Legs Workout', duration: 'ประมาณ 10 นาที', level: 'ปานกลาง', thumbnail: 'https://i.ytimg.com/vi/d34F-pPhJw8/hqdefault.jpg', description: 'คลิปฝึก 10 ท่าลดต้นขาและขาเบียด ทำตามง่าย เหมาะสำหรับผู้เริ่มต้นโดยไม่ต้องใช้อุปกรณ์', youtubeLink: 'https://www.youtube.com/watch?v=d34F-pPhJw8' },
   ],
   stretching: [
@@ -114,6 +114,12 @@ export default function WorkoutVideos({ bodyPart, onBack }: WorkoutVideosProps) 
   }, [selectedPartId])
 
   const videos = videosByBodyPart[selectedPartId] || [];
+  const levelOrder: Record<string, number> = { 'ง่าย': 0, 'ปานกลาง': 1, 'ยาก': 2 };
+  const sortedVideos = [...videos].sort((firstVideo, secondVideo) => {
+    const firstRank = levelOrder[firstVideo.level] ?? 99;
+    const secondRank = levelOrder[secondVideo.level] ?? 99;
+    return firstRank - secondRank;
+  });
 
   const getLevelColor = (level: string) => {
     switch (level) {
@@ -165,7 +171,7 @@ export default function WorkoutVideos({ bodyPart, onBack }: WorkoutVideosProps) 
 
             {/* Videos Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {videos.map((video) => (
+              {sortedVideos.map((video) => (
                 <div
                   key={video.id}
                   className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow group border border-gray-100"

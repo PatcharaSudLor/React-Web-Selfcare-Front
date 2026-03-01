@@ -47,6 +47,16 @@ const allergyTypes: AllergyType[] = [
   { id: 'eggs', label: 'Eggs', labelTh: 'ไข่', icon: '🥚' },
 ];
 
+const proteinOptions = [
+  { id: 'pork', label: 'Pork', labelTh: 'หมู', icon: '🐷' },
+  { id: 'beef', label: 'Beef', labelTh: 'เนื้อ', icon: '🐄' },
+  { id: 'chicken', label: 'Chicken', labelTh: 'ไก่', icon: '🐔' },
+  { id: 'nuts', label: 'Nuts', labelTh: 'ถั่ว', icon: '🥜' },
+  { id: 'seafood', label: 'Seafood', labelTh: 'อาหารทะเล', icon: '🦐' },
+  { id: 'dairy', label: 'Dairy', labelTh: 'นม', icon: '🥛' },
+  { id: 'eggs', label: 'Eggs', labelTh: 'ไข่', icon: '🥚' },
+];
+
 export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps) {
   const [likedMeals, setLikedMeals] = useState<string[]>([]);
   const [allergicFoods, setAllergicFoods] = useState<string[]>([]);
@@ -165,41 +175,43 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
                 ))}
               </div>
             </div>
-            {/* Excluded Proteins */}
+           {/* Excluded Proteins */}
             <div className="mb-8">
               <h3 className="text-gray-800 font-semibold mb-1 flex items-center gap-2">
                 <span className="text-orange-500 text-xl">•</span>
-             Excluded Proteins
-             </h3>
-             <p className="text-sm text-left text-gray-500 mb-4 ml-4">
-              Select proteins you want to avoid (optional)
-             </p>
+                Excluded Proteins
+              </h3>
+              <p className="text-sm text-left text-gray-500 mb-4 ml-4">
+                Select proteins you want to avoid (optional)
+              </p>
 
-             <div className="grid grid-cols-3 gap-3">
-              {allergyTypes
-                .filter(a => ['pork','chicken','beef','seafood','eggs','dairy','nuts'].includes(a.id)) // 👈 เอาเฉพาะโปรตีน
-                .map((protein) => (
-             <button
-                key={protein.id}
-                onClick={() => toggleProtein(protein.id)}
-                className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all hover:shadow-md ${
-                excludedProteins.includes(protein.id)
-                ? 'border-orange-500 bg-orange-50 shadow-sm'
-                : 'border-gray-200 hover:border-orange-300 bg-white'
-              }`}
-        >
-                 <span className="text-3xl">{protein.icon}</span>
-                 <span className={`text-sm font-medium ${
-                   excludedProteins.includes(protein.id)
-                    ? 'text-orange-700'
-                    : 'text-gray-600'
-              }`}>
-                {protein.labelTh}
-                  </span>
-                   </button>
-             ))}
-                  </div>
-                    </div>
+              <div className="grid grid-cols-3 gap-4">
+                {proteinOptions.map((protein) => {
+                  const active = excludedProteins.includes(protein.id);
+
+                  return (
+                    <button
+                      key={protein.id}
+                      type="button"
+                      onClick={() => toggleProtein(protein.id)}
+                      className={[
+                        'h-28 w-full rounded-2xl border transition-all',
+                        'flex flex-col items-center justify-center gap-2',
+                        'bg-white hover:shadow-sm',
+                        active
+                          ? 'border-orange-400 bg-orange-50'
+                          : 'border-gray-200 hover:border-gray-300',
+                      ].join(' ')}
+                    >
+                      <span className="text-3xl leading-none">{protein.icon}</span>
+                      <span className={active ? 'text-sm font-medium text-orange-700' : 'text-sm font-medium text-gray-700'}>
+                        {protein.labelTh}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
             {/* Budget */}
             <div className="mb-8">

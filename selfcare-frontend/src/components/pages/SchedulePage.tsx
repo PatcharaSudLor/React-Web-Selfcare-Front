@@ -15,7 +15,8 @@ interface Meal {
   nameTh: string;
   price: number;
   type: string;
-  excludeAllergies: string[];
+  protein: string;
+  allergens: string[];
   image?: string;
 }
 

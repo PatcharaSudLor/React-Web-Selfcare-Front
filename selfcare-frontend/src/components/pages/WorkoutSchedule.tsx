@@ -6,9 +6,10 @@ interface WorkoutScheduleProps {
   onBack: () => void;
   plan: WeeklyWorkoutPlan;
   onSaveToSchedule?: (schedule: { day: string; dayTh: string; workout: string; duration: string; exercises: string[]; color: string }[]) => void;
+  skipSupabasePersist?: boolean; // when parent already syncs
 }
 
-export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: WorkoutScheduleProps) {
+export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule, skipSupabasePersist }: WorkoutScheduleProps) {
   // Generate schedule based on user preferences
   const schedule = plan.days.map(day => ({
     day: day.day,
@@ -36,26 +37,28 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
       onSaveToSchedule(localSchedule);
     }
 
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const payload = schedule.map(item => ({
-          user_id: user.id,
-          day: item.day,
-          day_th: item.dayTh,
-          workout: item.workout,
-          duration: item.duration,
-          exercises: item.exercises,
-        }));
+    if (!skipSupabasePersist) {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const payload = schedule.map(item => ({
+            user_id: user.id,
+            day: item.day,
+            day_th: item.dayTh,
+            workout: item.workout,
+            duration: item.duration,
+            exercises: item.exercises,
+          }));
 
-        await supabase
-          .from('workout_schedules')
-          .delete()
-          .eq('user_id', user.id);
+          await supabase
+            .from('workout_schedules')
+            .delete()
+            .eq('user_id', user.id);
 
-        await supabase.from('workout_schedules').insert(payload);
-      }
-    } catch {}
+          await supabase.from('workout_schedules').insert(payload);
+        }
+      } catch {}
+    }
 
     alert('บันทึกลงตารางเรียบร้อยแล้ว!');
   };

@@ -24,7 +24,7 @@ export default function ResetPasswordPage() {
       // ignore returned promise; if it fails, we'll handle on updateUser
       supabase.auth
         .setSession({ access_token: token, refresh_token: '' })
-        .catch((e) => {
+        .catch((e: any) => {
           console.warn('Failed to set session from token', e);
         });
     } else {

@@ -11,7 +11,7 @@ export function useAuthRedirect() {
     // ✅ วิธีที่ถูก: ให้ Supabase JS parse hash เอง แล้ว fire SIGNED_IN ให้
     // ไม่ต้อง getSession() เอง เพราะ detectSessionInUrl: true จัดการให้แล้ว
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: import('@supabase/supabase-js').AuthChangeEvent, session: import('@supabase/supabase-js').Session | null) => {
         console.log('🔔 Auth event:', event, '| user:', session?.user?.email ?? 'none');
 
         if (event === 'SIGNED_IN' && session?.user) {

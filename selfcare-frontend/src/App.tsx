@@ -28,7 +28,7 @@ import { SchedulePage } from './components/pages/SchedulePage'
 import type { WeeklyWorkoutPlan } from './utils/workoutGenerator'
 import { useAuthRedirect } from './utils/useAuthRedirect';
 import './App.css'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { supabase } from './utils/supabase'
 
 interface SavedWorkoutDay {
@@ -102,6 +102,7 @@ function AppContent() {
   const [mealSchedules, setMealSchedules] = useState<SavedMealDay[][]>([])
   const [authUserId, setAuthUserId] = useState<string | null>(null)
   const [authReady, setAuthReady] = useState(false)
+  const prevAuthUserIdRef = useRef<string | null | undefined>(undefined)
   
   useAuthRedirect();
 
@@ -160,8 +161,14 @@ function AppContent() {
   useEffect(() => {
     if (!authReady) return
 
-    // Reset first so previous user's data does not flash
-    resetUserScopedState()
+    // Only reset when user actually changes (not just on initial load)
+    const prevId = prevAuthUserIdRef.current
+    const isUserChange = prevId !== undefined && prevId !== authUserId
+    prevAuthUserIdRef.current = authUserId
+
+    if (isUserChange) {
+      resetUserScopedState()
+    }
 
     // Clean up legacy unscoped keys to avoid accidental reuse
     localStorage.removeItem(WORKOUT_SCHEDULES_STORAGE_KEY)

@@ -61,7 +61,7 @@ export default function WorkoutPlanner({ onBack, onGeneratePlan }: WorkoutPlanne
         .from('workout_preferences')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (data) {
         setSelectedTime(data.daily_time);

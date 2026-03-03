@@ -28,7 +28,7 @@ import { SchedulePage } from './components/pages/SchedulePage'
 import type { WeeklyWorkoutPlan } from './utils/workoutGenerator'
 import { useAuthRedirect } from './utils/useAuthRedirect';
 import './App.css'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from './utils/supabase'
 
 interface SavedWorkoutDay {
@@ -102,7 +102,6 @@ function AppContent() {
   const [mealSchedules, setMealSchedules] = useState<SavedMealDay[][]>([])
   const [authUserId, setAuthUserId] = useState<string | null>(null)
   const [authReady, setAuthReady] = useState(false)
-  const prevAuthUserIdRef = useRef<string | null | undefined>(undefined)
   
   useAuthRedirect();
 
@@ -126,128 +125,55 @@ function AppContent() {
   useEffect(() => {
     let isMounted = true
 
-    const syncUser = async () => {
-      const { data, error } = await supabase.auth.getUser()
-      if (!isMounted) return
-
-      if (error) {
-        console.error('Failed to get user for storage scoping:', error)
-      }
-
-      setAuthUserId(data.user?.id ?? null)
-      setAuthReady(true)
-    }
-
-    syncUser()
-
-    const { data: listener } = supabase.auth.onAuthStateChange((event: import('@supabase/supabase-js').AuthChangeEvent, session: import('@supabase/supabase-js').Session | null) => {
-      if (!isMounted) return
-
-      setAuthUserId(session?.user?.id ?? null)
-      setAuthReady(true)
-
-      if (event === 'SIGNED_OUT') {
-        resetUserScopedState()
-      }
-    })
-
-    return () => {
-      isMounted = false
-      listener.subscription.unsubscribe()
-    }
-  }, [])
-
-
-  useEffect(() => {
-    if (!authReady) return
-
-    // Only reset when user actually changes (not just on initial load)
-    const prevId = prevAuthUserIdRef.current
-    const isUserChange = prevId !== undefined && prevId !== authUserId
-    prevAuthUserIdRef.current = authUserId
-
-    if (isUserChange) {
-      resetUserScopedState()
-    }
-
-    // Clean up legacy unscoped keys to avoid accidental reuse
+    // Clean up legacy unscoped keys
     localStorage.removeItem(WORKOUT_SCHEDULES_STORAGE_KEY)
     localStorage.removeItem(MEAL_SCHEDULES_STORAGE_KEY)
     localStorage.removeItem(MEAL_PLAN_STORAGE_KEY)
-  }, [authReady, authUserId])
 
-  useEffect(() => {
-    if (!authReady) return
+    const loadSchedules = async (userId: string) => {
+      if (!isMounted) return
 
-    const loadFromSupabase = async () => {
-      const userId = await getActiveUserId()
-      if (!userId) return
-
+      // Load workout schedules
       try {
         const { data, error } = await supabase
           .from('workout_schedules')
           .select('*')
           .eq('user_id', userId)
 
-        if (error) {
-          console.error('Load workout_schedules error:', error)
-          return
-        }
-
-        if (!data || data.length === 0) {
-          console.log('Load workout_schedules: no rows for user', userId)
-          return
-        }
-
-        const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-
-        const mapped: SavedWorkoutDay[] = data
-          .slice()
-          .sort((a: Record<string, any>, b: Record<string, any>) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day))
-          .map((item: Record<string, any>) => {
-            const exercisesArray = Array.isArray(item.exercises) ? item.exercises : []
-
-            const exercises = exercisesArray.map((ex: any) => {
-              if (typeof ex === 'string') return ex
-              if (ex && typeof ex === 'object' && ex.name) {
-                const sets = ex.sets ?? '?'
-                const reps = ex.reps ?? '?'
-                return `${ex.name} (${sets} x ${reps})`
+        if (!error && data && data.length > 0) {
+          const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+          const mapped: SavedWorkoutDay[] = data
+            .slice()
+            .sort((a: Record<string, any>, b: Record<string, any>) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day))
+            .map((item: Record<string, any>) => {
+              const exercisesArray = Array.isArray(item.exercises) ? item.exercises : []
+              const exercises = exercisesArray.map((ex: any) => {
+                if (typeof ex === 'string') return ex
+                if (ex && typeof ex === 'object' && ex.name) {
+                  return `${ex.name} (${ex.sets ?? '?'} x ${ex.reps ?? '?'})`
+                }
+                return 'Exercise'
+              })
+              const durationNumber = typeof item.duration === 'number' ? item.duration : Number(item.duration) || 0
+              return {
+                day: item.day,
+                dayTh: item.day_th ?? item.day,
+                workout: item.workout,
+                duration: `${durationNumber} นาที`,
+                exercises,
+                color: DAY_CARD_COLOR_MAP[item.day] ?? 'border-gray-200 bg-gray-50',
               }
-              return 'Exercise'
             })
-
-            const durationNumber = typeof item.duration === 'number' ? item.duration : Number(item.duration) || 0
-
-            return {
-              day: item.day,
-              dayTh: item.day_th ?? item.day,
-              workout: item.workout,
-              duration: `${durationNumber} นาที`,
-              exercises,
-              color: DAY_CARD_COLOR_MAP[item.day] ?? 'border-gray-200 bg-gray-50',
-            }
-          })
-
-        if (mapped.length > 0) {
-          setWorkoutSchedules([mapped])
-          setWorkoutPlanData(mapSavedScheduleToPlan(mapped))
+          if (isMounted && mapped.length > 0) {
+            setWorkoutSchedules([mapped])
+            setWorkoutPlanData(mapSavedScheduleToPlan(mapped))
+          }
         }
       } catch (err) {
         console.error('Unexpected error loading workout schedules:', err)
       }
-    }
 
-    loadFromSupabase()
-  }, [authReady, authUserId])
-
-  useEffect(() => {
-    if (!authReady) return
-
-    const loadMealsFromSupabase = async () => {
-      const userId = await getActiveUserId()
-      if (!userId) return
-
+      // Load meal schedules
       try {
         const { data, error } = await supabase
           .from('meal_schedules')
@@ -255,30 +181,46 @@ function AppContent() {
           .eq('user_id', userId)
           .maybeSingle()
 
-        if (error) {
-          console.error('Load meal_schedules error:', error)
-          return
-        }
-
-        if (!data) {
-          console.log('Load meal_schedules: no row for user', userId)
-          return
-        }
-
-        if (Array.isArray(data.schedule)) {
-          setMealSchedules([data.schedule])
-        }
-
-        if (data.plan) {
-          setMealPlanData(data.plan as MealPlanData)
+        if (!error && data) {
+          if (isMounted && Array.isArray(data.schedule)) {
+            setMealSchedules([data.schedule])
+          }
+          if (isMounted && data.plan) {
+            setMealPlanData(data.plan as MealPlanData)
+          }
         }
       } catch (err) {
         console.error('Unexpected error loading meal schedules:', err)
       }
     }
 
-    loadMealsFromSupabase()
-  }, [authReady, authUserId])
+    const { data: listener } = supabase.auth.onAuthStateChange((event: import('@supabase/supabase-js').AuthChangeEvent, session: import('@supabase/supabase-js').Session | null) => {
+      if (!isMounted) return
+
+      const userId = session?.user?.id ?? null
+      setAuthUserId(userId)
+      setAuthReady(true)
+
+      if (event === 'SIGNED_OUT') {
+        resetUserScopedState()
+      } else if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && userId) {
+        loadSchedules(userId)
+      }
+    })
+
+    // Also load on mount via getUser (in case onAuthStateChange already fired)
+    supabase.auth.getUser().then(({ data }) => {
+      if (!isMounted) return
+      const userId = data.user?.id ?? null
+      setAuthUserId(userId)
+      setAuthReady(true)
+    })
+
+    return () => {
+      isMounted = false
+      listener.subscription.unsubscribe()
+    }
+  }, [])
 
   // Meal schedules now live in Supabase (no localStorage write)
 

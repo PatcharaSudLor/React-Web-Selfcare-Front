@@ -153,7 +153,7 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
         .from('user_profile')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (!error && data) {
         const loadedData = {

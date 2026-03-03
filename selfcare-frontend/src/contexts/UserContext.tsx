@@ -125,7 +125,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
           .from('user_profile')
           .select('*')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (!error && data) {
           let avatarUrl: string | undefined = undefined;

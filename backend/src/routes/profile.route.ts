@@ -58,4 +58,85 @@ router.post('/setup', async (req, res) => {
         return res.status(500).json({ error: 'Server Error' })
     }
 })
+
+router.post('/bmr', async(req, res)=> {
+    try{
+        const { user_id, gender, height, weight, age} = req.body
+
+        if(!user_id || !gender || !height || !weight || !age){
+            return res.status(400).json({error:'Missing required fields'})
+        }
+
+        const h = Number(height)
+        const w = Number(weight)
+        const a = Number(age)
+
+        if (isNaN(h) || isNaN(w) || isNaN(a)) {
+            return res.status(400).json({ error: 'height, weight, age must be numbers' })
+        }
+
+        if (h <= 0 || w <= 0 || a <= 0) {
+            return res.status(400).json({ error: 'height, weight, age must be greater than 0' })
+        }
+
+        let bmr: number
+        if (gender === 'male'){
+            bmr = (10 * w) + (6.25 * h) - (5 * a) + 5
+        } else {
+            bmr = (10 * w) + (6.25 * h) - (5 * a) - 161
+        }
+        bmr = Math.round(bmr)
+
+        const { error } = await supabase
+        .from('user_profile')
+        .update({ bmr })
+        .eq('user_id', user_id)
+
+        if (error){
+            return res.status(500).json({error: error.message})
+        }
+
+        return res.json({ bmr })
+    }catch (err) {
+        return res.status(500).json({error: 'Server Error'})
+    }
+})
+
+router.post('/tdee', async(req, res) => {
+    try {
+        const { user_id, bmr, activityLevel } = req.body
+
+        if(!user_id || !bmr || !activityLevel) {
+            return res.status(400).json({error: 'Missing required fields'})
+        }
+
+        const multipliers: Record<string, number> = {
+            sedentary: 1.2,
+            light: 1.375,
+            moderate: 1.55,
+            very: 1.725,
+            extra: 1.9,
+        }
+
+        const multiplier = multipliers[activityLevel]
+        if (!multiplier) {
+            return res.status(400).json({error: 'Invalid activity level'})
+        }
+
+        const tdee = Math.round(bmr * multiplier)
+
+        const { error } = await supabase
+        .from('user_profile')
+        .update({ tdee })
+        .eq('user_id', user_id)
+
+        if(error){
+            return res.status(500).json({error: error.message})
+        }
+
+        return res.json({ tdee })
+    } catch (err){
+        return res.status(500).json({ error: 'Server Error'})
+    }
+})
 export default router

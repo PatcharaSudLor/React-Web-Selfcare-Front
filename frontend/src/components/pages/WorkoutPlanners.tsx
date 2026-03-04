@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Info } from 'lucide-react';
 import { useEffect } from 'react';
-import { supabase } from '../../utils/supabase.ts';
+import { supabase } from '../../utils/supabase';
 import { generateWorkoutPlan } from '../../utils/workoutGenerator';
 import type {
   WeeklyWorkoutPlan,

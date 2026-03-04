@@ -19,7 +19,7 @@ type AuthCallback = (event: string, session: any) => void
 let authCallback: AuthCallback | null = null
 
 supabase.auth.onAuthStateChange((event, session) => {
-  console.log('Auth event:', event)
+  console.log('Auth event:', event, 'email:', session?.user?.email)
   if (authCallback) {
     authCallback(event, session)
   }

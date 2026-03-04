@@ -1,7 +1,7 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
-import { supabase } from '../utils/supabase';
-
+import { supabase, setAuthCallback, clearAuthCallback } from '../utils/supabase';
+import { useNavigate } from 'react-router-dom';
 
 export interface UserInfoData {
   username?: string;
@@ -15,7 +15,7 @@ export interface UserInfoData {
   bmr?: number;
   tdee?: number;
   bloodType?: string;
-  avatarUrl?: string
+  avatarUrl?: string;
 }
 
 interface UserContextType {
@@ -43,135 +43,115 @@ const DEFAULT_USER_INFO: UserInfoData = {
 };
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [userInfo, setUserInfo] = useState<UserInfoData>(() => {
-    // Initialize from localStorage
-    try {
-      const stored = localStorage.getItem('selfcare_user_info');
+  const navigateRef = useRef<ReturnType<typeof useNavigate>>(null!);
+  navigateRef.current = useNavigate();
 
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return { ...DEFAULT_USER_INFO, ...parsed };
-      }
-    } catch (error) {
-      console.error('Error loading user info:', error);
-    }
-    return DEFAULT_USER_INFO;
-  });
-
+  const [userInfo, setUserInfo] = useState<UserInfoData>(DEFAULT_USER_INFO);
   const [loading, setLoading] = useState(true);
 
-
-  // Save to localStorage whenever userInfo changes
+  const setUserInfoRef = useRef(setUserInfo);
+  const setLoadingRef = useRef(setLoading);
   useEffect(() => {
-    try {
-      localStorage.setItem('selfcare_user_info', JSON.stringify(userInfo));
-    } catch (error) {
-      console.error('Error saving user info:', error);
-    }
-  }, [userInfo]);
-
-  const updateUserInfo = (data: Partial<UserInfoData>) => {
-    setUserInfo(prev => {
-      const updated = {
-        ...prev, username: data.username ?? prev.username,
-        gender: data.gender ?? prev.gender,
-        age: data.age ? String(data.age) : prev.age,
-        height: data.height ? String(data.height) : prev.height,
-        weight: data.weight ? String(data.weight) : prev.weight,
-        bmi: data.bmi ?? prev.bmi,
-        bmiCategory: data.bmiCategory ?? prev.bmiCategory,
-        bmr: data.bmr ?? prev.bmr,
-        tdee: data.tdee ?? prev.tdee,
-        bloodType: data.bloodType ?? prev.bloodType,
-        avatarUrl: data.avatarUrl ?? prev.avatarUrl,
-      };
-
-      // Auto-calculate BMI if height and weight are provided
-      if (data.height && data.weight) {
-        const heightM = parseFloat(data.height) / 100;
-        const weightKg = parseFloat(data.weight);
-        const calculatedBMI = weightKg / (heightM * heightM);
-        updated.bmi = calculatedBMI;
-
-        // Auto-set BMI category
-        if (calculatedBMI < 18.5) {
-          updated.bmiCategory = 'Underweight';
-        } else if (calculatedBMI < 25) {
-          updated.bmiCategory = 'Normal';
-        } else if (calculatedBMI < 30) {
-          updated.bmiCategory = 'Overweight';
-        } else {
-          updated.bmiCategory = 'Obese';
-        }
-      }
-
-      return updated;
-    });
-
-  };
+    setUserInfoRef.current = setUserInfo;
+    setLoadingRef.current = setLoading;
+  });
 
   useEffect(() => {
-    const loadUserProfile = async () => {
+    let isLoadingProfile = false;
+
+    async function loadProfile(userId: string, email: string) {
       try {
-        const { data: auth } = await supabase.auth.getUser();
-        const user = auth?.user;
+        const { data: profile, error } = await supabase
+          .from('user_profile')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
-        if (!user) {
-          setLoading(false);
+        if (error) { console.error(error); return; }
+
+        if (!profile) {
+          await supabase.from('user_profile').insert({
+            user_id: userId,
+            email,
+            username: 'User',
+            is_setup_completed: false,
+          });
+          navigateRef.current('/userinfo');
           return;
         }
 
-        const { data, error } = await supabase
-          .from('user_profile')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
+        setUserInfoRef.current(prev => ({
+          ...prev,
+          username: profile.username ?? prev.username,
+          gender: profile.gender ?? prev.gender,
+          age: profile.age ?? prev.age,
+          height: profile.height ?? prev.height,
+          weight: profile.weight ?? prev.weight,
+          bmi: profile.bmi ?? prev.bmi,
+          bmiCategory: profile.bmi_category ?? prev.bmiCategory,
+          bmr: profile.bmr ?? prev.bmr,
+          tdee: profile.tdee ?? prev.tdee,
+          bloodType: profile.blood_type ?? prev.bloodType,
+        }));
 
-        if (!error && data) {
-          let avatarUrl: string | undefined = undefined;
-
-          // ✅ แปลง path → public URL
-          if (data.avatar_url) {
-            const { data: publicData } = supabase.storage
-              .from('avatars')
-              .getPublicUrl(data.avatar_url);
-
-            avatarUrl = `${publicData.publicUrl}?t=${Date.now()}`;
-          }
-
-          setUserInfo(prev => ({
-            ...prev,
-            username: data.username ?? prev.username,
-            gender: data.gender ?? prev.gender,
-            age: data.age ? String(data.age) : prev.age,
-            height: data.height ? String(data.height) : prev.height,
-            weight: data.weight ? String(data.weight) : prev.weight,
-            bmi: data.bmi ?? prev.bmi,
-            bmiCategory: data.bmi_category ?? prev.bmiCategory,
-            bmr: data.bmr ?? prev.bmr,
-            tdee: data.tdee ?? prev.tdee,
-            bloodType: data.blood_type ?? prev.bloodType,
-            avatarUrl,
-          }));
+        if (profile.is_setup_completed) {
+          navigateRef.current('/home');
+        } else {
+          navigateRef.current('/userinfo');
         }
-      } catch (e) {
-        console.error(e);
+      } catch (err) {
+        console.error('loadProfile error:', err);
       } finally {
-        setLoading(false);
+        setLoadingRef.current(false);
       }
-    };
+    }
 
-    loadUserProfile();
+    setAuthCallback(async (event, session) => {
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
+        if (isLoadingProfile) return;
+        isLoadingProfile = true;
+        try {
+          await loadProfile(session.user.id, session.user.email ?? '');
+        } finally {
+          isLoadingProfile = false;
+        }
+      }
+      if (event === 'SIGNED_OUT') {
+        isLoadingProfile = false;
+        setUserInfoRef.current(DEFAULT_USER_INFO);
+        navigateRef.current('/');
+      }
+      if (event === 'INITIAL_SESSION' && !session) {
+        setLoadingRef.current(false);
+      }
+    });
+
+    return () => { clearAuthCallback(); };
   }, []);
 
-
+  const updateUserInfo = (data: Partial<UserInfoData>) => {
+    setUserInfo(prev => ({
+      ...prev,
+      username: data.username ?? prev.username,
+      gender: data.gender ?? prev.gender,
+      age: data.age ? String(data.age) : prev.age,
+      height: data.height ? String(data.height) : prev.height,
+      weight: data.weight ? String(data.weight) : prev.weight,
+      bmi: data.bmi ?? prev.bmi,
+      bmiCategory: data.bmiCategory ?? prev.bmiCategory,
+      bmr: data.bmr ?? prev.bmr,
+      tdee: data.tdee ?? prev.tdee,
+      bloodType: data.bloodType ?? prev.bloodType,
+      avatarUrl: data.avatarUrl ?? prev.avatarUrl,
+    }));
+  };
 
   const clearUserInfo = async () => {
     await supabase.auth.signOut();
-    setUserInfo(DEFAULT_USER_INFO);
-    localStorage.removeItem('selfcare_user_info');
+    setUserInfoRef.current(DEFAULT_USER_INFO);
   };
-
 
   return (
     <UserContext.Provider value={{ userInfo, updateUserInfo, clearUserInfo, loading }}>

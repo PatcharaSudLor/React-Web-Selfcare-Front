@@ -55,21 +55,17 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [socialLoading, setSocialLoading] = useState<Provider | null>(null);
-
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-
     const strength = getPasswordStrength(password);
     const strengthInfo = getStrengthLabel(strength);
     const hasLower = /[a-z]/.test(password);
     const hasUpper = /[A-Z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
     const hasLength = password.length >= 8;
-
     const isStrong = hasLower && hasUpper && hasNumber && hasLength;
 
     const validateEmail = (email: string) => {
@@ -103,25 +99,29 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
         }
 
         setLoading(true);
+        console.log('🔵 Calling supabase.auth.signUp...');
 
         try {
             // Use Supabase to sign up
-            const { error: supabaseError } = await supabase.auth.signUp({
+            const { data, error: supabaseError } = await supabase.auth.signUp({
                 email,
                 password,
             });
+
+            console.log('🟢 Response:', data, supabaseError); // ถ้าไม่ขึ้นเลย = network hang
+            console.log("SignUp data:", data);
+            console.log("SignUp error:", supabaseError);
 
             if (supabaseError) {
                 setError(supabaseError.message);
                 setLoading(false);
                 return;
             }
-
             // Success! Now redirect to login page
-            alert('Sign up successful! Please log in.');
             onLogin();
         } catch (err) {
             console.error('Sign up error:', err);
+            console.error('🔴 Error:', err);
             setError('An error occurred during sign up');
         } finally {
             setLoading(false);

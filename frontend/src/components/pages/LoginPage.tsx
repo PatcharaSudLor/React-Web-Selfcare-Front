@@ -7,7 +7,6 @@ import type { Provider } from '@supabase/supabase-js';
 interface LoginPageProps {
   onBack: () => void;
   onSignUp: () => void;
-  onLoginSuccess: (page: string) => void;
 }
 
 /* animation presets */
@@ -25,7 +24,7 @@ const item = {
 };
 
 
-export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPageProps) {
+export default function LoginPage({ onBack, onSignUp }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -44,10 +43,8 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
   };
 
   const handleLogin = async () => {
-    // Clear previous error
     setError('');
 
-    // Validation
     if (!email || !password) {
       setError('Please fill in all fields');
       return;
@@ -61,59 +58,29 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
     setLoading(true);
 
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (authError) {
-        setError(authError.message);
-        setLoading(false);
+      if (error) {
+        setError(error.message);
         return;
       }
 
-      const user = data.user;
-      if (!user) throw new Error('User data not found');
+      // ✅ ไม่ต้อง query profile
+      // ✅ ไม่ต้อง insert
+      // ✅ ไม่ต้อง navigate
+      // UserProvider จะจัดการให้ทั้งหมด
 
-      // ดึง profile
-      const { data: profile, error: profileError } = await supabase
-        .from('user_profile')
-        .select('is_setup_completed')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (profileError) {
-        console.error(profileError);
-        throw new Error('Failed to load profile');
-      }
-
-      if (!profile) {
-        await supabase.from('user_profile').insert({
-          user_id: user.id,
-          email: user.email,
-          is_setup_completed: false,
-        });
-
-        onLoginSuccess('userinfo');
-        return;
-      }
-
-      //  ตัดสินใจ
-      if (profile?.is_setup_completed) {
-        onLoginSuccess('home');
-      } else {
-        onLoginSuccess('userinfo');
-      }
-
-      // Success! Store session if remember me is checked
-      if (rememberMe && data.session) {
+      if (rememberMe) {
         localStorage.setItem('selfcare_remember_me', 'true');
         localStorage.setItem('selfcare_user_email', email);
       } else {
-        // Clear remember me if not checked
         localStorage.removeItem('selfcare_remember_me');
         localStorage.removeItem('selfcare_user_email');
       }
+
     } catch (err) {
       console.error('Login error:', err);
       setError('An error occurred during login');
@@ -124,7 +91,6 @@ export default function LoginPage({ onBack, onSignUp, onLoginSuccess }: LoginPag
 
   // ─── Google / Social OAuth ───────────────────────────────────────────────
   // NOTE: routing หลัง OAuth จะถูกจัดการโดย useAuthRedirect ใน App
-  // onLoginSuccess ที่นี่จะไม่ถูกเรียกสำหรับ OAuth flow
   const handleSocialLogin = async (provider: Provider) => {
     setError('');
     setSocialLoading(provider);

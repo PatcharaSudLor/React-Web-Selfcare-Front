@@ -110,7 +110,6 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
   const [previewUrl, setPreviewUrl] = useState<string>(profileImage);
   const [isSaving, setIsSaving] = useState(false);
   const [newPassword, setNewPassword] = useState('');
-  const { updateUserInfo } = useUser();
   const [originalAvatar, setOriginalAvatar] = useState(profileImage);
   const [originalFormData, setOriginalFormData] = useState<typeof formData | null>(null);
   const [storedAvatarPath, setStoredAvatarPath] = useState<string | null>(null);
@@ -120,6 +119,8 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
   const [passwordError, setPasswordError] = useState('');
   const strength = getPasswordStrength(newPassword);
   const strengthInfo = getStrengthLabel(strength);
+  const { updateUserInfo, clearUserInfo } = useUser(); // เพิ่ม clearUserInfo
+
 
   const hasLower = /[a-z]/.test(newPassword);
   const hasUpper = /[A-Z]/.test(newPassword);
@@ -194,9 +195,10 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
   }, [isEditing]);
 
 
-  const handleLogout = () => {
-    onLogout();
-  };
+  const handleLogout = async () => {
+  await clearUserInfo(); // ✅ sign out จริงๆ
+  onLogout();
+};
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));

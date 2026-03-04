@@ -1,5 +1,5 @@
 import { ArrowLeft, Share2, Dumbbell, Calendar } from 'lucide-react';
-import { supabase } from '../../utils/supabase.ts';
+import { supabase } from '../../utils/supabase';
 import type { WeeklyWorkoutPlan } from '../../utils/workoutGenerator';
 
 interface WorkoutScheduleProps {

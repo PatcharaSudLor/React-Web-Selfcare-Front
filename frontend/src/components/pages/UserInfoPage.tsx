@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { supabase } from '../../utils/supabase';
 import { ArrowLeft, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useUser } from '../../contexts/UserContext';
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '../../utils/supabase';
 
 interface UserInfoPageProps {
   onBack: () => void;
@@ -12,14 +12,12 @@ interface UserInfoPageProps {
 export interface UserInfoData {
   username: string;
   gender: 'male' | 'female' | '';
-  height: string;
-  weight: string;
-  age: string;
+  height: number;
+  weight: number;
+  age: number;
   bloodType: string;
   bmi: number;
   bmiCategory: string;
-  bmr?: number;
-  tdee?: number;
 }
 
 // Custom Gender Icons
@@ -55,75 +53,73 @@ export default function UserInfoPage({ onBack }: UserInfoPageProps) {
       return;
     }
 
-    // Calculate BMI
-    const heightInMeters = parseFloat(height) / 100;
-    const weightInKg = parseFloat(weight);
-    const bmiValue = weightInKg / (heightInMeters * heightInMeters);
-    const bmi = parseFloat(bmiValue.toFixed(1));
+    //ป้องกัน NaN
+    const heightNum = parseFloat(height);
+    const weightNum = parseFloat(weight);
+    const ageNum = parseInt(age, 10);
 
-    let bmiCategory = '';
-    if (bmiValue < 18.5) {
-      bmiCategory = 'Underweight';
-    } else if (bmiValue >= 18.5 && bmiValue < 25) {
-      bmiCategory = 'Normal';
-    } else if (bmiValue >= 25 && bmiValue < 30) {
-      bmiCategory = 'Overweight';
-    } else if (bmiValue >= 30 && bmiValue < 35) {
-      bmiCategory = 'Obese';
-    } else {
-      bmiCategory = 'Morbidly Obese';
+    if (isNaN(heightNum) || isNaN(weightNum) || isNaN(ageNum)) {
+      alert('Invalid number input');
+      return;
     }
 
-    // Attach authenticated user's id (if available) and save to Supabase.
     try {
       const { data: userData } = await supabase.auth.getUser();
       const user = userData?.user;
+
       if (!user) {
-        alert('You must be signed in to save your profile.');
+        alert('You must be signed in to save your profile');
         return;
       }
 
-      const { error } = await supabase.from('user_profile').upsert([{
-        user_id: user.id,
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/profile/setup`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: user.id,
+            username,
+            gender,
+            height: heightNum,
+            weight: weightNum,
+            age: ageNum,
+            bloodType,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        alert(result.error || 'Failed to save user info.');
+        return;
+      }
+
+      // ✅ ใช้ค่าจาก backend
+      const { bmi, bmiCategory } = result;
+
+      updateUserInfo({
         username,
         gender,
-        height: parseFloat(height),
-        weight: parseFloat(weight),
-        age: parseInt(age, 10),
-        blood_type: bloodType,
+        height,
+        weight,
+        age,
         bmi,
-        bmi_category: bmiCategory,
-        is_setup_completed: true,   // ✅ เพิ่มบรรทัดนี้
+        bmiCategory,
+      });
+      navigate('/bmiresults');
 
-      }]);
+      console.log('Backendd response:', result);
 
-      if (error) {
-        console.error('Supabase insert error:', error);
-        alert('Failed to save user info. Please try again.');
-        return;
-      }
     } catch (err) {
       console.error('Unexpected error saving to Supabase:', err);
       alert('Failed to save user info. Please try again.');
       return;
     }
-
-    // Notify parent after successful save
-    // หลัง insert Supabase สำเร็จ
-    updateUserInfo({
-      username,
-      gender,
-      height,
-      weight,
-      age,
-      bmi,
-      bmiCategory,
-    });
-    navigate('/bmiresults');
   };
-
-
-
 
   return (
     <div className="fixed inset-0  w-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col overflow-y-auto">

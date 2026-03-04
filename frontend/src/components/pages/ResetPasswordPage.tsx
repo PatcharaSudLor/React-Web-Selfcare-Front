@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../utils/supabase.ts';
+import { supabase } from '../../utils/supabase';
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');

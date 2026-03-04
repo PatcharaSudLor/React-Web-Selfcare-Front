@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Info, X, Zap, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useUser } from '../../contexts/UserContext';
-import { supabase } from '../../utils/supabase.ts';
+import { supabase } from '../../utils/supabase';
 
 type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'very' | 'extra';
 

@@ -37,7 +37,7 @@ export default function TDEEResultPage({ onBack }: TDEEResultPageProps) {
     window.scrollTo(0, 0);
   }, []);
 
-  const activityLevels: ActivityLevelOption[] = [
+  const activityLevel: ActivityLevelOption[] = [
     {
       id: 'sedentary',
       label: 'Sedentary',
@@ -75,7 +75,7 @@ export default function TDEEResultPage({ onBack }: TDEEResultPageProps) {
     }
   ];
 
-  const selectedActivityLevel = activityLevels.find(a => a.id === selectedActivity)!;
+  const selectedActivityLevel = activityLevel.find(a => a.id === selectedActivity)!;
   const tdee = Math.round(bmr * selectedActivityLevel.multiplier);
 
   const maintainWeight = tdee;
@@ -85,27 +85,27 @@ export default function TDEEResultPage({ onBack }: TDEEResultPageProps) {
   const weightGain = tdee + 500;
 
   const handleComplete = async () => {
-    updateUserInfo({ tdee });
-
     const { data: userData } = await supabase.auth.getUser();
     const user = userData?.user;
     if (!user) return;
 
-    const { error } = await supabase
-      .from('user_profile')
-      .update({
-        bmr: userInfo.bmr ?? null,   //  บันทึก BMR
-        tdee: tdee ?? null,          //  บันทึก TDEE
-        is_setup_completed: true, // ตั้งค่าสถานะการตั้งค่าเสร็จสมบูรณ์
-      })
-      .eq('user_id', user.id);
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile/tdee`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        user_id: user.id,
+        bmr,
+        activityLevel: selectedActivity,
+      }),
+    });
 
-    if (error) {
-      console.error('Failed to update profile:', error);
-      return;
+    const result = await response.json();
+    if(response.ok) {
+      updateUserInfo({ tdee: result.tdee });
+      navigate('/home');
+    } else {
+      console.error('Failed to save TDEE:', result.error);
     }
-
-    navigate('/home');
   };
 
 
@@ -238,7 +238,7 @@ export default function TDEEResultPage({ onBack }: TDEEResultPageProps) {
             </label>
 
             <div className="space-y-4">
-              {activityLevels.map((activity) => (
+              {activityLevel.map((activity) => (
                 <motion.button
                   key={activity.id}
                   onClick={() => setSelectedActivity(activity.id)}

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Info, X, Flame, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useUser } from '../../contexts/UserContext';
+import { supabase } from '../../utils/supabase';
 
 interface BMRResultPageProps {
   onBack: () => void;
@@ -12,37 +13,49 @@ export default function BMRResultPage({ onBack }: BMRResultPageProps) {
   const navigate = useNavigate();
   const { userInfo, updateUserInfo } = useUser();
   const [showInfo, setShowInfo] = useState(false);
+  const [bmr, setBmr] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   const gender = userInfo.gender || 'male';
   const height = userInfo.height || '0';
   const weight = userInfo.weight || '0';
   const age = userInfo.age || '0';
 
-  // Calculate BMR using Mifflin-St Jeor Equation
-  const calculateBMR = () => {
-    const weightKg = parseFloat(weight);
-    const heightCm = parseFloat(height);
-    const ageYears = parseFloat(age);
+  useEffect(() => {
+    const fetchBMR = async () => {
+      setIsLoading(true);
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData?.user;
+      if(!user)return;
 
-    let bmr: number;
-    if (gender === 'male') {
-      bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * ageYears) + 5;
-    } else {
-      bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * ageYears) - 161;
-    }
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile/bmr`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: user.id,
+          gender,
+          height: parseFloat(height),
+          weight: parseFloat(weight),
+          age: parseFloat(age),
+        }),
+      });
 
-    return Math.round(bmr);
-  };
+      const result = await response.json();
+      if (response.ok) {
+        setBmr(result.bmr);
+        updateUserInfo({ bmr: result.bmr });
+      }
+      setIsLoading(false);
+    };
 
-  const bmr = calculateBMR();
+    fetchBMR();
+  },[]);
 
   const getBMRDescription = () => {
-    return <p>This is the amount of calories your body needs to maintain basic physiological functions like breathing, circulation, and cell production while <br/> at rest.</p>;
+    return <p>This is the amount of calories your body needs to maintain basic physiological functions like breathing, circulation, and cell production while <br /> at rest.</p>;
   };
 
   const handleContinue = () => {
-    // Save BMR to context
-    updateUserInfo({ bmr });
     navigate('/tdeeresults');
   };
 
@@ -229,9 +242,9 @@ export default function BMRResultPage({ onBack }: BMRResultPageProps) {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-800 mb-2 ">What This Means</h3>
-                <p className="text-base text-gray-600 leading-relaxed">
+                <div className="text-base text-gray-600 leading-relaxed">
                   {getBMRDescription()}
-                </p>
+                </div>
               </div>
             </div>
           </motion.div>

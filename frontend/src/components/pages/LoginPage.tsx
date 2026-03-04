@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
-import { supabase } from '../../utils/supabase.ts';
+import { supabase } from '../../utils/supabase';
 import { motion } from 'framer-motion';
 import type { Provider } from '@supabase/supabase-js';
 

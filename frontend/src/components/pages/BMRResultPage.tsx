@@ -51,6 +51,17 @@ export default function BMRResultPage({ onBack }: BMRResultPageProps) {
     fetchBMR();
   },[]);
 
+  if (isLoading) {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-b from-emerald-50 to-white">
+      <div className="text-center space-y-4">
+        <Flame className="w-12 h-12 text-orange-500 animate-pulse mx-auto" />
+        <p className="text-gray-500 text-lg">Calculating your BMR...</p>
+      </div>
+    </div>
+  );
+}
+
   const getBMRDescription = () => {
     return <p>This is the amount of calories your body needs to maintain basic physiological functions like breathing, circulation, and cell production while <br /> at rest.</p>;
   };

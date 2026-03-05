@@ -29,22 +29,6 @@ import MealSchedule from './components/pages/MealSchedule'
 import { SchedulePage } from './components/pages/SchedulePage'
 
 
-// ✅ ย้ายออกมานอก AppContent
-function WorkoutVideosWrapper() {
-  const nav = useNavigate()
-  const loc = useLocation()
-  const params = new URLSearchParams(loc.search)
-  const partId = params.get('part') || 'upper-body'
-  const nameMap: Record<string, string> = {
-    'upper-body': 'Upper Body',
-    core: 'Core',
-    legs: 'Legs',
-    stretching: 'Stretching',
-  }
-  const bodyPart = { id: partId, name: nameMap[partId] ?? partId }
-  return <WorkoutVideos bodyPart={bodyPart} onBack={() => nav('/home')} />
-}
-
 function AppContent() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -138,10 +122,10 @@ function AppContent() {
             />
           }
         />
-        <Route path="/schedule" element={<SchedulePage/>} />
+        <Route path="/schedule" element={<SchedulePage />} />
         <Route path="/alerts" element={<AlertPage />} />
         <Route path="/profile" element={<ProfilePage onBack={() => navigate('/home')} profileImage="https://api.dicebear.com/7.x/avataaars/svg?seed=default" onLogout={handleLogout} />} />
-        <Route path="/workouts/videos" element={<WorkoutVideosWrapper />} />
+        <Route path="/workouts/videos" element={<WorkoutVideos />} />
         <Route path="/tips" element={<TipsPage onSelectTip={handleSelectTip} bookmarkedTips={bookmarkedTips} onToggleBookmark={handleToggleBookmark} />} />
         <Route path="/tips/detail" element={<TipDetailPage onBack={() => navigate('/tips')} />} />
       </Route>

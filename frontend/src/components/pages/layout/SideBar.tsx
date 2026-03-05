@@ -1,4 +1,18 @@
-import { Home, UtensilsCrossed, PlayCircle, Bell, Lightbulb, X, Calendar, Heart, MessageCircle, User, LogOut } from 'lucide-react'
+import {
+  Home,
+  UtensilsCrossed,
+  PlayCircle,
+  Bell,
+  Lightbulb,
+  X,
+  Calendar,
+  Heart,
+  MessageCircle,
+  User,
+  LogOut,
+  Dumbbell,
+  CookingPot
+} from 'lucide-react'
 
 interface SidebarProps {
   isOpen: boolean
@@ -10,7 +24,9 @@ interface SidebarProps {
 
 const menuItems = [
   { id: 'home', path: '/home', label: 'Home', icon: Home },
-  { id: 'recipe', path: '/meals', label: 'Recipes', icon: UtensilsCrossed },
+  { id: 'workout', path: '/workouts/planner', label: 'Workout', icon: Dumbbell },
+  { id: 'meal', path: '/meals/planner', label: 'Meal', icon: UtensilsCrossed },
+  { id: 'recipe', path: '/recipe', label: 'Recipes', icon: CookingPot },
   { id: 'video', path: '/workouts/videos?part=upper-body', label: 'Videos', icon: PlayCircle },
   { id: 'alerts', path: '/alerts', label: 'Alerts', icon: Bell },
   { id: 'tips', path: '/tips', label: 'Tips', icon: Lightbulb },

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Utensils } from 'lucide-react';
+import { supabase } from '../../utils/supabase';
 
 interface MealPlannerProps {
   onBack: () => void;
@@ -11,7 +12,6 @@ export interface MealPlanData {
   likedMeals: string[];
   allergicFoods: string[];
   budget: string;
-  excludedProteins?: string[];
 }
 
 type MealType = {
@@ -26,6 +26,7 @@ type AllergyType = {
   label: string;
   labelTh: string;
   icon: string;
+  group: 'protein' | 'other';
 };
 
 const mealTypes: MealType[] = [
@@ -38,14 +39,22 @@ const mealTypes: MealType[] = [
 ];
 
 const allergyTypes: AllergyType[] = [
-  { id: 'pork', label: 'Pork', labelTh: 'หมู', icon: '🐷' },
-  { id: 'beef', label: 'Beef', labelTh: 'เนื้อ', icon: '🐄' },
-  { id: 'chicken', label: 'Chicken', labelTh: 'ไก่', icon: '🐔' },
-  { id: 'nuts', label: 'Nuts', labelTh: 'ถั่ว', icon: '🥜' },
-  { id: 'seafood', label: 'Seafood', labelTh: 'อาหารทะเล', icon: '🦐' },
-  { id: 'dairy', label: 'Dairy', labelTh: 'นม', icon: '🥛' },
-  { id: 'eggs', label: 'Eggs', labelTh: 'ไข่', icon: '🥚' },
+  // โปรตีน
+  { id: 'pork', label: 'Pork', labelTh: 'หมู', icon: '🐷', group: 'protein' },
+  { id: 'beef', label: 'Beef', labelTh: 'เนื้อ', icon: '🐄', group: 'protein' },
+  { id: 'chicken', label: 'Chicken', labelTh: 'ไก่', icon: '🐔', group: 'protein' },
+  { id: 'seafood', label: 'Seafood', labelTh: 'อาหารทะเล', icon: '🦐', group: 'protein' },
+  // วัตถุดิบอื่น
+  { id: 'dairy', label: 'Dairy', labelTh: 'นม/เนย', icon: '🥛', group: 'other' },
+  { id: 'eggs', label: 'Eggs', labelTh: 'ไข่', icon: '🥚', group: 'other' },
+  { id: 'nuts', label: 'Tree Nuts', labelTh: 'ถั่วเปลือกแข็ง', icon: '🌰', group: 'other' },
+  { id: 'peanuts', label: 'Peanuts', labelTh: 'ถั่วลิสง', icon: '🥜', group: 'other' },
+  { id: 'gluten', label: 'Gluten', labelTh: 'กลูเตน', icon: '🌾', group: 'other' },
+  { id: 'soy', label: 'Soy', labelTh: 'ถั่วเหลือง', icon: '🌱', group: 'other' },
 ];
+
+const proteinAllergies = allergyTypes.filter(a => a.group === 'protein');
+const otherAllergies = allergyTypes.filter(a => a.group === 'other');
 
 export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps) {
   const [likedMeals, setLikedMeals] = useState<string[]>([]);
@@ -63,33 +72,60 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
       prev.includes(allergyId) ? prev.filter((id) => id !== allergyId) : [...prev, allergyId]
     );
   };
-  const [excludedProteins, setExcludedProteins] = useState<string[]>([]);
-  const toggleProtein = (proteinId: string) => {
-  setExcludedProteins((prev) =>
-    prev.includes(proteinId)
-      ? prev.filter((id) => id !== proteinId)
-      : [...prev, proteinId]
-  );
-};
 
-  
-  const handleGeneratePlan = () => {
-    if (likedMeals.length > 0) {
-      onGeneratePlan({
+  const handleGeneratePlan = async () => {
+    if (likedMeals.length === 0 || !budget) {
+      alert('Please complete all required fields')
+      return
+    }
+
+    const { data: { session } } = await supabase.auth.getSession()
+    const token = session?.access_token
+    if (!token) return
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/meal/preferences`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
         likedMeals,
         allergicFoods,
-        budget,
-        excludedProteins,
-      });
-    }
-  };
+        budget: Number(budget),
+      })
+    })
 
+    if (!response.ok) {
+      const err = await response.json()
+      alert(err.error || 'Failed to save preferences')
+      return
+    }
+
+    onGeneratePlan({ likedMeals, allergicFoods, budget })
+  };
 
   const isFormComplete = likedMeals.length > 0 && budget;
 
-   return (
+  const AllergyButton = ({ allergy }: { allergy: AllergyType }) => (
+    <button
+      key={allergy.id}
+      onClick={() => toggleAllergy(allergy.id)}
+      className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all hover:shadow-md ${allergicFoods.includes(allergy.id)
+          ? 'border-red-500 bg-red-50 shadow-sm'
+          : 'border-gray-200 hover:border-red-300 bg-white'
+        }`}
+    >
+      <span className="text-3xl">{allergy.icon}</span>
+      <span className={`text-sm font-medium text-center ${allergicFoods.includes(allergy.id) ? 'text-red-700' : 'text-gray-600'
+        }`}>
+        {allergy.labelTh}
+      </span>
+    </button>
+  );
+
+  return (
     <div className="fixed inset-0 h-screen w-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col overflow-hidden">
-      {/* Content */}
       <div className="flex-1 px-4 overflow-y-auto pb-6 pt-16">
         <div className="max-w-4xl mx-auto pt-4">
           {/* Back Button */}
@@ -103,7 +139,6 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
             </button>
           </div>
 
-          {/* Main Card */}
           <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
             {/* Header */}
             <div className="flex items-center justify-center gap-3 mb-8">
@@ -115,23 +150,23 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
             {/* Liked Meals */}
             <div className="mb-8">
               <h3 className="text-gray-800 font-semibold mb-1 flex items-center gap-2">
-                <span className="text-emerald-500 text-xl">•</span>
-                Liked Meals
+                <span className="text-emerald-500 text-3xl">•</span>
+                <span className="text-xl">Liked Meals</span>
               </h3>
-              <p className="text-sm text-left text-gray-500 mb-4 ml-4">Select your preferred meal types</p>
+              <p className="text-xm text-left text-gray-500 mb-4 ml-4">Select your preferred meal types</p>
               <div className="grid grid-cols-3 gap-3">
                 {mealTypes.map((meal) => (
                   <button
                     key={meal.id}
                     onClick={() => toggleMeal(meal.id)}
-                    className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all hover:shadow-md ${
-                      likedMeals.includes(meal.id)
+                    className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all hover:shadow-md ${likedMeals.includes(meal.id)
                         ? 'border-emerald-500 bg-emerald-50 shadow-sm'
                         : 'border-gray-200 hover:border-emerald-300 bg-white'
-                    }`}
+                      }`}
                   >
                     <span className="text-3xl">{meal.icon}</span>
-                    <span className={`text-sm font-medium ${likedMeals.includes(meal.id) ? 'text-emerald-700' : 'text-gray-600'}`}>
+                    <span className={`text-sm font-medium ${likedMeals.includes(meal.id) ? 'text-emerald-700' : 'text-gray-600'
+                      }`}>
                       {meal.labelTh}
                     </span>
                   </button>
@@ -142,72 +177,37 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
             {/* Allergic Foods */}
             <div className="mb-8">
               <h3 className="text-gray-800 font-semibold mb-1 flex items-center gap-2">
-                <span className="text-red-500 text-xl">•</span>
-                Allergic Foods
+                <span className="text-red-500 text-3xl">•</span>
+                <span className="text-xl">Allergic Foods</span>
               </h3>
-              <p className="text-sm text-left text-gray-500 mb-4 ml-4">Select foods you're allergic to (optional)</p>
+              <p className="text-xm text-left text-gray-500 mb-4 ml-4">
+                Select foods you're allergic to (optional)
+              </p>
+
+              {/* โปรตีน */}
+              <p className="text-xm font-semibold text-gray-400 uppercase tracking-wide mb-2 ml-1">🥩 โปรตีน</p>
+              <div className="grid grid-cols-4 gap-3 mb-4">
+                {proteinAllergies.map((allergy) => (
+                  <AllergyButton key={allergy.id} allergy={allergy} />
+                ))}
+              </div>
+
+              {/* วัตถุดิบอื่น */}
+              <p className="text-xm font-semibold text-gray-400 uppercase tracking-wide mb-2 ml-1">🌿 วัตถุดิบอื่น</p>
               <div className="grid grid-cols-3 gap-3">
-                {allergyTypes.map((allergy) => (
-                  <button
-                    key={allergy.id}
-                    onClick={() => toggleAllergy(allergy.id)}
-                    className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all hover:shadow-md ${
-                      allergicFoods.includes(allergy.id)
-                        ? 'border-red-500 bg-red-50 shadow-sm'
-                        : 'border-gray-200 hover:border-red-300 bg-white'
-                    }`}
-                  >
-                    <span className="text-3xl">{allergy.icon}</span>
-                    <span className={`text-sm font-medium ${allergicFoods.includes(allergy.id) ? 'text-red-700' : 'text-gray-600'}`}>
-                      {allergy.labelTh}
-                    </span>
-                  </button>
+                {otherAllergies.map((allergy) => (
+                  <AllergyButton key={allergy.id} allergy={allergy} />
                 ))}
               </div>
             </div>
-            {/* Excluded Proteins */}
-            <div className="mb-8">
-              <h3 className="text-gray-800 font-semibold mb-1 flex items-center gap-2">
-                <span className="text-orange-500 text-xl">•</span>
-             Excluded Proteins
-             </h3>
-             <p className="text-sm text-left text-gray-500 mb-4 ml-4">
-              Select proteins you want to avoid (optional)
-             </p>
-
-             <div className="grid grid-cols-3 gap-3">
-              {allergyTypes
-                .filter(a => ['pork','chicken','beef','seafood','eggs','dairy','nuts'].includes(a.id)) // 👈 เอาเฉพาะโปรตีน
-                .map((protein) => (
-             <button
-                key={protein.id}
-                onClick={() => toggleProtein(protein.id)}
-                className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all hover:shadow-md ${
-                excludedProteins.includes(protein.id)
-                ? 'border-orange-500 bg-orange-50 shadow-sm'
-                : 'border-gray-200 hover:border-orange-300 bg-white'
-              }`}
-        >
-                 <span className="text-3xl">{protein.icon}</span>
-                 <span className={`text-sm font-medium ${
-                   excludedProteins.includes(protein.id)
-                    ? 'text-orange-700'
-                    : 'text-gray-600'
-              }`}>
-                {protein.labelTh}
-                  </span>
-                   </button>
-             ))}
-                  </div>
-                    </div>
 
             {/* Budget */}
             <div className="mb-8">
               <h3 className="text-gray-800 font-semibold mb-1 flex items-center gap-2">
-                <span className="text-amber-500 text-xl">•</span>
-                Budget per Meal
+                <span className="text-amber-500 text-3xl">•</span>
+                <span className="text-xl">Budget per Meal</span>
               </h3>
-              <p className="text-sm text-left text-gray-500 mb-4 ml-4">Enter your budget for each meal (฿)</p>
+              <p className="text-xm text-left text-gray-500 mb-4 ml-4">Enter your budget for each meal (฿)</p>
               <div className="relative">
                 <input
                   type="number"
@@ -225,11 +225,10 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
               <button
                 onClick={handleGeneratePlan}
                 disabled={!isFormComplete}
-                className={`w-full py-4 rounded-2xl font-semibold transition-all shadow-sm ${
-                  isFormComplete
+                className={`w-full py-4 rounded-2xl font-semibold transition-all shadow-sm ${isFormComplete
                     ? 'bg-emerald-500 hover:bg-emerald-600 text-white hover:shadow-md active:scale-98'
                     : 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'
-                }`}
+                  }`}
               >
                 Generate Meal Plan
               </button>

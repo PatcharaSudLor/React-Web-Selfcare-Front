@@ -25,44 +25,58 @@ export default function WorkoutPlanner({ onBack, onGeneratePlan }: WorkoutPlanne
   const timeOptions = [15, 30, 45, 60];
 
   const handleGeneratePlan = async () => {
-  if (!selectedTime || !bodyType || !goal) {
-    alert('Please complete all required fields');
-    return;
-  }
+    if (!selectedTime || !bodyType || !goal) {
+      alert('Please complete all required fields');
+      return;
+    }
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token
+    if (!token) return;
 
-  await supabase.from('workout_preferences').upsert({
-    user_id: user.id,
-    daily_time: selectedTime,
-    body_type: bodyType,
-    goal,
-    medical_condition: medicalCondition,
-  });
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/workout/preferences`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        dailyTime: selectedTime,
+        bodyType,
+        goal,
+        medicalCondition,
+      })
+    })
+
+    if(!response.ok){
+      const err = await response.json()
+      alert(err.error || 'Failed to save preferences')
+      return
+    }
 
   const plan = generateWorkoutPlan({
-    bodyType,
-    goal,
-    dailyTime: selectedTime,
-    medicalCondition,
-  });
+      bodyType,
+      goal,
+      dailyTime: selectedTime,
+      medicalCondition,
+    });
 
-  onGeneratePlan(plan);
-};
-
+    onGeneratePlan(plan);
+  };
 
   useEffect(() => {
     const loadPreference = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token
+      if (!token) return;
 
-      const { data } = await supabase
-        .from('workout_preferences')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/workout/preferences`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
 
+      if (!response.ok) return
+
+      const data = await response.json()
       if (data) {
         setSelectedTime(data.daily_time);
         setBodyType(data.body_type);
@@ -73,8 +87,6 @@ export default function WorkoutPlanner({ onBack, onGeneratePlan }: WorkoutPlanne
 
     loadPreference();
   }, []);
-
-
 
   const isFormComplete = selectedTime && bodyType && goal;
 

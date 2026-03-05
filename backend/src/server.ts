@@ -6,6 +6,7 @@ import { supabase } from './config/supabase'
 import { authMiddleware } from './middleware/auth.middleware'
 import workoutRoute from './routes/workout.route'
 import mealRoute from './routes/meal.route'
+import workoutVideosRoute from './routes/workout-videos.route'
 
 dotenv.config()
 
@@ -16,6 +17,8 @@ app.use(express.json())
 app.use('/api/profile', authMiddleware, profileRoute)
 app.use('/api/workout', authMiddleware, workoutRoute)
 app.use('/api/meal', authMiddleware, mealRoute)
+// authMiddleware ไม่จำเป็นสำหรับ public content
+app.use('/api/workout-videos', workoutVideosRoute)
 
 app.get('/',  (req, res) => {
     res.send('Backend is running🚀')

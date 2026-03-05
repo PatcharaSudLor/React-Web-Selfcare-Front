@@ -24,15 +24,23 @@ export default function BMRResultPage({ onBack }: BMRResultPageProps) {
   useEffect(() => {
     const fetchBMR = async () => {
       setIsLoading(true);
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData?.user;
-      if(!user)return;
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token
+
+      //Token validate
+      if (!token) {
+        alert('Session expired, please login again')
+        navigate('/')
+        return
+      }
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile/bmr`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
-          user_id: user.id,
           gender,
           height: parseFloat(height),
           weight: parseFloat(weight),
@@ -49,18 +57,18 @@ export default function BMRResultPage({ onBack }: BMRResultPageProps) {
     };
 
     fetchBMR();
-  },[]);
+  }, []);
 
   if (isLoading) {
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-b from-emerald-50 to-white">
-      <div className="text-center space-y-4">
-        <Flame className="w-12 h-12 text-orange-500 animate-pulse mx-auto" />
-        <p className="text-gray-500 text-lg">Calculating your BMR...</p>
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-b from-emerald-50 to-white">
+        <div className="text-center space-y-4">
+          <Flame className="w-12 h-12 text-orange-500 animate-pulse mx-auto" />
+          <p className="text-gray-500 text-lg">Calculating your BMR...</p>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   const getBMRDescription = () => {
     return <p>This is the amount of calories your body needs to maintain basic physiological functions like breathing, circulation, and cell production while <br /> at rest.</p>;

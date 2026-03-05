@@ -9,10 +9,21 @@ interface WorkoutScheduleProps {
 }
 
 export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: WorkoutScheduleProps) {
+
+  const dayThMap: Record<string, string> = {
+    Monday: 'จันทร์',
+    Tuesday: 'อังคาร',
+    Wednesday: 'พุธ',
+    Thursday: 'พฤหัสบดี',
+    Friday: 'ศุกร์',
+    Saturday: 'เสาร์',
+    Sunday: 'อาทิตย์',
+  }
+
   // Generate schedule based on user preferences
   const schedule = plan.days.map(day => ({
     day: day.day,
-    dayTh: day.day, // map ภาษาไทยทีหลังได้
+    dayTh: dayThMap[day.day] ?? day.day,
     workout: day.focus,
     duration: day.duration,
     exercises: day.exercises,
@@ -37,25 +48,52 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
     }
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const payload = schedule.map(item => ({
-          user_id: user.id,
-          day: item.day,
-          day_th: item.dayTh,
-          workout: item.workout,
-          duration: item.duration,
-          exercises: item.exercises,
-        }));
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token
+      if (!token) return
 
-        await supabase
-          .from('workout_schedules')
-          .delete()
-          .eq('user_id', user.id);
 
-        await supabase.from('workout_schedules').insert(payload);
+      const schedulePayload = schedule.map(item => ({
+        day: item.day,
+        dayTh: item.dayTh,
+        workout: item.workout,
+        duration: String(item.duration),
+        exercises: item.exercises,
+      }));
+
+      const scheduleRes = await fetch(`${import.meta.env.VITE_API_URL}/api/workout/schedule`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ schedule: schedulePayload })
+      })
+
+      if (!scheduleRes.ok) {
+        const err = await scheduleRes.json()
+        alert(err.error || 'Failed to save schedule')
+        return
       }
-    } catch {}
+
+      const activePlanRes = await fetch(`${import.meta.env.VITE_API_URL}/api/workout/active-plan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ planData: schedulePayload })
+      })
+
+      if (!activePlanRes.ok) {
+        const err = await activePlanRes.json()
+        alert(err.error || 'Failed to save active plan')
+        return
+      }
+
+    } catch (err) {
+      console.error(err)
+    }
 
     alert('บันทึกลงตารางเรียบร้อยแล้ว!');
   };
@@ -85,7 +123,6 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
     Saturday: 'border-purple-200 bg-purple-50',
     Sunday: 'border-red-200 bg-red-50',
   };
-
 
   return (
     <div className="fixed inset-0 h-screen w-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col overflow-hidden">

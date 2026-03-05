@@ -22,6 +22,11 @@ import AlertPage from './components/pages/AlertPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import './App.css'
 import { useState } from 'react'
+import WorkoutPlanner from './components/pages/WorkoutPlanners'
+import WorkoutSchedule from './components/pages/WorkoutSchedule'
+import MealPlanner from './components/pages/MealPlanners'
+import MealSchedule from './components/pages/MealSchedule'
+import { SchedulePage } from './components/pages/SchedulePage'
 
 
 // ✅ ย้ายออกมานอก AppContent
@@ -93,6 +98,47 @@ function AppContent() {
         </ProtectedRoute>
       }>
         <Route path="/home" element={<HomePage />} />
+        <Route
+          path="/workouts/planner"
+          element={
+            <WorkoutPlanner
+              onBack={() => navigate(-1)}
+              onGeneratePlan={(plan) =>
+                navigate('/workouts/schedule', { state: { plan } })
+              }
+            />
+          }
+        />
+        <Route
+          path="/workouts/schedule"
+          element={
+            <WorkoutSchedule
+              onBack={() => navigate('/workouts/planner')}
+              plan={location.state?.plan}
+              onSaveToSchedule={(schedule) => navigate('/schedule')}
+            />
+          }
+        />
+        <Route
+          path="/meals/planner"
+          element={
+            <MealPlanner
+              onBack={() => navigate(-1)}
+              onGeneratePlan={(data) => navigate('/meals/schedule', { state: { mealPlanData: data } })}
+            />
+          }
+        />
+        <Route
+          path="/meals/schedule"
+          element={
+            <MealSchedule
+              onBack={() => navigate('/meals/planner')}
+              mealPlanData={location.state?.mealPlanData}
+              onSaveToSchedule={(schedule) => navigate('/schedule')}
+            />
+          }
+        />
+        <Route path="/schedule" element={<SchedulePage/>} />
         <Route path="/alerts" element={<AlertPage />} />
         <Route path="/profile" element={<ProfilePage onBack={() => navigate('/home')} profileImage="https://api.dicebear.com/7.x/avataaars/svg?seed=default" onLogout={handleLogout} />} />
         <Route path="/workouts/videos" element={<WorkoutVideosWrapper />} />

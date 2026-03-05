@@ -64,12 +64,14 @@ export default function UserInfoPage({ onBack }: UserInfoPageProps) {
     }
 
     try {
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData?.user;
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token
 
-      if (!user) {
-        alert('You must be signed in to save your profile');
-        return;
+      //Token validate
+      if (!token) {
+        alert('Session expired, please login again')
+        navigate('/')
+        return
       }
 
       const response = await fetch(
@@ -78,9 +80,9 @@ export default function UserInfoPage({ onBack }: UserInfoPageProps) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
-            user_id: user.id,
             username,
             gender,
             height: heightNum,

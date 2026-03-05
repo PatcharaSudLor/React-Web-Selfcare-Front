@@ -19,6 +19,7 @@ import TipsPage from './components/pages/TipsPage'
 import type { Tip } from './components/pages/TipsPage'
 import TipDetailPage from './components/pages/TipDetailPage'
 import AlertPage from './components/pages/AlertPage'
+import ProtectedRoute from './components/ProtectedRoute'
 import './App.css'
 import { useState } from 'react'
 
@@ -70,20 +71,27 @@ function AppContent() {
 
   return (
     <Routes>
+      {/* Public routes */}
       <Route path="/" element={<FirstPage onLogin={handleLogin} onSignUp={handleSignUp} />} />
       <Route path="/signup" element={<SignUpPage onBack={handleBack} onLogin={handleLogin} />} />
       <Route path="/login" element={<LoginPage onBack={handleBack} onSignUp={handleSignUp} />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
-      <Route path="/userinfo" element={<UserInfoPage onBack={handleBack} />} />
-      <Route path="/bmiresults" element={<BMIResultPage onBack={handleBack} />} />
-      <Route path="/bmrresults" element={<BMRResultPage onBack={handleBack} />} />
-      <Route path="/tdeeresults" element={<TDEEResultPage onBack={handleBack} />} />
-      <Route path="/bmiviews" element={<BMIViewPage />} />
-      <Route path="/bmrviews" element={<BMRViewPage />} />
-      <Route path="/tdeeviews" element={<TDEEViewPage />} />
 
-      {/* Pages within MainLayout */}
-      <Route element={<MainLayout currentPage={location.pathname} onNavigate={(path) => navigate(path)} onLogout={handleLogout} />}>
+      {/* Setup routes — ครอบด้วย ProtectedRoute */}
+      <Route path="/userinfo" element={<ProtectedRoute><UserInfoPage onBack={handleBack} /></ProtectedRoute>} />
+      <Route path="/bmiresults" element={<ProtectedRoute><BMIResultPage onBack={handleBack} /></ProtectedRoute>} />
+      <Route path="/bmrresults" element={<ProtectedRoute><BMRResultPage onBack={handleBack} /></ProtectedRoute>} />
+      <Route path="/tdeeresults" element={<ProtectedRoute><TDEEResultPage onBack={handleBack} /></ProtectedRoute>} />
+      <Route path="/bmiviews" element={<ProtectedRoute><BMIViewPage /></ProtectedRoute>} />
+      <Route path="/bmrviews" element={<ProtectedRoute><BMRViewPage /></ProtectedRoute>} />
+      <Route path="/tdeeviews" element={<ProtectedRoute><TDEEViewPage /></ProtectedRoute>} />
+
+      {/* Main routes — ครอบ ProtectedRoute ครั้งเดียวรอบนอกสุด */}
+      <Route element={
+        <ProtectedRoute>
+          <MainLayout currentPage={location.pathname} onNavigate={(path) => navigate(path)} onLogout={handleLogout} />
+        </ProtectedRoute>
+      }>
         <Route path="/home" element={<HomePage />} />
         <Route path="/alerts" element={<AlertPage />} />
         <Route path="/profile" element={<ProfilePage onBack={() => navigate('/home')} profileImage="https://api.dicebear.com/7.x/avataaars/svg?seed=default" onLogout={handleLogout} />} />

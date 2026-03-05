@@ -15,26 +15,11 @@ export default function BMRViewPage() {
   const weight = userInfo.weight || '0';
   const age = userInfo.age || '0';
 
-  // Calculate BMR using Mifflin-St Jeor Equation
-  const calculateBMR = () => {
-    const weightKg = parseFloat(weight);
-    const heightCm = parseFloat(height);
-    const ageYears = parseFloat(age);
-
-    let bmr: number;
-    if (gender === 'male') {
-      bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * ageYears) + 5;
-    } else {
-      bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * ageYears) - 161;
-    }
-
-    return Math.round(bmr);
-  };
-
-  const bmr = calculateBMR();
+  // ใช้ค่าจาก context โดยตรง
+  const bmr = userInfo.bmr || 0
 
   const getBMRDescription = () => {
-    return <p>This is the amount of calories your body needs to maintain basic physiological functions like breathing, circulation, and cell production while <br/> at rest.</p>;
+    return <p>This is the amount of calories your body needs to maintain basic physiological functions like breathing, circulation, and cell production while <br /> at rest.</p>;
   };
 
   const handleTDEEView = () => {

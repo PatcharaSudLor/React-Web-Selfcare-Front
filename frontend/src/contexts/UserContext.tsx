@@ -59,7 +59,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let isLoadingProfile = false;
 
-    async function loadProfile(userId: string, email: string) {
+    async function loadProfile(userId: string, email: string, event: string) {
+      console.log('🔍 loadProfile event:', event)
       try {
         const { data: profile, error } = await supabase
           .from('user_profile')
@@ -94,26 +95,43 @@ export function UserProvider({ children }: { children: ReactNode }) {
           bmr: profile.bmr ?? prev.bmr,
           tdee: profile.tdee ?? prev.tdee,
           bloodType: profile.blood_type ?? prev.bloodType,
+          avatarUrl: profile.avatar_url
+            ? supabase.storage.from('avatars').getPublicUrl(profile.avatar_url).data.publicUrl
+            : prev.avatarUrl,
         }));
 
-        if (profile.is_setup_completed) {
-          navigateRef.current('/home');
-        } else {
-          navigateRef.current('/userinfo');
+        if (event === 'SIGNED_IN') {
+          const currentPath = window.location.pathname
+          const isAuthPage = currentPath === '/' || currentPath === '/login' || currentPath === '/signup'
+
+          if (isAuthPage) {
+            // login ใหม่จริงๆ → navigate
+            if (profile.is_setup_completed) {
+              navigateRef.current('/home')
+            } else {
+              navigateRef.current('/userinfo')
+            }
+          }
+
+          // อยู่หน้าอื่น = refresh → ไม่ navigate
+        } else if (event === 'INITIAL_SESSION' && !profile.is_setup_completed) {
+          navigateRef.current('/userinfo')
         }
       } catch (err) {
-        console.error('loadProfile error:', err);
+        console.error('loadProfile error:', err)
       } finally {
-        setLoadingRef.current(false);
+        setLoadingRef.current(false)
       }
     }
 
     setAuthCallback(async (event, session) => {
+      console.log('🎯 Auth event:', event, '| has session:', !!session)
+
       if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
         if (isLoadingProfile) return;
         isLoadingProfile = true;
         try {
-          await loadProfile(session.user.id, session.user.email ?? '');
+          await loadProfile(session.user.id, session.user.email ?? '', event);
         } finally {
           isLoadingProfile = false;
         }

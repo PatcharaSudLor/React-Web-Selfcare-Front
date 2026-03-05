@@ -314,6 +314,7 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
           gender: formData.gender,
           age: formData.age,
           bloodType: formData.bloodType,
+          avatarUrl: avatarPath,
         })
       })
 

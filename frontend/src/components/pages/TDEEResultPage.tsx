@@ -85,22 +85,30 @@ export default function TDEEResultPage({ onBack }: TDEEResultPageProps) {
   const weightGain = tdee + 500;
 
   const handleComplete = async () => {
-    const { data: userData } = await supabase.auth.getUser();
-    const user = userData?.user;
-    if (!user) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token
+
+    //Token validate
+    if (!token) {
+        alert('Session expired, please login again')
+        navigate('/')
+        return
+      }
 
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile/tdee`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify({
-        user_id: user.id,
         bmr,
         activityLevel: selectedActivity,
       }),
     });
 
     const result = await response.json();
-    if(response.ok) {
+    if (response.ok) {
       updateUserInfo({ tdee: result.tdee });
       navigate('/home');
     } else {
@@ -245,8 +253,8 @@ export default function TDEEResultPage({ onBack }: TDEEResultPageProps) {
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                   className={`w-full p-6 rounded-3xl border-2 transition-all text-left ${selectedActivity === activity.id
-                      ? "border-blue-400 bg-blue-50 shadow-lg"
-                      : "border-gray-200 bg-white hover:border-blue-200"
+                    ? "border-blue-400 bg-blue-50 shadow-lg"
+                    : "border-gray-200 bg-white hover:border-blue-200"
                     }`}
                 >
                   <div className="flex items-center gap-4">

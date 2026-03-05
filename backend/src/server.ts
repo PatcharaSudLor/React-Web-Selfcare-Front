@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import profileRoute from './routes/profile.route'
 import { supabase } from './config/supabase'
+import { authMiddleware } from './middleware/auth.middleware'
 
 dotenv.config()
 
@@ -10,7 +11,7 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
-app.use('/api/profile', profileRoute)
+app.use('/api/profile', authMiddleware, profileRoute)
 
 app.get('/',  (req, res) => {
     res.send('Backend is running🚀')

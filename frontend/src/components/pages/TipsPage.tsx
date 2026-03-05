@@ -1,644 +1,324 @@
-import { useState } from 'react';
-import { Search, Clock, TrendingUp } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { useState, useEffect } from 'react'
+import { Search, Clock, Bookmark } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { supabase } from '../../utils/supabase'
 
-export interface Tip {
-  id: string;
-  title: string;
-  titleTh: string;
-  category: string;
-  categoryTh: string;
-  readTime: string;
-  image: string;
-  excerpt: string;
-  excerptTh: string;
-  content: {
-    intro: string;
-    sections: {
-      heading: string;
-      text: string;
-    }[];
-    conclusion: string;
-  };
-  tags: string[];
+interface Tip {
+    id: string
+    title: string
+    title_th: string
+    category: string
+    category_th: string
+    read_time: string
+    image_url: string
+    excerpt_th: string
+    content: any
+    tags: string[]
+    goal_tags: string[]
 }
 
-interface TipsPageProps {
-  onSelectTip: (tip: Tip) => void;
-  bookmarkedTips: Tip[];
-  onToggleBookmark: (tip: Tip) => void;
-}
+const categories = [
+    { id: 'All', name: 'ทั้งหมด' },
+    { id: 'Workout', name: 'ออกกำลังกาย' },
+    { id: 'Nutrition', name: 'โภชนาการ' },
+    { id: 'Mental Health', name: 'สุขภาพจิต' },
+    { id: 'Sleep', name: 'การนอนหลับ' },
+    { id: 'Yoga', name: 'โยคะ' },
+    { id: 'Hydration', name: 'การดื่มน้ำ' },
+    { id: 'Wellness', name: 'การดูแลตัวเอง' },
+]
 
-const tips: Tip[] = [
-  {
-    id: '1',
-    title: '5 Tips for Effective Workout',
-    titleTh: '5 เทคนิคออกกำลังกายให้ได้ผล',
-    category: 'Workout',
-    categoryTh: 'การออกกำลังกาย',
-    readTime: '5 นาที',
-    image: 'https://images.unsplash.com/photo-1750698544932-c7471990f1ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Learn how to maximize your workout results',
-    excerptTh: 'เรียนรู้วิธีเพิ่มประสิทธิภาพการออกกำลังกายของคุณ',
-    content: {
-      intro: 'การออกกำลังกายให้ได้ผลนั้นไม่ได้ขึ้นอยู่กับเวลาที่ใช้มากเพียงอย่างเดียว แต่ต้องอาศัยเทคนิคและความเข้าใจในหลักการที่ถูกต้อง',
-      sections: [
-        {
-          heading: '1. เริ่มต้นด้วยการอบอุ่นร่างกาย',
-          text: 'การอบอุ่นร่างกายก่อนออกกำลังกาย 5-10 นาที ช่วยเตรียมกล้ามเนื้อและลดความเสี่ยงในการบาดเจ็บ ควรทำการยืดเหยียดและเคลื่อนไหวเบาๆ',
-        },
-        {
-          heading: '2. ตั้งเป้าหมายที่ชัดเจน',
-          text: 'กำหนดเป้าหมายที่วัดผลได้ เช่น ลดน้ำหนัก 5 กิโลกรัม หรือวิ่งได้ 5 กิโลเมตร ภายใน 3 เดือน เป้าหมายที่ชัดเจนจะช่วยให้คุณมีแรงจูงใจ',
-        },
-        {
-          heading: '3. ฝึกหลากหลายท่า',
-          text: 'อย่าทำแต่ท่าเดิมซ้ำๆ ควรหมุนเวียนการออกกำลังกายเพื่อกระตุ้นกล้ามเนื้อส่วนต่างๆ และป้องกันความเบื่อหน่าย',
-        },
-        {
-          heading: '4. พักผ่อนให้เพียงพอ',
-          text: 'ร่างกายต้องการเวลาในการฟื้นตัว ควรนอนหลับ 7-8 ชั่วโมงต่อคืน และไม่ควรออกกำลังกายหนักทุกวัน',
-        },
-        {
-          heading: '5. ดื่มน้ำเพียงพอ',
-          text: 'ดื่มน้ำก่อน ระหว่าง และหลังออกกำลังกาย เพื่อป้องกันการขาดน้ำและช่วยให้ร่างกายทำงานได้อย่างมีประสิทธิภาพ',
-        },
-      ],
-      conclusion: 'การออกกำลังกายที่ดีต้องมาพร้อมกับความสม่ำเสมอ การพักผ่อนที่เพียงพอ และการฟังสัญญาณจากร่างกาย อย่าลืมว่าผลลัพธ์ที่ดีต้องใช้เวลา',
-    },
-    tags: ['workout', 'fitness', 'health'],
-  },
-  {
-    id: '2',
-    title: 'Nutrition Basics',
-    titleTh: 'พื้นฐานโภชนาการที่ควรรู้',
-    category: 'Nutrition',
-    categoryTh: 'โภชนาการ',
-    readTime: '7 นาที',
-    image: 'https://images.unsplash.com/photo-1670164747721-d3500ef757a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Understanding macronutrients and healthy eating',
-    excerptTh: 'ทำความเข้าใจเรื่องสารอาหารและการกินที่ดีต่อสุขภาพ',
-    content: {
-      intro: 'โภชนาการเป็นรากฐานสำคัญของสุขภาพที่ดี การเลือกทานอาหารที่เหมาะสมจะช่วยให้ร่างกายได้รับพลังงานและสารอาหารที่จำเป็น',
-      sections: [
-        {
-          heading: 'โปรตีน: สร้างและซ่อมแซมกล้ามเนื้อ',
-          text: 'โปรตีนเป็นสารอาหารสำคัญสำหรับการสร้างและซ่อมแซมเซลล์ ควรทานประมาณ 0.8-1 กรัมต่อน้ำหนักตัว 1 กิโลกรัม แหล่งโปรตีนที่ดีคือ ไก่ ปลา ไข่ และถั่ว',
-        },
-        {
-          heading: 'คาร์โบไหเดรต: แหล่งพลังงาน',
-          text: 'คาร์โบไหเดรตเป็นแหล่งพลังงานหลักของร่างกาย ควรเลือกคาร์โบไหเดรตที่ดีต่อสุขภาพ เช่น ข้าวกล้อง ขนมปังโฮลวีต และผัก',
-        },
-        {
-          heading: 'ไขมัน: จำเป็นแต่ควรเลือก',
-          text: 'ไขมันมีประโยชน์สำหรับการทำงานของสมองและฮอร์โมน ควรเลือกไขมันดีจากน้ำมันมะกอก อะโวคาโด และถั่ว หลีกเลี่ยงไขมันทรานส์',
-        },
-        {
-          heading: 'วิตามินและแร่ธาตุ',
-          text: 'ทานผักและผลไม้หลากหลายสีให้ครบ 5 ส่วนต่อวัน เพื่อให้ได้รับวิตามินและแร่ธาตุที่หลากหลาย',
-        },
-        {
-          heading: 'น้ำ: สำคัญที่สุด',
-          text: 'ดื่มน้ำอย่างน้อย 2 ลิตรต่อวัน น้ำช่วยในการขับของเสีย ควบคุมอุณหภูมิร่างกาย และขนส่งสารอาหาร',
-        },
-      ],
-      conclusion: 'การกินอาหารที่สมดุลและหลากหลายเป็นกุญแจสำคัญของสุขภาพดี ไม่จำเป็นต้องงดอาหารกลุ่มใดกลุ่มหนึ่ง แต่ควรรู้จักเลือกและควบคุมปริมาณ',
-    },
-    tags: ['nutrition', 'food', 'health'],
-  },
-  {
-    id: '3',
-    title: 'Mental Health Matters',
-    titleTh: 'ดูแลสุขภาพจิตให้ดี',
-    category: 'Mental Health',
-    categoryTh: 'สุขภาพจิต',
-    readTime: '6 นาที',
-    image: 'https://images.unsplash.com/photo-1635545999375-057ee4013deb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Taking care of your mental wellness',
-    excerptTh: 'การดูแลสุขภาพจิตที่ดี มีความสำคัญไม่แพ้สุขภาพกาย',
-    content: {
-      intro: 'สุขภาพจิตเป็นส่วนสำคัญของคุณภาพชีวิต การมีจิตใจที่แข็งแรงจะช่วยให้เราสามารถเผชิญกับความท้าทายต่างๆ ได้',
-      sections: [
-        {
-          heading: 'ฝึกสติและการทำสมาธิ',
-          text: 'การฝึกสติช่วยให้เราตระหนักรู้ในปัจจุบัน ลดความกังวล ลองเริ่มจากการนั่งสมาธิวันละ 5-10 นาที',
-        },
-        {
-          heading: 'พูดคุยกับคนที่เชื่อใจ',
-          text: 'การแบ่งปันความรู้สึกกับเพื่อนหรือครอบครัวช่วยให้รู้สึกดีขึ้น อย่ากลั้นอารมณ์เก็บไว้คนเดียว',
-        },
-        {
-          heading: 'ออกกำลังกายเป็นประจำ',
-          text: 'การออกกำลังกายช่วยปล่อยฮอร์โมนเอนดอร์ฟินที่ทำให้รู้สึกมีความสุข แม้แค่เดิน 30 นาทีก็มีประโยชน์',
-        },
-        {
-          heading: 'จัดการความเครียด',
-          text: 'หาวิธีคลายเครียดที่เหมาะกับตัวเอง เช่น อ่านหนังสือ ฟังเพลง หรือทำงานอดิเรก',
-        },
-        {
-          heading: 'ขอความช่วยเหลือเมื่อจำเป็น',
-          text: 'ไม่ต้องอายที่จะพบจิตแพทย์หรือนักจิตวิทยา การขอความช่วยเหลือคือการดูแลตัวเองอย่างรับผิดชอบ',
-        },
-      ],
-      conclusion: 'สุขภาพจิตสำคัญพอๆ กับสุขภาพกาย อย่าละเลยสัญญาณเตือนและให้เวลากับตัวเองในการพักผ่อนและฟื้นฟู',
-    },
-    tags: ['mental health', 'wellness', 'meditation'],
-  },
-  {
-    id: '4',
-    title: 'Sleep Better Tonight',
-    titleTh: 'เคล็ดลับนอนหลับสนิท',
-    category: 'Sleep',
-    categoryTh: 'การนอนหลับ',
-    readTime: '5 นาที',
-    image: 'https://images.unsplash.com/photo-1551095118-0fdad4a7f78a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Tips for quality sleep and rest',
-    excerptTh: 'เทคนิคสำหรับการนอนหลับที่มีคุณภาพ',
-    content: {
-      intro: 'การนอนหลับที่มีคุณภาพเป็นสิ่งสำคัญสำหรับสุขภาพทั้งกายและใจ ช่วยให้ร่างกายฟื้นตัวและเตรียมพร้อมสำหรับวันใหม่',
-      sections: [
-        {
-          heading: 'กำหนดเวลานอนให้สม่ำเสมอ',
-          text: 'นอนและตื่นในเวลาเดิมทุกวัน แม้ในวันหยุด เพื่อปรับนาฬิกาชีวิตของร่างกาย',
-        },
-        {
-          heading: 'สร้างบรรยากาศห้องนอนที่เหมาะสม',
-          text: 'ห้องควรมืด เงียบ และเย็นสบาย อุณหภูมิที่เหมาะสมอยู่ที่ประมาณ 18-22 องศา',
-        },
-        {
-          heading: 'หลีกเลี่ยงหน้าจอก่อนนอน',
-          text: 'แสงสีน้ำเงินจากโทรศัพท์และคอมพิวเตอร์รบกวนการผลิตเมลาโทนิน ควรหยุดใช้อย่างน้อย 1 ชั่วโมงก่อนนอน',
-        },
-        {
-          heading: 'อย่ากินหนักก่อนนอน',
-          text: 'หลีกเลี่ยงอาหารหนักและคาเฟอีนอย่างน้อย 3-4 ชั่วโมงก่อนนอน',
-        },
-        {
-          heading: 'ผ่อนคลายก่อนเข้านอน',
-          text: 'ทำกิจกรรมที่ช่วยผ่อนคลาย เช่น อ่านหนังสือ ฟังเพลงเบาๆ หรือทำสมาธิ',
-        },
-      ],
-      conclusion: 'การนอนหลับที่มีคุณภาพ 7-8 ชั่วโมงต่อคืนเป็นการลงทุนที่ดีที่สุดสำหรับสุขภาพ หากมีปัญหานอนไม่หลับเรื้อรัง ควรปรึกษาแพทย์',
-    },
-    tags: ['sleep', 'rest', 'health'],
-  },
-  {
-    id: '5',
-    title: 'Yoga for Beginners',
-    titleTh: 'โยคะสำหรับมือใหม่',
-    category: 'Yoga',
-    categoryTh: 'โยคะ',
-    readTime: '8 นาที',
-    image: 'https://images.unsplash.com/photo-1607909599990-e2c4778e546b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Start your yoga journey today',
-    excerptTh: 'เริ่มต้นการฝึกโยคะอย่างถูกวิธี',
-    content: {
-      intro: 'โยคะเป็นกิจกรรมที่ผสมผสานระหว่างการออกกำลังกาย การฝึกสมาธิ และการยืดเหยียด เหมาะสำหรับทุกเพศทุกวัย',
-      sections: [
-        {
-          heading: 'เริ่มจากท่าง่ายๆ',
-          text: 'ไม่ต้องรีบร้อน เริ่มจากท่าพื้นฐานเช่น Mountain Pose, Child Pose และ Downward Dog ฝึกให้ถูกต้องก่อนไปท่าที่ยากขึ้น',
-        },
-        {
-          heading: 'หายใจอย่างมีสติ',
-          text: 'การหายใจเป็นส่วนสำคัญของโยคะ หายใจเข้าลึกๆ ผ่านจมูก และหายใจออกช้าๆ',
-        },
-        {
-          heading: 'ใช้อุปกรณ์ช่วย',
-          text: 'ผ้ารองโยคะ (yoga mat) บล็อคโยคะ และสายรัด (yoga strap) ช่วยให้ฝึกได้ปลอดภัยและสะดวกขึ้น',
-        },
-        {
-          heading: 'ฟังร่างกาย',
-          text: 'อย่าฝืนทำท่าที่ร่างกายไม่พร้อม ควรยืดเหยียดอย่างค่อยเป็นค่อยไป หากเจ็บควรหยุดทันที',
-        },
-        {
-          heading: 'ฝึกอย่างสม่ำเสมอ',
-          text: 'ผลของโยคะจะเห็นได้ชัดเมื่อฝึกอย่างสม่ำเสมอ แม้แค่วันละ 15-20 นาทีก็เห็นผล',
-        },
-      ],
-      conclusion: 'โยคะไม่ใช่แค่การออกกำลังกาย แต่เป็นการดูแลทั้งกายและใจ เริ่มต้นวันนี้และเปิดประสบการณ์ใหม่ให้กับตัวเอง',
-    },
-    tags: ['yoga', 'stretching', 'flexibility'],
-  },
-  {
-    id: '6',
-    title: 'Hydration Guide',
-    titleTh: 'คู่มือการดื่มน้ำให้เพียงพอ',
-    category: 'Hydration',
-    categoryTh: 'การดื่มน้ำ',
-    readTime: '4 นาที',
-    image: 'https://images.unsplash.com/photo-1551753103-f121bd83be46?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Why water is essential for your health',
-    excerptTh: 'ทำไมน้ำจึงสำคัญต่อสุขภาพของคุณ',
-    content: {
-      intro: 'น้ำคิดเป็น 60% ของน้ำหนักตัวเรา และมีบทบาทสำคัญในการทำงานของร่างกายเกือบทุกระบบ',
-      sections: [
-        {
-          heading: 'ควรดื่มน้ำเท่าไหร่',
-          text: 'คนทั่วไปควรดื่มน้ำอย่างน้อย 8-10 แก้วหรือประมาณ 2 ลิตรต่อวัน อาจต้องเพิ่มขึ้นถ้าออกกำลังกายหรืออากาศร้อน',
-        },
-        {
-          heading: 'สัญญาณของการขาดน้ำ',
-          text: 'ปวดศีรษะ ปากแห้ง ปัสสาวะสีเข้ม เหนื่อยง่าย และวิงเวียน ถ้าพบอาการเหล่านี้ควรดื่มน้ำเพิ่ม',
-        },
-        {
-          heading: 'ประโยชน์ของการดื่มน้ำเพียงพอ',
-          text: 'ช่วยขับของเสีย ควบคุมอุณหภูมิร่างกาย ทำให้ผิวพรรณดี ช่วยย่อยอาหาร และเพิ่มประสิทธิภาพการทำงาน',
-        },
-        {
-          heading: 'เคล็ดลับดื่มน้ำให้เพียงพอ',
-          text: 'พกขวดน้ำติดตัว ดื่มทุกครั้งที่กระหาย ตั้งเตือนดื่มน้ำ และดื่มน้ำก่อนทานอาหาร',
-        },
-        {
-          heading: 'เวลาที่ควรดื่มน้ำ',
-          text: 'ตื่นนอน ก่อนและหลังออกกำลังกาย ก่อนอาหาร และก่อนนอน (แต่ไม่มากเกินไป)',
-        },
-      ],
-      conclusion: 'การดื่มน้ำให้เพียงพอเป็นนิสัยง่ายๆ ที่มีผลดีต่อสุขภาพมหาศาล เริ่มดื่มน้ำให้มากขึ้นตั้งแต่วันนี้',
-    },
-    tags: ['hydration', 'water', 'health'],
-  },
-  {
-    id: '7',
-    title: 'Stress Management Basics',
-    titleTh: 'การจัดการความเครียดเบื้องต้น',
-    category: 'Mental Health',
-    categoryTh: 'สุขภาพจิต',
-    readTime: '5 นาที',
-    image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Simple techniques to reduce daily stress',
-    excerptTh: 'เทคนิคง่ายๆ เพื่อลดความเครียดในชีวิตประจำวัน',
-    content: {
-      intro: 'การจัดการความเครียดช่วยให้ชีวิตมีสมดุลและลดผลกระทบทางกายและจิตใจ',
-      sections: [
-        { heading: 'หายใจลึกๆ', text: 'ฝึกการหายใจช้าๆ เพื่อผ่อนคลายระบบประสาท' },
-        { heading: 'พักเป็นช่วงสั้น', text: 'แบ่งงานเป็นช่วงแล้วพักเบรกเล็กๆ เพื่อรีเซ็ตสมอง' },
-      ],
-      conclusion: 'หาเทคนิคที่เหมาะกับตัวเองและฝึกเป็นนิสัย'
-    },
-    tags: ['stress', 'mindfulness']
-  },
-  {
-    id: '8',
-    title: 'Healthy Snacking',
-    titleTh: 'ของว่างที่ดีต่อสุขภาพ',
-    category: 'Nutrition',
-    categoryTh: 'โภชนาการ',
-    readTime: '4 นาที',
-    image: 'https://images.unsplash.com/photo-1532634896-26909d0d3f2e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Smart snack choices between meals',
-    excerptTh: 'เลือกของว่างที่มีประโยชน์ระหว่างมื้ออาหาร',
-    content: { intro: 'ของว่างที่ดีช่วยควบคุมน้ำหนักและพลังงาน', sections: [{ heading: 'โปรตีนเล็กน้อย', text: 'เลือกถั่วหรือโยเกิร์ตเพื่อความอิ่ม' }], conclusion: 'วางแผนของว่างให้ถูกต้อง' },
-    tags: ['snack', 'nutrition']
-  },
-  {
-    id: '9',
-    title: 'Quick Office Stretches',
-    titleTh: 'ยืดเหยียดง่ายๆ ที่ทำในออฟฟิศ',
-    category: 'Workout',
-    categoryTh: 'การออกกำลังกาย',
-    readTime: '3 นาที',
-    image: 'https://images.unsplash.com/photo-1526401485004-0b6b5b2c0e71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Short stretches to relieve tension at desk',
-    excerptTh: 'ท่ายืดสั้นๆ ช่วยลดความตึงที่โต๊ะทำงาน',
-    content: { intro: 'แค่ไม่กี่นาทีช่วยลดอาการตึงเครียด', sections: [{ heading: 'คอและไหล่', text: 'หมุนคอและยืดไหล่เป็นประจำ' }], conclusion: 'ทำทุก 60 นาทีเพื่อผลดีที่สุด' },
-    tags: ['stretch', 'desk']
-  },
-  {
-    id: '10',
-    title: 'Meal Prep 101',
-    titleTh: 'เตรียมอาหารล่วงหน้าอย่างง่าย',
-    category: 'Nutrition',
-    categoryTh: 'โภชนาการ',
-    readTime: '6 นาที',
-    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Save time and eat healthier with basic meal prep',
-    excerptTh: 'ประหยัดเวลาและกินให้สุขภาพดีขึ้นด้วยการเตรียมอาหาร',
-    content: { intro: 'เริ่มจากเมนูง่ายๆ และแบ่งส่วนให้พอเหมาะ', sections: [{ heading: 'วางแผนมื้อ', text: 'เลือกโปรตีน แป้ง และผักให้ครบ' }], conclusion: 'เริ่มเล็กๆ แล้วขยายเมื่อชิน' },
-    tags: ['mealprep', 'planning']
-  },
-  {
-    id: '11',
-    title: 'Posture Tips',
-    titleTh: 'ปรับท่านั่งให้ถูกต้อง',
-    category: 'Workout',
-    categoryTh: 'การออกกำลังกาย',
-    readTime: '4 นาที',
-    image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Improve posture to reduce pain and improve breathing',
-    excerptTh: 'ปรับท่านั่งเพื่อลดอาการปวดและหายใจดีขึ้น',
-    content: { intro: 'ท่าที่ถูกต้องช่วยสมดุลร่างกาย', sections: [{ heading: 'นั่งตรง', text: 'พยามยามให้หลังชิดพนักพิงและเท้าราบ' }], conclusion: 'ฝึกสม่ำเสมอเพื่อผลระยะยาว' },
-    tags: ['posture', 'health']
-  },
-  {
-    id: '12',
-    title: 'Healthy Morning Routine',
-    titleTh: 'กิจวัตรยามเช้าเพื่อสุขภาพ',
-    category: 'Wellness',
-    categoryTh: 'การดูแลตัวเอง',
-    readTime: '5 นาที',
-    image: 'https://images.unsplash.com/photo-1503264116251-35a269479413?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Small morning habits that improve your day',
-    excerptTh: 'นิสัยเล็กๆ ในตอนเช้าที่ช่วยให้วันดีขึ้น',
-    content: { intro: 'เริ่มจากน้ำหนึ่งแก้วและการยืดเล็กๆ', sections: [{ heading: 'ดื่มน้ำก่อน', text: 'ช่วยรีเฟรชระบบย่อยและเพิ่มพลัง' }], conclusion: 'สร้างนิสัยทีละเล็กละน้อย' },
-    tags: ['routine', 'morning']
-  },
-    {
-    id: '13',
-    title: 'Home Workout Without Equipment',
-    titleTh: 'ออกกำลังกายที่บ้านแบบไม่ใช้อุปกรณ์',
-    category: 'Workout',
-    categoryTh: 'การออกกำลังกาย',
-    readTime: '6 นาที',
-    image: 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Bodyweight exercises you can do anywhere',
-    excerptTh: 'ท่าออกกำลังกายด้วยน้ำหนักตัว ทำได้ทุกที่',
-    content: {
-      intro: 'คุณไม่จำเป็นต้องเข้าฟิตเนสก็สามารถออกกำลังกายได้อย่างมีประสิทธิภาพ',
-      sections: [
-        { heading: 'Push-up', text: 'ช่วยเสริมสร้างกล้ามเนื้ออก ไหล่ และแขน' },
-        { heading: 'Squat', text: 'บริหารต้นขาและสะโพก' },
-        { heading: 'Plank', text: 'เพิ่มความแข็งแรงของแกนกลางลำตัว' },
-      ],
-      conclusion: 'ทำ 3-4 รอบ รอบละ 10-15 ครั้ง เพื่อผลลัพธ์ที่ดี'
-    },
-    tags: ['home workout', 'bodyweight']
-  },
-  {
-    id: '14',
-    title: 'Benefits of Walking Daily',
-    titleTh: 'ประโยชน์ของการเดินทุกวัน',
-    category: 'Workout',
-    categoryTh: 'การออกกำลังกาย',
-    readTime: '4 นาที',
-    image: 'https://images.unsplash.com/photo-1502904550040-7534597429ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Why 30 minutes of walking matters',
-    excerptTh: 'ทำไมการเดินวันละ 30 นาทีจึงสำคัญ',
-    content: {
-      intro: 'การเดินเป็นการออกกำลังกายที่ง่ายที่สุดและปลอดภัย',
-      sections: [
-        { heading: 'หัวใจแข็งแรง', text: 'ช่วยลดความเสี่ยงโรคหัวใจ' },
-        { heading: 'ควบคุมน้ำหนัก', text: 'ช่วยเผาผลาญพลังงานส่วนเกิน' },
-      ],
-      conclusion: 'เริ่มจากวันละ 15 นาที แล้วเพิ่มเวลาเมื่อร่างกายพร้อม'
-    },
-    tags: ['walking', 'cardio']
-  },
-  {
-    id: '15',
-    title: 'Healthy Gut Guide',
-    titleTh: 'ดูแลลำไส้ให้แข็งแรง',
-    category: 'Nutrition',
-    categoryTh: 'โภชนาการ',
-    readTime: '6 นาที',
-    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Improve digestion naturally',
-    excerptTh: 'ปรับสมดุลลำไส้แบบธรรมชาติ',
-    content: {
-      intro: 'ลำไส้ที่ดีช่วยให้ภูมิคุ้มกันแข็งแรง',
-      sections: [
-        { heading: 'กินไฟเบอร์', text: 'ช่วยระบบขับถ่ายทำงานดีขึ้น' },
-        { heading: 'โปรไบโอติก', text: 'พบในโยเกิร์ตและอาหารหมักดอง' },
-      ],
-      conclusion: 'เริ่มปรับอาหารเล็กๆ น้อยๆ ทุกวัน'
-    },
-    tags: ['gut health', 'digestive']
-  },
-  {
-    id: '16',
-    title: 'Digital Detox Tips',
-    titleTh: 'พักสายตาจากหน้าจอ',
-    category: 'Wellness',
-    categoryTh: 'การดูแลตัวเอง',
-    readTime: '5 นาที',
-    image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Reduce screen time for better focus',
-    excerptTh: 'ลดเวลาหน้าจอเพื่อสมาธิที่ดีขึ้น',
-    content: {
-      intro: 'การใช้หน้าจอมากเกินไปส่งผลต่อสุขภาพตาและสมาธิ',
-      sections: [
-        { heading: 'กฎ 20-20-20', text: 'ทุก 20 นาที มองไกล 20 ฟุต 20 วินาที' },
-        { heading: 'กำหนดเวลาใช้งาน', text: 'ตั้งเวลาใช้งานโซเชียลมีเดีย' },
-      ],
-      conclusion: 'เริ่มจากลดวันละ 30 นาที'
-    },
-    tags: ['digital detox', 'focus']
-  },
-  {
-    id: '17',
-    title: 'Breathing for Energy',
-    titleTh: 'หายใจเพิ่มพลังงาน',
-    category: 'Mental Health',
-    categoryTh: 'สุขภาพจิต',
-    readTime: '3 นาที',
-    image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Simple breathing to boost alertness',
-    excerptTh: 'เทคนิคหายใจเพิ่มความสดชื่น',
-    content: {
-      intro: 'การหายใจลึกช่วยเพิ่มออกซิเจนในเลือด',
-      sections: [
-        { heading: 'หายใจเข้าลึก 4 วิ', text: 'กลั้น 4 วิ และปล่อย 4 วิ' },
-      ],
-      conclusion: 'ทำ 5 รอบเมื่อรู้สึกง่วง'
-    },
-    tags: ['breathing', 'energy']
-  },
-  {
-    id: '18',
-    title: 'Healthy Smoothie Ideas',
-    titleTh: 'สมูทตี้เพื่อสุขภาพ',
-    category: 'Nutrition',
-    categoryTh: 'โภชนาการ',
-    readTime: '4 นาที',
-    image: 'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Quick smoothie recipes',
-    excerptTh: 'สูตรสมูทตี้ทำง่าย',
-    content: {
-      intro: 'สมูทตี้เป็นวิธีง่ายในการเพิ่มผักผลไม้',
-      sections: [
-        { heading: 'กล้วย+นมอัลมอนด์', text: 'ให้พลังงานก่อนออกกำลังกาย' },
-        { heading: 'ผักโขม+แอปเปิ้ล', text: 'ดีต่อระบบขับถ่าย' },
-      ],
-      conclusion: 'เลือกผลไม้ไม่หวานเกินไป'
-    },
-    tags: ['smoothie', 'healthy drink']
-  },
-  {
-    id: '19',
-    title: 'Evening Relax Routine',
-    titleTh: 'กิจวัตรผ่อนคลายก่อนนอน',
-    category: 'Sleep',
-    categoryTh: 'การนอนหลับ',
-    readTime: '5 นาที',
-    image: 'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Wind down for better sleep',
-    excerptTh: 'ผ่อนคลายเพื่อการนอนที่ดีขึ้น',
-    content: {
-      intro: 'กิจวัตรก่อนนอนช่วยให้สมองเตรียมพัก',
-      sections: [
-        { heading: 'อาบน้ำอุ่น', text: 'ช่วยผ่อนคลายกล้ามเนื้อ' },
-        { heading: 'ปิดไฟสลัว', text: 'กระตุ้นเมลาโทนิน' },
-      ],
-      conclusion: 'ทำซ้ำทุกคืนเพื่อสร้างนิสัย'
-    },
-    tags: ['sleep', 'routine']
-  },
-  {
-    id: '20',
-    title: 'Simple Core Workout',
-    titleTh: 'บริหารหน้าท้องง่ายๆ',
-    category: 'Workout',
-    categoryTh: 'การออกกำลังกาย',
-    readTime: '5 นาที',
-    image: 'https://images.unsplash.com/photo-1517964603305-11c0f6f66012?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
-    excerpt: 'Strengthen your core at home',
-    excerptTh: 'เสริมความแข็งแรงหน้าท้องที่บ้าน',
-    content: {
-      intro: 'แกนกลางลำตัวแข็งแรงช่วยลดอาการปวดหลัง',
-      sections: [
-        { heading: 'Plank', text: 'ค้างไว้ 30-60 วินาที' },
-        { heading: 'Leg Raise', text: 'ทำ 12-15 ครั้งต่อเซ็ต' },
-      ],
-      conclusion: 'ฝึก 3 วันต่อสัปดาห์'
-    },
-    tags: ['core', 'abs']
-  }
+export default function TipsPage() {
+    const navigate = useNavigate()
+    const [tips, setTips] = useState<Tip[]>([])
+    const [recommendedTips, setRecommendedTips] = useState<Tip[]>([])
+    const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set())
+    const [selectedCategory, setSelectedCategory] = useState('All')
+    const [searchQuery, setSearchQuery] = useState('')
+    const [isLoading, setIsLoading] = useState(true)
+    const [userGoal, setUserGoal] = useState('')
 
-];
+    useEffect(() => {
+        const init = async () => {
+            const { data: { session } } = await supabase.auth.getSession()
+            const token = session?.access_token
+            if (!token) return
 
-export default function TipsPage({ onSelectTip }: TipsPageProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [searchQuery, setSearchQuery] = useState('');
+            const headers = { 'Authorization': `Bearer ${token}` }
 
-  const categories = [
-    { id: 'All', name: 'ทั้งหมด', color: 'bg-gray-500' },
-    { id: 'Workout', name: 'การออกกำลังกาย', color: 'bg-emerald-500' },
-    { id: 'Nutrition', name: 'โภชนาการ', color: 'bg-orange-500' },
-    { id: 'Mental Health', name: 'สุขภาพจิต', color: 'bg-purple-500' },
-    { id: 'Sleep', name: 'การนอนหลับ', color: 'bg-indigo-500' },
-    { id: 'Yoga', name: 'โยคะ', color: 'bg-pink-500' },
-    { id: 'Hydration', name: 'การดื่มน้ำ', color: 'bg-blue-500' },
-  ];
+            // ดึง goal จาก workout preferences
+            const prefRes = await fetch(`${import.meta.env.VITE_API_URL}/api/workout/preferences`, { headers })
+            if (prefRes.ok) {
+                const pref = await prefRes.json()
+                setUserGoal(pref.goal ?? '')
+            }
 
-  const filteredTips = tips.filter((tip) => {
-    const matchesCategory = selectedCategory === 'All' || tip.category === selectedCategory;
-    const matchesSearch =
-      searchQuery === '' ||
-      tip.titleTh.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tip.excerptTh.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+            // ดึง bookmarks
+            const bmRes = await fetch(`${import.meta.env.VITE_API_URL}/api/tips/bookmarks/list`, { headers })
+            if (bmRes.ok) {
+                const bms = await bmRes.json()
+                setBookmarkedIds(new Set(bms.map((t: Tip) => t.id)))
+            }
+        }
+        init()
+    }, [])
 
-  return (
-  <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white pt-2 pb-16">
-    <div className="max-w-6xl mx-auto px-6">
+    useEffect(() => {
+        fetchTips()
+    }, [selectedCategory, searchQuery])
 
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-3xl font-semibold text-gray-800">Tips</h2>
-        <p className="text-gray-600 mt-1">บทความรู้เพื่อสุขภาพที่ดี</p>
-      </div>
+    // fetch recommended แยก เมื่อ userGoal พร้อม
+    useEffect(() => {
+        if (!userGoal) return
+        const fetchRecommended = async () => {
+            const { data: { session } } = await supabase.auth.getSession()
+            const token = session?.access_token
+            if (!token) return
+            const res = await fetch(
+                `${import.meta.env.VITE_API_URL}/api/tips?goal=${userGoal}`,
+                { headers: { 'Authorization': `Bearer ${token}` } }
+            )
+            if (res.ok) {
+                const data = await res.json()
+                setRecommendedTips(data.slice(0, 3))
+            }
+        }
+        fetchRecommended()
+    }, [userGoal])
 
-      {/* Search */}
-      <div className="mb-6">
-        <div className="relative max-w-xl">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="ค้นหาบทความ..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 rounded-full bg-white border border-gray-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none shadow-sm transition"
-          />
-        </div>
-      </div>
+    const fetchTips = async () => {
+        setIsLoading(true)
+        const { data: { session } } = await supabase.auth.getSession()
+        const token = session?.access_token
+        if (!token) { setIsLoading(false); return }
 
-      {/* Categories */}
-      <div className="flex flex-wrap gap-3 mb-8">
-        {categories.map((category) => (
-          <button
-            key={category.id}
-            onClick={() => setSelectedCategory(category.id)}
-            className={`px-4 py-2 rounded-full text-sm transition-all border ${
-              selectedCategory === category.id
-                ? `${category.color} text-white shadow-md`
-                : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
-            }`}
-          >
-            {category.name}
-          </button>
-        ))}
-      </div>
+        const params = new URLSearchParams()
+        if (selectedCategory !== 'All') params.set('category', selectedCategory)
+        if (searchQuery) params.set('search', searchQuery)
 
-      {/* 🔥 GRID บทความทั้งหมด */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        const res = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/tips?${params}`,
+            { headers: { 'Authorization': `Bearer ${token}` } }
+        )
+        if (res.ok) setTips(await res.json())
+        setIsLoading(false)
+    }
 
-        {filteredTips.map((tip) => (
-          <div
-            key={tip.id}
-            className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition overflow-hidden"
-          >
-            <button
-              onClick={() => onSelectTip(tip)}
-              className="w-full text-left"
-            >
-              {/* ✅ รูปเท่ากันทุกใบ */}
-              <div className="relative w-full aspect-[16/9] overflow-hidden">
-                <ImageWithFallback
-                  src={tip.image}
-                  alt={tip.titleTh}
-                  className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition duration-500"
-                />
-              </div>
+    const toggleBookmark = async (e: React.MouseEvent, tipId: string) => {
+        e.stopPropagation()
+        const { data: { session } } = await supabase.auth.getSession()
+        const token = session?.access_token
+        if (!token) return
 
-              <div className="p-4">
-                <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
-                  <Clock className="w-4 h-4" />
-                  {tip.readTime}
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tips/bookmarks/toggle`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tip_id: tipId }),
+        })
+        if (res.ok) {
+            const { bookmarked } = await res.json()
+            setBookmarkedIds(prev => {
+                const next = new Set(prev)
+                bookmarked ? next.add(tipId) : next.delete(tipId)
+                return next
+            })
+        }
+    }
+
+    return (
+    <div className="min-h-screen bg-gray-50 pb-16">
+        <div className="max-w-6xl mx-auto px-6 py-8">
+
+            {/* Header */}
+            <div className="mb-8">
+                <div className="flex items-end justify-between">
+                    <div>
+                        <p className="text-xs font-semibold tracking-widest text-emerald-500 uppercase mb-2">Health & Wellness</p>
+                        <h2 className="text-4xl font-bold text-gray-900 leading-none">Tips</h2>
+                        <p className="text-gray-400 mt-2 text-sm">บทความรู้เพื่อสุขภาพที่ดีของคุณ</p>
+                    </div>
+                    <div className="text-right hidden sm:block">
+                        <p className="text-3xl font-bold text-gray-100">{tips.length}</p>
+                        <p className="text-xs text-gray-400 -mt-1">บทความ</p>
+                    </div>
                 </div>
+            </div>
 
-                <h3 className="text-sm font-semibold text-gray-800 line-clamp-2">
-                  {tip.titleTh}
-                </h3>
+            {/* Search */}
+            <div className="mb-6">
+                <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                        type="text"
+                        placeholder="ค้นหาบทความ..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-11 pr-10 py-3 rounded-2xl bg-white border border-gray-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-50 outline-none shadow-sm text-sm transition-all"
+                    />
+                    {searchQuery && (
+                        <button
+                            onClick={() => setSearchQuery('')}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 text-xl leading-none"
+                        >×</button>
+                    )}
+                </div>
+            </div>
 
-                <p className="text-xs text-gray-600 mt-2 line-clamp-2">
-                  {tip.excerptTh}
-                </p>
-              </div>
-            </button>
-          </div>
-        ))}
+            {/* Categories */}
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 mb-8">
+                {categories.map(cat => (
+                    <button
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(cat.id)}
+                        className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-all font-medium ${
+                            selectedCategory === cat.id
+                                ? 'bg-gray-900 text-white shadow-sm'
+                                : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300 hover:text-gray-700'
+                        }`}
+                    >
+                        {cat.name}
+                    </button>
+                ))}
+            </div>
 
-      </div>
-
-      {/* Trending */}
-      <div className="mt-16">
-        <div className="flex items-center gap-2 mb-4">
-          <TrendingUp className="w-5 h-5 text-purple-600" />
-          <h3 className="text-lg font-semibold text-gray-800">
-            แนะนำสำหรับคุณ
-          </h3>
+            {/* Recommended Section */}
+{selectedCategory === 'All' && !searchQuery && recommendedTips.length > 0 && (
+    <div className="mb-10">
+        <div className="flex items-center gap-3 mb-5">
+            <div className="w-1 h-5 bg-emerald-500 rounded-full" />
+            <h3 className="text-base font-semibold text-gray-800">แนะนำสำหรับคุณ</h3>
+            <span className="text-xs bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full font-medium">
+                {userGoal === 'lose' ? '🔥 ลดน้ำหนัก' : userGoal === 'gain' ? '💪 เพิ่มกล้าม' : '✨ รักษาสุขภาพ'}
+            </span>
         </div>
 
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {tips.slice(0, 3).map((tip) => (
-            <button
-              key={tip.id}
-              onClick={() => onSelectTip(tip)}
-              className="bg-white rounded-2xl shadow-sm hover:shadow-md p-4 text-left transition"
+        {/* Scroll container — เต็มความกว้างพอดี */}
+        <div className="-mx-6 px-6">
+            <div
+                className="flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-hide"
+                style={{ scrollPaddingLeft: '24px' }}
             >
-              <p className="text-sm font-medium text-gray-800 line-clamp-2">
-                {tip.titleTh}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                {tip.readTime}
-              </p>
-            </button>
-          ))}
-        </div>
-      </div>
+                {recommendedTips.map((tip) => (
+                    <div
+                        key={tip.id}
+                        className="relative rounded-2xl overflow-hidden cursor-pointer group snap-start shrink-0"
+                        style={{ width: 'calc(85vw - 48px)', maxWidth: '340px', height: '200px' }}
+                        onClick={() => navigate(`/tips/${tip.id}`, { state: { tip } })}
+                    >
+                        <img
+                            src={tip.image_url}
+                            alt={tip.title_th}
+                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/600x338?text=No+Image' }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
+                        {/* Bookmark */}
+                        <button
+                            onClick={(e) => toggleBookmark(e, tip.id)}
+                            className="absolute top-3 right-3 w-8 h-8 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center transition-all z-10"
+                        >
+                            <Bookmark
+                                className="w-4 h-4 text-white"
+                                fill={bookmarkedIds.has(tip.id) ? '#34d399' : 'none'}
+                                stroke={bookmarkedIds.has(tip.id) ? '#34d399' : 'white'}
+                            />
+                        </button>
+
+                        <div className="absolute bottom-0 left-0 right-0 p-4">
+                            <span className="text-xs text-emerald-300 font-medium">{tip.category_th}</span>
+                            <p className="text-white font-semibold text-sm mt-0.5 line-clamp-2">{tip.title_th}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Scroll dots indicator */}
+            {recommendedTips.length > 1 && (
+                <div className="flex justify-center gap-1.5 mt-3">
+                    {recommendedTips.map((_, i) => (
+                        <div key={i} className={`rounded-full bg-gray-300 transition-all ${i === 0 ? 'w-4 h-1.5 bg-emerald-500' : 'w-1.5 h-1.5'}`} />
+                    ))}
+                </div>
+            )}
+        </div>
+
+        <div className="border-t border-gray-200 mt-6 mb-2" />
     </div>
-  </div>
-);
+)}
+            {/* Tips Grid */}
+            {isLoading ? (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {[1,2,3,4,5,6].map(i => (
+                        <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse shadow-sm">
+                            <div className="aspect-video bg-gray-200" />
+                            <div className="p-4 space-y-2">
+                                <div className="h-3 bg-gray-200 rounded w-1/3" />
+                                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                                <div className="h-3 bg-gray-100 rounded w-full" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : tips.length === 0 ? (
+                <div className="text-center py-20">
+                    <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Search className="w-6 h-6 text-gray-300" />
+                    </div>
+                    <p className="text-gray-500 text-sm mb-2">ไม่พบบทความที่ตรงกับการค้นหา</p>
+                    <button
+                        onClick={() => { setSearchQuery(''); setSelectedCategory('All') }}
+                        className="text-xs text-emerald-600 hover:underline"
+                    >
+                        ล้างตัวกรอง
+                    </button>
+                </div>
+            ) : (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {tips.map(tip => (
+                        <div key={tip.id} className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden group border border-gray-100">
+                            <button onClick={() => navigate(`/tips/${tip.id}`, { state: { tip } })} className="w-full text-left">
+                                <div className="relative w-full aspect-[16/9] overflow-hidden">
+                                    <img
+                                        src={tip.image_url}
+                                        alt={tip.title_th}
+                                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                                        onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/600x338?text=No+Image' }}
+                                    />
+                                    <div className="absolute top-2.5 left-2.5">
+                                        <span className="text-xs bg-white/90 backdrop-blur-sm text-gray-600 px-2.5 py-1 rounded-full font-medium shadow-sm">
+                                            {tip.category_th}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="p-4 pb-2">
+                                    <h3 className="text-sm font-semibold text-gray-800 line-clamp-2 mb-1.5 group-hover:text-emerald-600 transition-colors">
+                                        {tip.title_th}
+                                    </h3>
+                                    <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{tip.excerpt_th}</p>
+                                </div>
+                            </button>
+                            <div className="px-4 pb-4 flex items-center justify-between mt-1">
+                                <div className="flex items-center gap-1 text-xs text-gray-400">
+                                    <Clock className="w-3.5 h-3.5" />
+                                    <span>{tip.read_time}</span>
+                                </div>
+                                <button
+                                    onClick={(e) => toggleBookmark(e, tip.id)}
+                                    className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
+                                    {bookmarkedIds.has(tip.id)
+                                        ? <Bookmark className="w-4 h-4 text-emerald-500" fill="currentColor" />
+                                        : <Bookmark className="w-4 h-4 text-gray-300 hover:text-gray-500" />
+                                    }
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+        </div>
+    </div>
+)
 }

@@ -8,6 +8,7 @@ import workoutRoute from './routes/workout.route'
 import mealRoute from './routes/meal.route'
 import workoutVideosRoute from './routes/workout-videos.route'
 import alertRoute from './routes/alert.route'
+import tipsRoute from './routes/tips.route'
 
 dotenv.config()
 
@@ -19,6 +20,7 @@ app.use('/api/profile', authMiddleware, profileRoute)
 app.use('/api/workout', authMiddleware, workoutRoute)
 app.use('/api/meal', authMiddleware, mealRoute)
 app.use('/api/alerts', authMiddleware, alertRoute)
+app.use('/api/tips', authMiddleware, tipsRoute)
 // authMiddleware ไม่จำเป็นสำหรับ public content
 app.use('/api/workout-videos', workoutVideosRoute)
 

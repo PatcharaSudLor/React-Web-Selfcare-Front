@@ -16,12 +16,10 @@ import MainLayout from './components/pages/layout/MainLayout'
 import WorkoutVideos from './components/pages/WorkoutVideos'
 import ProfilePage from './components/pages/ProfilePage'
 import TipsPage from './components/pages/TipsPage'
-import type { Tip } from './components/pages/TipsPage'
 import TipDetailPage from './components/pages/TipDetailPage'
 import AlertPage from './components/pages/AlertPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import './App.css'
-import { useState } from 'react'
 import WorkoutPlanner from './components/pages/WorkoutPlanners'
 import WorkoutSchedule from './components/pages/WorkoutSchedule'
 import MealPlanner from './components/pages/MealPlanners'
@@ -32,7 +30,6 @@ import { SchedulePage } from './components/pages/SchedulePage'
 function AppContent() {
   const navigate = useNavigate()
   const location = useLocation()
-  const [bookmarkedTips, setBookmarkedTips] = useState<Tip[]>([])
 
   const handleLogin = () => {
     navigate('/login')
@@ -48,14 +45,6 @@ function AppContent() {
 
   const handleLogout = () => {
     navigate('/')
-  }
-
-  const handleSelectTip = (tip: Tip) => {
-    navigate('/tips/detail', { state: { tip } })
-  }
-
-  const handleToggleBookmark = (tip: Tip) => {
-    setBookmarkedTips((prev) => (prev.some(t => t.id === tip.id) ? prev.filter(t => t.id !== tip.id) : [...prev, tip]))
   }
 
   return (
@@ -99,7 +88,7 @@ function AppContent() {
             <WorkoutSchedule
               onBack={() => navigate('/workouts/planner')}
               plan={location.state?.plan}
-              onSaveToSchedule={(schedule) => navigate('/schedule')}
+              onSaveToSchedule={() => navigate('/schedule')}
             />
           }
         />
@@ -118,7 +107,7 @@ function AppContent() {
             <MealSchedule
               onBack={() => navigate('/meals/planner')}
               mealPlanData={location.state?.mealPlanData}
-              onSaveToSchedule={(schedule) => navigate('/schedule')}
+              onSaveToSchedule={() => navigate('/schedule')}
             />
           }
         />
@@ -126,8 +115,8 @@ function AppContent() {
         <Route path="/alerts" element={<AlertPage />} />
         <Route path="/profile" element={<ProfilePage onBack={() => navigate('/home')} profileImage="https://api.dicebear.com/7.x/avataaars/svg?seed=default" onLogout={handleLogout} />} />
         <Route path="/workouts/videos" element={<WorkoutVideos />} />
-        <Route path="/tips" element={<TipsPage onSelectTip={handleSelectTip} bookmarkedTips={bookmarkedTips} onToggleBookmark={handleToggleBookmark} />} />
-        <Route path="/tips/detail" element={<TipDetailPage onBack={() => navigate('/tips')} />} />
+        <Route path="/tips" element={<TipsPage />} />
+<Route path="/tips/:id" element={<TipDetailPage />} />
       </Route>
     </Routes>
   )

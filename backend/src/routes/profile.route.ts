@@ -1,5 +1,6 @@
 import express from 'express'
 import { supabase } from '../config/supabase'
+import { authMiddleware } from '../middleware/auth.middleware'
 
 const router = express.Router()
 
@@ -148,4 +149,37 @@ router.post('/tdee', async (req, res) => {
         return res.status(500).json({ error: 'Server Error' })
     }
 })
+
+{/*GET /api/profile — ดึงข้อมูล profile*/ }
+router.get('/', async (req, res) => {
+    const user_id = (req as any).user.id
+    const { data, error } = await supabase
+        .from('user_profile')
+        .select('*')
+        .eq('user_id', user_id)
+        .single()
+
+    if (error) return res.status(500).json({ error: error.message })
+    return res.json(data)
+})
+
+{/*PATCH /api/profile — อัปเดต profile*/ }
+router.patch('/', async (req, res) => {
+    const user_id = (req as any).user.id
+    const { username, gender, age, bloodType } = req.body
+
+    const { error } = await supabase
+        .from('user_profile')
+        .update({
+            username,
+            gender: gender?.toLowerCase(),
+            age: age ? Number(age) : null,
+            blood_type: bloodType,
+        })
+        .eq('user_id', user_id)
+
+    if (error) return res.status(500).json({ error: error.message })
+    return res.json({ message: 'Profile updated successfully' })
+})
+
 export default router

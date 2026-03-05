@@ -130,7 +130,7 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
   const isStrongPassword =
     hasLower && hasUpper && hasNumber && hasLength;
 
-  
+
 
   const [formData, setFormData] = useState({
     email: '',
@@ -140,53 +140,50 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
     bloodType: 'O'
   });
 
-  {/* Load profile data on mount */ }
   useEffect(() => {
     const loadProfile = async () => {
-      setIsLoadingData(true);
+      setIsLoadingData(true)
 
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) {
-        setIsLoadingData(false);
-        return;
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+      if (!token) { setIsLoadingData(false); return }
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+
+      if (!response.ok) { setIsLoadingData(false); return }
+
+      const data = await response.json()
+
+      const loadedData = {
+        email: session.user.email ?? '',
+        username: data.username ?? '',
+        gender: data.gender
+          ? data.gender.charAt(0).toUpperCase() + data.gender.slice(1)
+          : 'Male',
+        age: data.age ? String(data.age) : '',
+        bloodType: data.blood_type ?? 'O',
       }
-      const { data, error } = await supabase
-        .from('user_profile')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
 
-      if (!error && data) {
-        const loadedData = {
-          email: user.email ?? '',
-          username: data.username ?? '',
-          gender: data.gender
-            ? data.gender.charAt(0).toUpperCase() + data.gender.slice(1)
-            : 'Male',
-          age: data.age ? String(data.age) : '',
-          bloodType: data.blood_type ?? 'O',
-        };
+      setFormData(loadedData)
+      setOriginalFormData(loadedData)
 
-        setFormData(loadedData);
-        setOriginalFormData(loadedData);
-
-        if (data.avatar_url) {
-          setStoredAvatarPath(data.avatar_url);
-
-          const { data: publicData } = supabase.storage
-            .from('avatars')
-            .getPublicUrl(data.avatar_url);
-
-          const bustedUrl = `${publicData.publicUrl}?t=${Date.now()}`;
-
-          setOriginalAvatar(bustedUrl);
-          setPreviewUrl(bustedUrl);
-        }
+      if (data.avatar_url) {
+        setStoredAvatarPath(data.avatar_url)
+        const { data: publicData } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(data.avatar_url)
+        const bustedUrl = `${publicData.publicUrl}?t=${Date.now()}`
+        setOriginalAvatar(bustedUrl)
+        setPreviewUrl(bustedUrl)
       }
-      setIsLoadingData(false);
+
+      setIsLoadingData(false)
     }
-    loadProfile();
-  }, []);
+
+    loadProfile()
+  }, [])
 
   useEffect(() => {
     if (isEditing) {
@@ -196,9 +193,9 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
 
 
   const handleLogout = async () => {
-  await clearUserInfo(); // ✅ sign out จริงๆ
-  onLogout();
-};
+    await clearUserInfo(); // ✅ sign out จริงๆ
+    onLogout();
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -297,67 +294,69 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
         }
       }
 
-      const payload = {
-        username: formData.username,
-        gender: formData.gender?.toLowerCase?.() ?? formData.gender,
-        age: formData.age ? Number(formData.age) : null,
-        blood_type: formData.bloodType,
-        is_setup_completed: true,
-      } as any;
-
-      // ใส่ email แค่ครั้งแรก หรือถ้ายัง null
-      if (!originalFormData?.email) {
-        payload.email = user.email;
+      // ✅ ใหม่ — ผ่าน backend
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+      if (!token) {
+        alert('Session expired, please login again')
+        setIsSaving(false)
+        return
       }
 
-      // ใส่ avatar เฉพาะเมื่อมีค่า
+      const updateResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          username: formData.username,
+          gender: formData.gender,
+          age: formData.age,
+          bloodType: formData.bloodType,
+        })
+      })
+
+      if (!updateResponse.ok) {
+        const err = await updateResponse.json()
+        alert(err.error || 'เกิดข้อผิดพลาดขณะบันทึกข้อมูล')
+        setIsSaving(false)
+        return
+      }
+
+      // ✅ ย้ายโค้ดออกมาตรงๆ ไม่ต้องมี else แล้ว
+      alert('บันทึกข้อมูลเรียบร้อยแล้ว')
+      setIsEditing(false)
+      setOriginalFormData({ ...formData, email: user.email ?? '' })
+
       if (avatarPath) {
-        payload.avatar_url = avatarPath;
+        const { data: publicData } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(avatarPath);
+        const bustedUrl = `${publicData.publicUrl}?t=${Date.now()}`;
+        setOriginalAvatar(bustedUrl);
+        setPreviewUrl(bustedUrl);
+        updateUserInfo({ avatarUrl: bustedUrl, });
       }
 
-      const { error: updateError } = await supabase.from('user_profile').update(payload).eq('user_id', user.id);
-      if (updateError) {
-        console.error('Failed to save profile:', updateError);
-        alert('เกิดข้อผิดพลาดขณะบันทึกข้อมูล');
-      } else {
-        alert('บันทึกข้อมูลเรียบร้อยแล้ว');
-        setIsEditing(false);
-        setOriginalFormData({
-          ...formData,
-          email: user.email ?? '',
+      setSelectedFile(null);
+      setNewPassword('');
+
+      // Update user context so other parts of the app show latest info
+      try {
+        updateUserInfo({
+          username: formData.username,
+          gender: (formData.gender || '').toLowerCase() as any,
+          age: formData.age,
+          bloodType: formData.bloodType,
+          avatarUrl: avatarPath
+            ? `${supabase.storage.from('avatars').getPublicUrl(avatarPath).data.publicUrl}?t=${Date.now()}`
+            : undefined,
         });
-        if (avatarPath) {
-          const { data: publicData } = supabase.storage
-            .from('avatars')
-            .getPublicUrl(avatarPath);
-
-          const bustedUrl = `${publicData.publicUrl}?t=${Date.now()}`;
-
-          setOriginalAvatar(bustedUrl);
-          setPreviewUrl(bustedUrl);
-
-          updateUserInfo({
-            avatarUrl: bustedUrl,
-          });
-        }
-        setSelectedFile(null);
-        setNewPassword('');
-        // Update user context so other parts of the app show latest info
-        try {
-          updateUserInfo({
-            username: formData.username,
-            gender: (formData.gender || '').toLowerCase() as any,
-            age: formData.age,
-            bloodType: formData.bloodType,
-            avatarUrl: avatarPath
-              ? `${supabase.storage.from('avatars').getPublicUrl(avatarPath).data.publicUrl}?t=${Date.now()}`
-              : undefined,
-          });
-        } catch (e) { /* ignore */ }
+      } catch (err) {
+        console.error(err)
+        alert('เกิดข้อผิดพลาด')
       }
-    } catch (err) {
-      console.error(err);
-      alert('เกิดข้อผิดพลาด');
     } finally {
       setIsSaving(false);
     }
@@ -594,9 +593,8 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
 
                             {/* Checklist */}
                             <ul
-                              className={`mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs transition-all ${
-                                isStrongPassword ? 'opacity-0 max-h-0 overflow-hidden' : 'opacity-100 max-h-20'
-                              }`}
+                              className={`mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs transition-all ${isStrongPassword ? 'opacity-0 max-h-0 overflow-hidden' : 'opacity-100 max-h-20'
+                                }`}
                             >
                               <li className={hasLower ? 'text-emerald-600' : 'text-gray-400'}>
                                 ✓ lowercase

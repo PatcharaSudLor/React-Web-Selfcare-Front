@@ -165,21 +165,40 @@ router.get('/', async (req, res) => {
 
 {/*PATCH /api/profile — อัปเดต profile*/ }
 router.patch('/', async (req, res) => {
-    const user_id = (req as any).user.id
-    const { username, gender, age, bloodType } = req.body
+    try {
+        const user_id = (req as any).user.id
+        const { username, gender, age, bloodType, avatarUrl } = req.body
 
-    const { error } = await supabase
-        .from('user_profile')
-        .update({
+        if (!username || !gender || !age || !bloodType) {
+            return res.status(400).json({ error: 'Missing required fields' })
+        }
+
+        const ageNum = Number(age)
+        if (isNaN(ageNum) || ageNum <= 0) {
+            return res.status(400).json({ error: 'Invalid age' })
+        }
+
+        const updatePayload: any = {
             username,
-            gender: gender?.toLowerCase(),
-            age: age ? Number(age) : null,
+            gender: gender.toLowerCase(),
+            age: ageNum,
             blood_type: bloodType,
-        })
-        .eq('user_id', user_id)
+        }
 
-    if (error) return res.status(500).json({ error: error.message })
-    return res.json({ message: 'Profile updated successfully' })
+        if (avatarUrl) {
+            updatePayload.avatar_url = avatarUrl
+        }
+
+        const { error } = await supabase
+            .from('user_profile')
+            .update(updatePayload)
+            .eq('user_id', user_id)
+
+        if (error) return res.status(500).json({ error: error.message })
+        return res.json({ message: 'Profile updated successfully' })
+    } catch (err) {
+        return res.status(500).json({ error: 'Server Error' })
+    }
 })
 
 export default router

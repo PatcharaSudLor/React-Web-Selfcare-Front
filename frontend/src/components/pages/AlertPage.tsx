@@ -281,7 +281,7 @@ export default function AlertPage() {
       <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-3xl p-6 mb-6 text-white shadow-lg">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-sm opacity-80 mb-1">Daily Progress</p>
+            <p className="text-sm text-left opacity-80 mb-1">Daily Progress</p>
             <p className="text-2xl font-semibold">
               {completedCount === alerts.length ? 'ครบแล้ววันนี้! 🎉' : 'Keep Going! 💪'}
             </p>
@@ -326,7 +326,7 @@ export default function AlertPage() {
         <div className="flex items-start gap-3">
           <div className="text-2xl">💡</div>
           <div>
-            <p className="text-sm font-semibold text-gray-700 mb-1">Quote of the Day</p>
+            <p className="text-sm text-left font-semibold text-gray-700 mb-1">Quote of the Day</p>
             <p className="text-sm text-gray-500 italic leading-relaxed">"{getTodayQuote()}"</p>
           </div>
         </div>

@@ -127,7 +127,7 @@ export default function HomePage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-900">เคล็ดลับสุขภาพวันนี้</h2>
               <button 
-                onClick={() => navigate('/tips')}
+                onClick={() => navigate('/alerts')}
                 className="flex items-center gap-1 text-emerald-600 hover:text-emerald-700 font-medium text-sm transition-colors"
               >
                 ดูทั้งหมด

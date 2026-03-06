@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Clock, TrendingUp, Play, X } from 'lucide-react'
 import { useUser } from '../../contexts/UserContext'
-import { supabase } from '../../utils/supabase' 
+import { supabase } from '../../utils/supabase'
 
 
 interface Video {
@@ -106,7 +106,7 @@ function getBodyTypeTags(bodyType: string): string[] {
 export default function WorkoutVideos() {
   const [videos, setVideos] = useState<Video[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [activeCategory, setActiveCategory] = useState('all')
+  const [activeCategory, setActiveCategory] = useState('for-you')
   const [selectedGoals, setSelectedGoals] = useState<string[]>([])
   const [selectedDifficulty, setSelectedDifficulty] = useState<string[]>([])
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>([])
@@ -116,28 +116,32 @@ export default function WorkoutVideos() {
 
   const { userInfo } = useUser()
 
-// fetch workout preferences
-useEffect(() => {
+  // fetch workout preferences
+  useEffect(() => {
     const fetchUserPrefs = async () => {
-        const { data: { session } } = await supabase.auth.getSession()
-        const token = session?.access_token
-        if (!token) return
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+      if (!token) return
 
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/workout/preferences`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-        if (res.ok) {
-            const data = await res.json()
-            setUserGoal(data.goal ?? '')
-            setUserBodyType(data.bodyType ?? '')
-        }
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/workout/preferences`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setUserGoal(data.goal ?? '')
+        setUserBodyType(data.bodyType ?? '')
+      }
     }
     fetchUserPrefs()
-}, [])
+  }, [])
 
   useEffect(() => {
+    if (activeCategory === 'for-you' && recommendedTags.length === 0) {
+      setIsLoading(false)
+      return
+    }
     fetchVideos()
-  }, [activeCategory, selectedGoals, selectedDifficulty, selectedEquipment, selectedDuration])
+  }, [activeCategory, selectedGoals, selectedDifficulty, selectedEquipment, selectedDuration, userGoal, userBodyType])
 
   const fetchVideos = async () => {
     setIsLoading(true)
@@ -173,14 +177,14 @@ useEffect(() => {
   }
 
   const clearFilters = () => {
-    setActiveCategory('all')
+    setActiveCategory('for-you')
     setSelectedGoals([])
     setSelectedDifficulty([])
     setSelectedEquipment([])
     setSelectedDuration([])
   }
 
-  const hasActiveFilters = activeCategory !== 'all' ||
+  const hasActiveFilters = activeCategory !== 'for-you' ||
     selectedGoals.length > 0 ||
     selectedDifficulty.length > 0 ||
     selectedEquipment.length > 0 ||

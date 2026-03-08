@@ -79,30 +79,30 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
       return
     }
 
-    const { data: { session } } = await supabase.auth.getSession()
-    const token = session?.access_token
-    if (!token) return
+    // 1. ส่งข้อมูลไปสร้างแผนทันที
+    onGeneratePlan({ likedMeals, allergicFoods, budget });
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/meal/preferences`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        likedMeals,
-        allergicFoods,
-        budget: Number(budget),
-      })
-    })
-
-    if (!response.ok) {
-      const err = await response.json()
-      alert(err.error || 'Failed to save preferences')
-      return
+    // 2. บันทึกข้อมูลลง API ในพื้นหลัง (Background)
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (token) {
+        fetch(`${import.meta.env.VITE_API_URL}/api/meal/preferences`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            likedMeals,
+            allergicFoods,
+            budget: Number(budget),
+          })
+        }).catch(err => console.error('Background meal save failed:', err));
+      }
+    } catch (err) {
+      console.error('Meal preference error:', err);
     }
-
-    onGeneratePlan({ likedMeals, allergicFoods, budget })
   };
 
   const isFormComplete = likedMeals.length > 0 && budget;

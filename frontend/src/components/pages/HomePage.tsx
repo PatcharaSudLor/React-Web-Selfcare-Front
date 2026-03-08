@@ -175,7 +175,7 @@ export default function HomePage() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Workouts */}
               <button 
-                onClick={() => navigate('/workouts')}
+                onClick={() => navigate('/workouts/planner')}
                 className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
               >
                 <div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-3xl flex items-center justify-center">
@@ -197,7 +197,7 @@ export default function HomePage() {
 
               {/* Meals */}
               <button 
-                onClick={() => navigate('/meals')}
+                onClick={() => navigate('/meals/planner')}
                 className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
               >
                 <div className="w-20 h-20 bg-gradient-to-br from-amber-100 to-orange-200 rounded-3xl flex items-center justify-center">

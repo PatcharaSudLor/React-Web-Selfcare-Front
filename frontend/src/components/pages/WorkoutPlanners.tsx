@@ -30,31 +30,8 @@ export default function WorkoutPlanner({ onBack, onGeneratePlan }: WorkoutPlanne
       return;
     }
 
-    const { data: { session } } = await supabase.auth.getSession();
-    const token = session?.access_token
-    if (!token) return;
-
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/workout/preferences`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        dailyTime: selectedTime,
-        bodyType,
-        goal,
-        medicalCondition,
-      })
-    })
-
-    if(!response.ok){
-      const err = await response.json()
-      alert(err.error || 'Failed to save preferences')
-      return
-    }
-
-  const plan = generateWorkoutPlan({
+    // 1. สร้างแผนในเครื่องทันทีเพื่อให้ผู้ใช้เห็นตารางก่อน (ไม่รอนาน)
+    const plan = generateWorkoutPlan({
       bodyType,
       goal,
       dailyTime: selectedTime,
@@ -62,6 +39,29 @@ export default function WorkoutPlanner({ onBack, onGeneratePlan }: WorkoutPlanne
     });
 
     onGeneratePlan(plan);
+
+    // 2. บันทึกข้อมูลลง API ในพื้นหลัง
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (token) {
+        fetch(`${import.meta.env.VITE_API_URL}/api/workout/preferences`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            dailyTime: selectedTime,
+            bodyType,
+            goal,
+            medicalCondition,
+          })
+        }).catch(err => console.error('Background save failed:', err));
+      }
+    } catch (err) {
+      console.error('Preference save error:', err);
+    }
   };
 
   useEffect(() => {

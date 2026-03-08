@@ -28,6 +28,14 @@ interface MealScheduleProps {
     mealPlanData: MealPlanData
 }
 
+const DEFAULT_MEALS: Meal[] = [
+    { id: 'd1', name: 'Chicken Breast with Rice', name_th: 'อกไก่ข้าวกล้อง', price: 60, type: 'rice', ingredients: ['อกไก่', 'ข้าวกล้อง'] },
+    { id: 'd2', name: 'Stir-fried Basil with Pork', name_th: 'กะเพราหมูสับ', price: 50, type: 'rice', ingredients: ['หมูสับ', 'ใบกะเพรา'] },
+    { id: 'd3', name: 'Salmon Salad', name_th: 'สลัดแซลมอน', price: 120, type: 'salad', ingredients: ['แซลมอน', 'ผักสลัด'] },
+    { id: 'd4', name: 'Chicken Noodles', name_th: 'ก๋วยเตี๋ยวไก่', price: 45, type: 'noodles', ingredients: ['เส้นก๋วยเตี๋ยว', 'ไก่'] },
+    { id: 'd5', name: 'Beef Steak', name_th: 'สเต็กเนื้อ', price: 180, type: 'steak', ingredients: ['เนื้อวัว', 'มันฝรั่ง'] },
+]
+
 const weekDays = [
     { day: 'Monday', dayTh: 'จันทร์' },
     { day: 'Tuesday', dayTh: 'อังคาร' },
@@ -69,14 +77,24 @@ export default function MealSchedule({ onBack, onSaveToSchedule, mealPlanData }:
                 params.set('allergies', allergicFoods.join(','))
             }
 
-            const res = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/meal/items?${params}`,
-                { headers: { 'Authorization': `Bearer ${token}` } }
-            )
+            let meals: Meal[] = []
+            try {
+                const res = await fetch(
+                    `${import.meta.env.VITE_API_URL}/api/meal/items?${params}`,
+                    { headers: { 'Authorization': `Bearer ${token}` } }
+                )
+                if (res.ok) {
+                    meals = await res.json()
+                }
+            } catch (err) {
+                console.error('Fetch meals error, using defaults:', err)
+            }
 
-            if (!res.ok) { setIsLoading(false); return }
-
-            const meals: Meal[] = await res.json()
+            // ถ้าไม่มีข้อมูลจาก API ให้ใช้ตัวสำรอง
+            if (meals.length === 0) {
+                meals = DEFAULT_MEALS.filter(m => m.price <= budgetNumber)
+                if (meals.length === 0) meals = DEFAULT_MEALS // ถ้าถูกเกินจนไม่มี ให้เอาทั้งหมดมาสำรองไว้ก่อน
+            }
 
             const getRandomMeal = (seed: number): Meal => {
                 if (meals.length === 0) {

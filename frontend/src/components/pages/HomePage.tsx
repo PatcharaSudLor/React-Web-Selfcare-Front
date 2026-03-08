@@ -208,7 +208,7 @@ export default function HomePage() {
 
               {/* AI Assistant */}
               <button 
-                onClick={() => navigate('/assistant')}
+                onClick={() => navigate('/chat')}
                 className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
               >
                 <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-3xl flex items-center justify-center">

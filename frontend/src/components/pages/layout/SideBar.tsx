@@ -32,7 +32,7 @@ const menuItems = [
   { id: 'tips', path: '/tips', label: 'Tips', icon: Lightbulb },
   { id: 'schedule', path: '/schedule', label: 'Schedule', icon: Calendar },
   { id: 'favorite', path: '/favorite', label: 'Favorite', icon: Heart },
-  { id: 'assistant', path: '/assistant', label: 'Assistant', icon: MessageCircle },
+  { id: 'assistant', path: '/chat', label: 'Assistant', icon: MessageCircle },
 ]
 
 const bottomItems = [

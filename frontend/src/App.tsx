@@ -25,6 +25,8 @@ import WorkoutSchedule from './components/pages/WorkoutSchedule'
 import MealPlanner from './components/pages/MealPlanners'
 import MealSchedule from './components/pages/MealSchedule'
 import { SchedulePage } from './components/pages/SchedulePage'
+import ChatPage from './components/pages/ChatPage'
+
 
 
 function AppContent() {
@@ -63,6 +65,8 @@ function AppContent() {
       <Route path="/bmiviews" element={<ProtectedRoute><BMIViewPage /></ProtectedRoute>} />
       <Route path="/bmrviews" element={<ProtectedRoute><BMRViewPage /></ProtectedRoute>} />
       <Route path="/tdeeviews" element={<ProtectedRoute><TDEEViewPage /></ProtectedRoute>} />
+      <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+
 
       {/* Main routes — ครอบ ProtectedRoute ครั้งเดียวรอบนอกสุด */}
       <Route element={

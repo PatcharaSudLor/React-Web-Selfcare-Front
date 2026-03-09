@@ -25,9 +25,6 @@ import WorkoutSchedule from './components/pages/WorkoutSchedule'
 import MealPlanner from './components/pages/MealPlanners'
 import MealSchedule from './components/pages/MealSchedule'
 import { SchedulePage } from './components/pages/SchedulePage'
-import ChatPage from './components/pages/ChatPage'
-
-
 
 function AppContent() {
   const navigate = useNavigate()
@@ -49,6 +46,10 @@ function AppContent() {
     navigate('/')
   }
 
+  const handleHome = () => {
+    navigate('/home')
+  }
+
   return (
     <Routes>
       {/* Public routes */}
@@ -65,7 +66,6 @@ function AppContent() {
       <Route path="/bmiviews" element={<ProtectedRoute><BMIViewPage /></ProtectedRoute>} />
       <Route path="/bmrviews" element={<ProtectedRoute><BMRViewPage /></ProtectedRoute>} />
       <Route path="/tdeeviews" element={<ProtectedRoute><TDEEViewPage /></ProtectedRoute>} />
-      <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
 
 
       {/* Main routes — ครอบ ProtectedRoute ครั้งเดียวรอบนอกสุด */}
@@ -79,7 +79,7 @@ function AppContent() {
           path="/workouts/planner"
           element={
             <WorkoutPlanner
-              onBack={() => navigate(-1)}
+              onHome={handleHome}
               onGeneratePlan={(plan) =>
                 navigate('/workouts/schedule', { state: { plan } })
               }
@@ -116,7 +116,7 @@ function AppContent() {
           }
         />
         <Route path="/schedule" element={<SchedulePage />} />
-        <Route path="/alerts" element={<AlertPage />} />
+        <Route path="/alerts" element={<AlertPage onBack={() => navigate(-1)} />} />
         <Route path="/profile" element={<ProfilePage onBack={() => navigate('/home')} profileImage="https://api.dicebear.com/7.x/avataaars/svg?seed=default" onLogout={handleLogout} />} />
         <Route path="/workouts/videos" element={<WorkoutVideos />} />
         <Route path="/tips" element={<TipsPage />} />

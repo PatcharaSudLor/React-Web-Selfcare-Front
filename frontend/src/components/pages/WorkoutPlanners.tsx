@@ -10,12 +10,12 @@ import type {
 } from '../../utils/workoutGenerator';
 
 interface WorkoutPlannerProps {
-  onBack: () => void;
+  onHome: () => void;
   onGeneratePlan: (plan: WeeklyWorkoutPlan) => void;
 }
 
 
-export default function WorkoutPlanner({ onBack, onGeneratePlan }: WorkoutPlannerProps) {
+export default function WorkoutPlanner({ onHome, onGeneratePlan }: WorkoutPlannerProps) {
   const [selectedTime, setSelectedTime] = useState<number | null>(null);
   const [bodyType, setBodyType] = useState<BodyType | null>(null);
   const [goal, setGoal] = useState<Goal | null>(null);
@@ -30,7 +30,6 @@ export default function WorkoutPlanner({ onBack, onGeneratePlan }: WorkoutPlanne
       return;
     }
 
-    // 1. สร้างแผนในเครื่องทันทีเพื่อให้ผู้ใช้เห็นตารางก่อน (ไม่รอนาน)
     const plan = generateWorkoutPlan({
       bodyType,
       goal,
@@ -40,7 +39,6 @@ export default function WorkoutPlanner({ onBack, onGeneratePlan }: WorkoutPlanne
 
     onGeneratePlan(plan);
 
-    // 2. บันทึกข้อมูลลง API ในพื้นหลัง
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
@@ -98,7 +96,7 @@ export default function WorkoutPlanner({ onBack, onGeneratePlan }: WorkoutPlanne
           {/* Back Button */}
           <div className="mb-6">
             <button
-              onClick={onBack}
+              onClick={onHome}
               className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />

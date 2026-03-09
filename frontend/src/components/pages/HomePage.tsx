@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Dumbbell, Utensils, MessageCircle, TrendingUp, ChevronRight, Activity, Flame, PlayCircle } from 'lucide-react';
+import { Heart, Dumbbell, Utensils, TrendingUp, ChevronRight, Activity, Flame, PlayCircle } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
 
 const tips = [
@@ -126,7 +126,7 @@ export default function HomePage() {
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-900">เคล็ดลับสุขภาพวันนี้</h2>
-              <button 
+              <button
                 onClick={() => navigate('/alerts')}
                 className="flex items-center gap-1 text-emerald-600 hover:text-emerald-700 font-medium text-sm transition-colors"
               >
@@ -157,11 +157,10 @@ export default function HomePage() {
                   <button
                     key={index}
                     onClick={() => setCurrentTipIndex(index)}
-                    className={`h-2 rounded-full transition-all ${
-                      index === currentTipIndex 
-                        ? 'bg-emerald-600 w-6' 
+                    className={`h-2 rounded-full transition-all ${index === currentTipIndex
+                        ? 'bg-emerald-600 w-6'
                         : 'bg-gray-300 w-2'
-                    }`}
+                      }`}
                     aria-label={`Go to tip ${index + 1}`}
                   />
                 ))}
@@ -174,7 +173,7 @@ export default function HomePage() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">เมนูด่วน</h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Workouts */}
-              <button 
+              <button
                 onClick={() => navigate('/workouts/planner')}
                 className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
               >
@@ -196,7 +195,7 @@ export default function HomePage() {
               </button>
 
               {/* Meals */}
-              <button 
+              <button
                 onClick={() => navigate('/meals/planner')}
                 className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
               >
@@ -206,19 +205,8 @@ export default function HomePage() {
                 <span className="text-gray-800 font-medium">รวมเมนูอาหาร</span>
               </button>
 
-              {/* AI Assistant */}
-              <button 
-                onClick={() => navigate('/chat')}
-                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
-              >
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-3xl flex items-center justify-center">
-                  <MessageCircle className="w-10 h-10 text-blue-600" />
-                </div>
-                <span className="text-gray-800 font-medium">ผู้ช่วย AI</span>
-              </button>
-
               {/* Favorite */}
-              <button 
+              <button
                 onClick={() => navigate('/favorite')}
                 className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
               >

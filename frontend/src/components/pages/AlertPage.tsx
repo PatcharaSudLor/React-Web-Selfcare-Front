@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Droplets, Dumbbell, Moon, Apple, Smile, Sparkles, Heart, Flame } from 'lucide-react';
+import { Droplets, Dumbbell, Moon, Apple, Smile, Sparkles, Heart, Flame, ArrowLeft } from 'lucide-react';
 import { supabase } from '../../utils/supabase';
 import { useUser } from '../../contexts/UserContext';
 
@@ -11,7 +11,11 @@ interface Alert {
   questionTh: string;
   detail?: string;
   category: string;
-  goals?: string[]; // ถ้ามี goals แสดงเฉพาะ user ที่ตรง
+  goals?: string[];
+}
+
+interface AlertPage {
+    onBack:() => void;
 }
 
 interface AlertCardProps {
@@ -84,7 +88,7 @@ function AlertCard({ alert, answered, onAnswer, onEdit }: AlertCardProps) {
     )
 }
 
-export default function AlertPage() {
+export default function AlertPage({onBack} : AlertPage) {
   const { userInfo } = useUser()
   const currentHour = new Date().getHours();
   const greetingTh = currentHour < 12 ? 'สวัสดีตอนเช้า' : currentHour < 18 ? 'สวัสดีตอนบ่าย' : 'สวัสดีตอนเย็น';
@@ -266,7 +270,19 @@ export default function AlertPage() {
   )
 
   return (
+    
     <div className="w-full max-w-2xl mx-auto px-4 py-6">
+
+      {/* Back Button */}
+          <div className="mb-6">
+            <button
+              onClick={onBack}
+              className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span className="text-sm font-medium">Back</span>
+            </button>
+          </div>
 
       {/* Header */}
       <div className="mb-6">

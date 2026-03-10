@@ -174,21 +174,45 @@ export default function RecipeDetailPage() {
                 {/* Back button */}
                 <button
                     onClick={() => navigate(-1)}
-                    style={{ position: 'absolute', top: 20, left: 20, width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.3)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', transition: 'background 0.2s' }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.25)' }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.15)' }}
-                >
-                    <ArrowLeft style={{ width: 18, height: 18 }} />
-                </button>
-
-                {/* Bookmark button */}
-                <button
-                    onClick={toggleBookmark}
-                    style={{ position: 'absolute', top: 20, right: 20, width: 40, height: 40, borderRadius: '50%', background: isBookmarked ? '#059669' : 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.3)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s, transform 0.15s' }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.1)' }}
+                    style={{
+                        position: 'absolute', top: 20, left: 20, width: 40, height: 40, zIndex: 3,
+                        background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.15)' }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)' }}
                 >
-                    <Bookmark style={{ width: 18, height: 18, fill: isBookmarked ? '#fff' : 'none', color: '#fff' }} />
+                    <span style={{
+                        width: 32, height: 32, borderRadius: '50%', background: '#ffffff',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                    }}>
+                        <ArrowLeft style={{ width: 18, height: 18, color: '#374151' }} />
+                    </span>
+                </button>
+
+                {/* Bookmark button (icon with circle behind) */}
+                <button
+                    onClick={toggleBookmark}
+                    style={{
+                        position: 'absolute', top: 20, right: 20, width: 40, height: 40, zIndex: 3,
+                        background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.15)' }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)' }}
+                >
+                    <span style={{
+                        width: 32, height: 32, borderRadius: '50%',
+                        background: isBookmarked ? '#059669' : '#ffffff',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                    }}>
+                        <Bookmark
+                            style={{ width: 18, height: 18, color: isBookmarked ? '#fde047' : '#374151' }}
+                            fill={isBookmarked ? '#fde047' : 'none'}
+                        />
+                    </span>
                 </button>
 
                 {/* Title overlay */}

@@ -4,7 +4,8 @@ import {
     Users,
     Flame,
     ChevronRight,
-    Soup
+    Soup,
+    Bookmark
 } from "lucide-react"
 import { DIFFICULTY_CONFIG } from "../../constants/recipeConstants"
 import StarRating from "./StarRating"
@@ -19,6 +20,7 @@ function RecipeCard({ recipe, isBookmarked, onSelect, onToggleBookmark }: {
 }) {
     const [imgError, setImgError] = useState(false)
     const diff = DIFFICULTY_CONFIG[recipe.difficulty as keyof typeof DIFFICULTY_CONFIG]
+
 
     return (
         <div
@@ -73,28 +75,25 @@ function RecipeCard({ recipe, isBookmarked, onSelect, onToggleBookmark }: {
                 {/* Bookmark button */}
                 <button
                     style={{
-                        position: 'absolute', top: 10, right: 10, width: 32, height: 32, borderRadius: '50%', zIndex: 3,
-                        background: isBookmarked ? '#059669' : 'rgba(255,255,255,0.9)',
-                        border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        backdropFilter: 'blur(8px)', transition: 'background 0.2s, transform 0.15s',
+                        position: 'absolute', top: 10, right: 10, width: 32, height: 32, padding: 0, zIndex: 3,
+                        background: isBookmarked ? '#059669' : '#ffffff',
+                        borderRadius: '50%',
+                        border: '1px solid rgba(0,0,0,0.05)',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'background 0.2s, transform 0.15s',
                         boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                     }}
                     onClick={(e) => { e.stopPropagation(); onToggleBookmark(e) }}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.15)' }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)' }}
                 >
-                    <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill={isBookmarked ? "#fff" : "none"}
-                        stroke={isBookmarked ? "#fff" : "#374151"}
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    >
-                        <path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z" />
-                    </svg>
+                    {/* bookmark icon only; color changes when bookmarked */}
+                    <Bookmark
+                        size={20}
+                        strokeWidth={2.5}
+                        fill={isBookmarked ? '#fde047' : 'none'}
+                        stroke={isBookmarked ? '#fde047' : '#374151'}
+                    />
                 </button>
 
                 {/* Healthy tags */}

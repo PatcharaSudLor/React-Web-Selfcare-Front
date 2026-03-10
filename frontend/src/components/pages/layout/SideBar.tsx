@@ -26,7 +26,7 @@ const menuItems = [
   { id: 'home', path: '/home', label: 'Home', icon: Home },
   { id: 'workout', path: '/workouts/planner', label: 'Workout', icon: Dumbbell },
   { id: 'meal', path: '/meals/planner', label: 'Meal', icon: UtensilsCrossed },
-  { id: 'recipe', path: '/recipe', label: 'Recipes', icon: CookingPot },
+  { id: 'recipe', path: '/recipes', label: 'Recipes', icon: CookingPot },
   { id: 'video', path: '/workouts/videos?part=upper-body', label: 'Videos', icon: PlayCircle },
   { id: 'alerts', path: '/alerts', label: 'Alerts', icon: Bell },
   { id: 'tips', path: '/tips', label: 'Tips', icon: Lightbulb },

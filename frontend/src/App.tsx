@@ -25,6 +25,9 @@ import WorkoutSchedule from './components/pages/WorkoutSchedule'
 import MealPlanner from './components/pages/MealPlanners'
 import MealSchedule from './components/pages/MealSchedule'
 import { SchedulePage } from './components/pages/SchedulePage'
+import RecipePage from './components/pages/RecipePage'
+import RecipeDetailPage from './components/pages/RecipeDetailPage'
+
 
 function AppContent() {
   const navigate = useNavigate()
@@ -120,7 +123,9 @@ function AppContent() {
         <Route path="/profile" element={<ProfilePage onBack={() => navigate('/home')} profileImage="https://api.dicebear.com/7.x/avataaars/svg?seed=default" onLogout={handleLogout} />} />
         <Route path="/workouts/videos" element={<WorkoutVideos />} />
         <Route path="/tips" element={<TipsPage />} />
-<Route path="/tips/:id" element={<TipDetailPage />} />
+        <Route path="/tips/:id" element={<TipDetailPage />} />
+        <Route path="/recipes" element={<RecipePage />} />
+        <Route path="/recipes/:id" element={<RecipeDetailPage/>} />
       </Route>
     </Routes>
   )

@@ -37,7 +37,7 @@ export default function Header({ onMenuClick, onProfileClick }: HeaderProps) {
             className="p-2 rounded-full hover:bg-gray-100 transition-colors"
             aria-label="Profile"
           >
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
               {loading ? (
                 <div className="w-full h-full bg-gray-200 animate-pulse" />
               ) : userInfo.avatarUrl ? (

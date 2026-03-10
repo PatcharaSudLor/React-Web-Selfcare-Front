@@ -25,11 +25,8 @@ export default function MainLayout({
     }
 
     const handleLogout = () => {
-        // Clear user context
         clearUserInfo()
-        // Call parent logout
         onLogout()
-        // Navigate to login/home
         navigate('/')
     }
 
@@ -55,7 +52,7 @@ export default function MainLayout({
 
             {/* Main Content */}
             <main className="pt-16">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="max-w-7xl mx-auto pb-8">
                     <Outlet />
                 </div>
             </main>

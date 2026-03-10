@@ -36,23 +36,8 @@ router.get('/', async (req, res) => {
     }
 })
 
-// GET /api/tips/:id
-router.get('/:id', async (req, res) => {
-    try {
-        const { data, error } = await supabase
-            .from('tips')
-            .select('*')
-            .eq('id', req.params.id)
-            .single()
-
-        if (error) return res.status(404).json({ error: 'Not found' })
-        return res.json(data)
-    } catch {
-        return res.status(500).json({ error: 'Server Error' })
-    }
-})
-
-// GET /api/tips/bookmarks — ต้อง auth
+// ⚠️ ต้องวางก่อน /:id เสมอ ไม่งั้น Express จะ match "bookmarks" เป็น :id
+// GET /api/tips/bookmarks/list
 router.get('/bookmarks/list', async (req, res) => {
     try {
         const user_id = (req as any).user.id
@@ -75,12 +60,14 @@ router.post('/bookmarks/toggle', async (req, res) => {
         const user_id = (req as any).user.id
         const { tip_id } = req.body
 
+        if (!tip_id) return res.status(400).json({ error: 'tip_id is required' })
+
         const { data: existing } = await supabase
             .from('tip_bookmarks')
             .select('id')
             .eq('user_id', user_id)
             .eq('tip_id', tip_id)
-            .single()
+            .maybeSingle()  // ใช้ maybeSingle แทน single เพื่อไม่ error เมื่อไม่มีข้อมูล
 
         if (existing) {
             await supabase.from('tip_bookmarks').delete()
@@ -90,6 +77,22 @@ router.post('/bookmarks/toggle', async (req, res) => {
             await supabase.from('tip_bookmarks').insert({ user_id, tip_id })
             return res.json({ bookmarked: true })
         }
+    } catch {
+        return res.status(500).json({ error: 'Server Error' })
+    }
+})
+
+// GET /api/tips/:id — ต้องอยู่หลัง /bookmarks/*
+router.get('/:id', async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('tips')
+            .select('*')
+            .eq('id', req.params.id)
+            .single()
+
+        if (error) return res.status(404).json({ error: 'Not found' })
+        return res.json(data)
     } catch {
         return res.status(500).json({ error: 'Server Error' })
     }

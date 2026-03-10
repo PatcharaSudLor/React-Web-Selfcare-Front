@@ -10,6 +10,7 @@ import workoutVideosRoute from './routes/workout-videos.route'
 import alertRoute from './routes/alert.route'
 import tipsRoute from './routes/tips.route'
 import recipesRoute from './routes/recipes.route'
+import workoutVideoBookmarksRoute from './routes/WorkoutVideoBookmarks.routes'
 
 dotenv.config()
 
@@ -26,6 +27,7 @@ app.use('/api/recipes', authMiddleware, recipesRoute)
 
 // authMiddleware ไม่จำเป็นสำหรับ public content
 app.use('/api/workout-videos', workoutVideosRoute)
+app.use('/api/workout-videos/bookmarks', authMiddleware, workoutVideoBookmarksRoute)
 
 app.get('/',  (req, res) => {
     res.send('Backend is running🚀')

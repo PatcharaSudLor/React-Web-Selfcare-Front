@@ -28,6 +28,7 @@ import { SchedulePage } from './components/pages/SchedulePage'
 import RecipePage from './components/pages/RecipePage'
 import RecipeDetailPage from './components/pages/RecipeDetailPage'
 
+import { FavoritePage } from './components/pages/FavoritePage'
 
 function AppContent() {
   const navigate = useNavigate()
@@ -126,6 +127,7 @@ function AppContent() {
         <Route path="/tips/:id" element={<TipDetailPage />} />
         <Route path="/recipes" element={<RecipePage />} />
         <Route path="/recipes/:id" element={<RecipeDetailPage/>} />
+        <Route path="/favorite" element={<FavoritePage onBack={() => navigate('/home')} />} />
       </Route>
     </Routes>
   )

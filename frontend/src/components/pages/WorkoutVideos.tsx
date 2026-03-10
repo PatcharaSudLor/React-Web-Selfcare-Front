@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Clock, TrendingUp, Play, X } from 'lucide-react'
-import { useUser } from '../../contexts/UserContext'
+import { useNavigate } from 'react-router-dom'
+import { Clock, TrendingUp, Play, X, Bookmark } from 'lucide-react'
 import { supabase } from '../../utils/supabase'
 
 
@@ -74,16 +74,13 @@ function getDifficultyLabel(difficulty: string) {
   }
 }
 
-// function แปลง YouTube URL → thumbnail อัตโนมัติ
 function getYoutubeThumbnail(youtubeUrl: string) {
   const match = youtubeUrl.match(/[?&]v=([^&]+)/)
   if (!match) return 'https://via.placeholder.com/480x270?text=No+Image'
   const videoId = match[1]
-  // ลอง maxresdefault ก่อน ถ้าไม่มีจะ fallback เป็น hqdefault
   return `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`
 }
 
-// Map goal → goal_tags
 function getGoalTags(goal: string): string[] {
   switch (goal) {
     case 'lose': return ['fat-loss', 'endurance']
@@ -93,7 +90,6 @@ function getGoalTags(goal: string): string[] {
   }
 }
 
-// Map body_type → goal_tags เพิ่มเติม
 function getBodyTypeTags(bodyType: string): string[] {
   switch (bodyType) {
     case 'ectomorph': return ['muscle-gain', 'strength']
@@ -104,6 +100,7 @@ function getBodyTypeTags(bodyType: string): string[] {
 }
 
 export default function WorkoutVideos() {
+  const navigate = useNavigate()
   const [videos, setVideos] = useState<Video[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('for-you')
@@ -113,23 +110,30 @@ export default function WorkoutVideos() {
   const [selectedDuration, setSelectedDuration] = useState<string[]>([])
   const [userGoal, setUserGoal] = useState('')
   const [userBodyType, setUserBodyType] = useState('')
+  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set())
 
-  const { userInfo } = useUser()
-
-  // fetch workout preferences
+  // fetch workout preferences + bookmarks
   useEffect(() => {
     const fetchUserPrefs = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       const token = session?.access_token
       if (!token) return
 
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/workout/preferences`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      if (res.ok) {
-        const data = await res.json()
+      const headers = { 'Authorization': `Bearer ${token}` }
+
+      // ดึง goal จาก workout preferences
+      const prefRes = await fetch(`${import.meta.env.VITE_API_URL}/api/workout/preferences`, { headers })
+      if (prefRes.ok) {
+        const data = await prefRes.json()
         setUserGoal(data.goal ?? '')
         setUserBodyType(data.bodyType ?? '')
+      }
+
+      // ดึง bookmarks
+      const bmRes = await fetch(`${import.meta.env.VITE_API_URL}/api/workout-videos/bookmarks/list`, { headers })
+      if (bmRes.ok) {
+        const bms = await bmRes.json()
+        setBookmarkedIds(new Set(bms.map((v: Video) => v.id)))
       }
     }
     fetchUserPrefs()
@@ -148,7 +152,6 @@ export default function WorkoutVideos() {
     const params = new URLSearchParams()
 
     if (activeCategory === 'for-you') {
-      // ส่ง goal tags ของ user ไป filter
       if (recommendedTags.length > 0) {
         params.set('goal', recommendedTags.join(','))
       }
@@ -167,6 +170,30 @@ export default function WorkoutVideos() {
       setVideos(data)
     }
     setIsLoading(false)
+  }
+
+  const toggleBookmark = async (e: React.MouseEvent, videoId: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const { data: { session } } = await supabase.auth.getSession()
+    const token = session?.access_token
+    if (!token) return
+
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/workout-videos/bookmarks/toggle`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ video_id: videoId }),
+    })
+    if (res.ok) {
+      const { bookmarked } = await res.json()
+      setBookmarkedIds(prev => {
+        const next = new Set(prev)
+        bookmarked ? next.add(videoId) : next.delete(videoId)
+        return next
+      })
+      // Navigate to favorite page when video is bookmarked
+      
+    }
   }
 
   const toggleFilter = (value: string, selected: string[], setSelected: (v: string[]) => void) => {
@@ -202,7 +229,6 @@ export default function WorkoutVideos() {
     </button>
   )
 
-  // รวม tags จาก goal + body_type ไม่ซ้ำกัน
   const recommendedTags = Array.from(new Set([
     ...getGoalTags(userGoal),
     ...getBodyTypeTags(userBodyType),
@@ -325,14 +351,14 @@ export default function WorkoutVideos() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {videos.map(video => (
               <div key={video.id} className={`bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all border group ${isRecommended(video)
-                ? 'border-emerald-400 ring-2 ring-emerald-100'  // ✅ highlight
+                ? 'border-emerald-400 ring-2 ring-emerald-100'
                 : 'border-gray-100'
                 }`}>
                 {/* Thumbnail */}
                 <a href={video.youtube_url} target="_blank" rel="noopener noreferrer"
                   className="relative block overflow-hidden" style={{ aspectRatio: '16/9' }}>
 
-                  {/* ✅ For You badge */}
+                  {/* For You badge */}
                   {isRecommended(video) && activeCategory !== 'for-you' && (
                     <div className="absolute top-2.5 left-2.5 z-10">
                       <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500 text-white shadow-sm">
@@ -347,7 +373,6 @@ export default function WorkoutVideos() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     onError={(e) => {
                       const img = e.currentTarget as HTMLImageElement
-                      // ถ้า maxresdefault ไม่มี fallback เป็น hqdefault
                       if (img.src.includes('maxresdefault')) {
                         img.src = img.src.replace('maxresdefault', 'hqdefault')
                       } else {
@@ -355,18 +380,21 @@ export default function WorkoutVideos() {
                       }
                     }}
                   />
+
                   {/* Play overlay */}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-all flex items-center justify-center">
                     <div className="w-11 h-11 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all shadow-lg">
                       <Play className="w-4 h-4 text-emerald-600 ml-0.5" fill="currentColor" />
                     </div>
                   </div>
+
                   {/* Difficulty badge */}
                   <div className="absolute top-2.5 right-2.5">
                     <span className={`px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm ${getDifficultyColor(video.difficulty)}`}>
                       {getDifficultyLabel(video.difficulty)}
                     </span>
                   </div>
+
                   {/* Duration badge */}
                   <div className="absolute bottom-2.5 left-2.5">
                     <span className="px-2 py-1 rounded-full text-xs font-medium bg-black/60 text-white flex items-center gap-1">
@@ -394,12 +422,25 @@ export default function WorkoutVideos() {
                   <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed mb-3">
                     {video.description}
                   </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {video.goal_tags?.map(tag => (
-                      <span key={tag} className="text-xs bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-full font-medium">
-                        {tag}
-                      </span>
-                    ))}
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap gap-1.5">
+                      {video.goal_tags?.map(tag => (
+                        <span key={tag} className="text-xs bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-full font-medium">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Bookmark Button */}
+                    <button
+                      onClick={(e) => toggleBookmark(e, video.id)}
+                      className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors shrink-0 ml-2"
+                    >
+                      {bookmarkedIds.has(video.id)
+                        ? <Bookmark className="w-4 h-4 text-emerald-500" fill="currentColor" />
+                        : <Bookmark className="w-4 h-4 text-gray-300 hover:text-gray-500" />
+                      }
+                    </button>
                   </div>
                 </div>
               </div>

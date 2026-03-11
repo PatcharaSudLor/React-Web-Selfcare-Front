@@ -138,7 +138,7 @@ export default function LoginPage({ onBack, onSignUp }: LoginPageProps) {
   };
 
   return (
-    <motion.div className="fixed inset-0 h-screen w-screen bg-white flex flex-col overflow-hidden"
+    <motion.div className="fixed inset-0 h-screen w-screen bg-white flex flex-col overflow-y-auto"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}>
       {/* Header */}

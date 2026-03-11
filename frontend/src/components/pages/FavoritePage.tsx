@@ -113,6 +113,7 @@ export function FavoritePage({ onBack }: FavoritePageProps) {
   const hasNoFavorites = bookmarkedTips.length === 0 && bookmarkedVideos.length === 0
   const showVideos = activeTab === 'all' || activeTab === 'videos'
   const showTips = activeTab === 'all' || activeTab === 'tips'
+  const totalFavorites = bookmarkedVideos.length + bookmarkedTips.length
 
   if (isLoading) return (
     <div className="container mx-auto px-4 py-6 max-w-4xl pb-24">
@@ -138,26 +139,25 @@ export function FavoritePage({ onBack }: FavoritePageProps) {
   )
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-4xl pb-24">
-
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <button
-          onClick={onBack}
-          className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-all"
-        >
-          <ArrowLeft className="w-5 h-5 text-gray-700" />
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white">
+      <div className="px-6 py-4 bg-white border-b border-gray-100">
+        <button onClick={onBack} className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors">
+          <ArrowLeft className="w-5 h-5" />
+          <span className="text-sm font-medium">Back</span>
         </button>
-        <div>
-          <h2 className="text-2xl text-gray-800">Favorite</h2>
-          <p className="text-sm text-gray-600">
-            รายการโปรดของคุณ ({bookmarkedVideos.length + bookmarkedTips.length} รายการ)
-          </p>
-        </div>
       </div>
 
-      {/* Tabs */}
-      {!hasNoFavorites && (
+      <div className="container mx-auto px-4 py-6 max-w-4xl pb-24">
+        {/* Header */}
+        <div className="mb-6">
+          <h2 className="text-2xl text-gray-800">Favorite</h2>
+          <p className="text-sm text-gray-600">
+            รายการโปรดของคุณ ({totalFavorites} รายการ)
+          </p>
+        </div>
+
+        {/* Tabs */}
+        {!hasNoFavorites && (
         <div className="flex gap-2 mb-6">
           <button
             onClick={() => setActiveTab('all')}
@@ -167,7 +167,7 @@ export function FavoritePage({ onBack }: FavoritePageProps) {
                 : 'bg-white text-gray-700 hover:bg-gray-50'
             }`}
           >
-            ทั้งหมด ({bookmarkedVideos.length + bookmarkedTips.length})
+            ทั้งหมด ({totalFavorites})
           </button>
           <button
             onClick={() => setActiveTab('videos')}
@@ -192,10 +192,10 @@ export function FavoritePage({ onBack }: FavoritePageProps) {
             บทความ ({bookmarkedTips.length})
           </button>
         </div>
-      )}
+        )}
 
-      {/* Empty State */}
-      {hasNoFavorites && (
+        {/* Empty State */}
+        {hasNoFavorites && (
         <div className="text-center py-16">
           <div className="text-6xl mb-4">📌</div>
           <h3 className="text-xl text-gray-800 mb-2">ยังไม่มีรายการโปรด</h3>
@@ -203,10 +203,17 @@ export function FavoritePage({ onBack }: FavoritePageProps) {
             กดไอคอนบุ๊คมาร์กที่วิดีโอหรือบทความที่คุณชอบ
           </p>
         </div>
-      )}
+        )}
 
-      {/* Videos Section */}
-      {showVideos && bookmarkedVideos.length > 0 && (
+        {activeTab === 'all' && !hasNoFavorites && (
+          <div className="mb-4 rounded-2xl border border-emerald-100 bg-emerald-50/60 px-4 py-3">
+            <p className="text-sm font-medium text-emerald-800">ทั้งหมด ({totalFavorites})</p>
+            <p className="text-xs text-emerald-700/80">หน้านี้แสดงทั้งวิดีโอและบทความที่คุณบันทึกไว้</p>
+          </div>
+        )}
+
+        {/* Videos Section */}
+        {showVideos && bookmarkedVideos.length > 0 && (
         <div className="mb-8">
           <h3 className="text-lg text-gray-800 mb-4 flex items-center gap-2">
             <Play className="w-5 h-5 text-emerald-600" fill="currentColor" />
@@ -298,10 +305,10 @@ export function FavoritePage({ onBack }: FavoritePageProps) {
             ))}
           </div>
         </div>
-      )}
+        )}
 
-      {/* Tips Section */}
-      {showTips && bookmarkedTips.length > 0 && (
+        {/* Tips Section */}
+        {showTips && bookmarkedTips.length > 0 && (
         <div>
           <h3 className="text-lg text-gray-800 mb-4 flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-purple-600" />
@@ -359,6 +366,7 @@ export function FavoritePage({ onBack }: FavoritePageProps) {
         </div>
       )}
 
+      </div>
     </div>
   )
 }

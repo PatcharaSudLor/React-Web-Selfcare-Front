@@ -357,7 +357,7 @@ export function SchedulePage() {
 
                             {workoutPlan && (
                                 <div className="bg-white rounded-xl p-3 flex items-center justify-between mb-3">
-                                    <div>
+                                    <div className="text-left min-w-[170px]">
                                         <p className="text-sm text-gray-800 flex items-center gap-2">
                                             <Dumbbell className="w-4 h-4 text-emerald-600" /> แผนออกกำลังกาย
                                         </p>
@@ -372,7 +372,7 @@ export function SchedulePage() {
 
                             {mealPlan && (
                                 <div className="bg-white rounded-xl p-3 flex items-center justify-between">
-                                    <div>
+                                    <div className="text-left min-w-[170px]">
                                         <p className="text-sm text-gray-800 flex items-center gap-2">
                                             <Utensils className="w-4 h-4 text-emerald-600" /> แผนอาหาร
                                         </p>

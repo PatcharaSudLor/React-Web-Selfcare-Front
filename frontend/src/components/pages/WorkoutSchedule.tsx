@@ -32,6 +32,16 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
 
 
   const handleSave = async () => {
+    const dayCardColorMap: Record<string, string> = {
+      Monday: 'border-yellow-200 bg-yellow-50',
+      Tuesday: 'border-pink-200 bg-pink-50',
+      Wednesday: 'border-green-200 bg-green-50',
+      Thursday: 'border-orange-200 bg-orange-50',
+      Friday: 'border-sky-200 bg-sky-50',
+      Saturday: 'border-purple-200 bg-purple-50',
+      Sunday: 'border-red-200 bg-red-50',
+    };
+
     // 1. บันทึกลง LocalCache ทันที (Dual Save) เพื่อให้หน้า Schedule โหลดได้ไว
     const activePlanData = schedule.map(item => ({
       day: item.day,
@@ -39,7 +49,7 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
       workout: item.workout,
       duration: `${item.duration} นาที`,
       exercises: item.exercises.map((ex: any) =>
- typeof ex === 'string' ? ex : `${ex.name} (${ex.sets} x ${ex.reps})`),
+        typeof ex === 'string' ? ex : `${ex.name} (${ex.sets} x ${ex.reps})`),
       color: dayCardColorMap[item.day] ?? 'border-gray-200 bg-gray-50',
     }));
     localStorage.setItem('active_workout_plan', JSON.stringify(activePlanData));
@@ -79,7 +89,7 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             planData: schedulePayload,
             plan_data: schedulePayload // ส่งทั้ง 2 ชื่อเพื่อรองรับ Backend ทุกเวอร์ชัน
           })

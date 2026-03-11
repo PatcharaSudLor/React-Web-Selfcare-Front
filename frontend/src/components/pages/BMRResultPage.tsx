@@ -71,7 +71,7 @@ export default function BMRResultPage({ onBack }: BMRResultPageProps) {
   }
 
   const getBMRDescription = () => {
-    return <p>This is the amount of calories your body needs to maintain basic physiological functions like breathing, circulation, and cell production while <br /> at rest.</p>;
+    return <>This is the amount of calories your body needs to maintain basic physiological functions like breathing, circulation, and cell production while <br /> at rest.</>;
   };
 
   const handleContinue = () => {
@@ -261,9 +261,9 @@ export default function BMRResultPage({ onBack }: BMRResultPageProps) {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-800 mb-2 ">What This Means</h3>
-                <div className="text-base text-gray-600 leading-relaxed">
+                <p className="text-base text-gray-600 leading-relaxed">
                   {getBMRDescription()}
-                </div>
+                </p>
               </div>
             </div>
           </motion.div>

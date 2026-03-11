@@ -115,13 +115,17 @@ export default function WorkoutVideos() {
   const [userGoal, setUserGoal] = useState('')
   const [userBodyType, setUserBodyType] = useState('')
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set())
+  const [prefsLoaded, setPrefsLoaded] = useState(false)
 
   // fetch workout preferences + bookmarks
   useEffect(() => {
     const fetchUserPrefs = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       const token = session?.access_token
-      if (!token) return
+      if (!token) {
+        setPrefsLoaded(true)
+        return
+      }
 
       const headers = { 'Authorization': `Bearer ${token}` }
 
@@ -129,8 +133,8 @@ export default function WorkoutVideos() {
       const prefRes = await fetch(`${import.meta.env.VITE_API_URL}/api/workout/preferences`, { headers })
       if (prefRes.ok) {
         const data = await prefRes.json()
-        setUserGoal(data.goal ?? '')
-        setUserBodyType(data.bodyType ?? '')
+        setUserGoal(data?.goal ?? '')
+        setUserBodyType(data?.bodyType ?? '')
       }
 
       // ดึง bookmarks
@@ -139,42 +143,65 @@ export default function WorkoutVideos() {
         const bms = await bmRes.json()
         setBookmarkedIds(new Set(bms.map((v: Video) => v.id)))
       }
+      setPrefsLoaded(true)
     }
     fetchUserPrefs()
   }, [])
 
   useEffect(() => {
-    if (activeCategory === 'for-you' && recommendedTags.length === 0) {
-      setIsLoading(false)
-      return
-    }
+    if (!prefsLoaded) return
     fetchVideos()
-  }, [activeCategory, selectedGoals, selectedDifficulty, selectedEquipment, selectedDuration, userGoal, userBodyType])
+  }, [prefsLoaded, activeCategory, selectedGoals, selectedDifficulty, selectedEquipment, selectedDuration])
 
   const fetchVideos = async () => {
-    setIsLoading(true)
+  setIsLoading(true)
+
+  try {
     const params = new URLSearchParams()
 
-    if (activeCategory === 'for-you') {
-      if (recommendedTags.length > 0) {
-        params.set('goal', recommendedTags.join(','))
-      }
-    } else {
-      if (activeCategory !== 'all') params.set('category', activeCategory)
+    // category
+    if (activeCategory !== 'for-you' && activeCategory !== 'all') {
+      params.set('category', activeCategory)
     }
 
-    if (selectedGoals.length > 0) params.set('goal', selectedGoals.join(','))
-    if (selectedDifficulty.length > 0) params.set('difficulty', selectedDifficulty.join(','))
-    if (selectedEquipment.length > 0) params.set('equipment', selectedEquipment.join(','))
-    if (selectedDuration.length > 0) params.set('duration', selectedDuration.join(','))
+    // รวม goal tags
+    const goalTags =
+      selectedGoals.length > 0
+        ? selectedGoals
+        : activeCategory === 'for-you'
+        ? recommendedTags
+        : []
 
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/workout-videos?${params}`)
+    if (goalTags.length > 0) {
+      params.set('goal', goalTags.join(','))
+    }
+
+    if (selectedDifficulty.length > 0)
+      params.set('difficulty', selectedDifficulty.join(','))
+
+    if (selectedEquipment.length > 0)
+      params.set('equipment', selectedEquipment.join(','))
+
+    if (selectedDuration.length > 0)
+      params.set('duration', selectedDuration.join(','))
+
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/workout-videos?${params}`
+    )
+
     if (res.ok) {
       const data = await res.json()
       setVideos(data)
+    } else {
+      setVideos([])
     }
+  } catch (err) {
+    console.error(err)
+    setVideos([])
+  } finally {
     setIsLoading(false)
   }
+}
 
   const toggleBookmark = async (e: React.MouseEvent, videoId: string) => {
     e.preventDefault()
@@ -196,7 +223,7 @@ export default function WorkoutVideos() {
         return next
       })
       // Navigate to favorite page when video is bookmarked
-      
+
     }
   }
 
@@ -245,11 +272,13 @@ export default function WorkoutVideos() {
     if (!goalBasedTags.length && !bodyTypeBasedTags.length) return false
     const matchesGoal = hasAnyTagMatch(video.goal_tags, goalBasedTags)
     const matchesBodyType = hasAnyTagMatch(video.goal_tags, bodyTypeBasedTags)
-    return matchesGoal && matchesBodyType
+    return matchesGoal || matchesBodyType
   }
 
   const displayedVideos = activeCategory === 'for-you'
-    ? videos.filter(isRecommended)
+    ? recommendedTags.length === 0
+      ? videos
+      : videos.filter(isRecommended)
     : videos
 
   return (
@@ -336,9 +365,37 @@ export default function WorkoutVideos() {
             </p>
           </div>
         )}
+        {activeCategory === 'for-you' && !userGoal && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+            <p className="text-sm text-yellow-700">
+              ยังไม่ได้ตั้งค่าเป้าหมายการออกกำลังกาย
+            </p>
+            <a
+              href="/workouts/planner"
+              className="text-sm font-medium text-yellow-800 underline"
+            >
+              ตั้งค่าเพื่อรับวิดีโอที่เหมาะกับคุณ
+            </a>
+          </div>
+        )}
 
         {/* Video Grid */}
         {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse shadow-sm">
+                <div className="aspect-video bg-gray-200" />
+                <div className="p-4 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded-full w-3/4" />
+                  <div className="h-3 bg-gray-100 rounded-full w-1/2" />
+                  <div className="h-3 bg-gray-100 rounded-full w-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : !prefsLoaded ? (
+
+          // ยังโหลด user prefs ไม่เสร็จ → ให้แสดง skeleton ต่อ
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[1, 2, 3, 4, 5, 6].map(i => (
               <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse shadow-sm">

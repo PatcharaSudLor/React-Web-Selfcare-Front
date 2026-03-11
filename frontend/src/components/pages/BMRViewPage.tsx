@@ -19,7 +19,7 @@ export default function BMRViewPage() {
   const bmr = userInfo.bmr || 0
 
   const getBMRDescription = () => {
-    return <p>This is the amount of calories your body needs to maintain basic physiological functions like breathing, circulation, and cell production while <br /> at rest.</p>;
+    return <>This is the amount of calories your body needs to maintain basic physiological functions like breathing, circulation, and cell production while <br /> at rest.</>;
   };
 
   const handleTDEEView = () => {

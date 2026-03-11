@@ -85,7 +85,7 @@ export default function HomePage() {
 
             {/* BMR Card */}
             <button
-              onClick={() => navigate('/bmrresults')}
+              onClick={() => navigate('/bmrviews')}
               className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all active:scale-95 text-left"
             >
               <div className="flex items-center justify-between mb-4">

@@ -96,7 +96,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
           tdee: profile.tdee ?? prev.tdee,
           bloodType: profile.blood_type ?? prev.bloodType,
           avatarUrl: profile.avatar_url
-            ? supabase.storage.from('avatars').getPublicUrl(profile.avatar_url).data.publicUrl
+            ? `${supabase.storage.from('avatars').getPublicUrl(profile.avatar_url).data.publicUrl}?t=${Date.now()}`
             : prev.avatarUrl,
         }));
 

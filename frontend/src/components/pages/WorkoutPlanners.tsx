@@ -3,19 +3,16 @@ import { ArrowLeft, Info, Sparkles, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../utils/supabase';
 import {
-  type WeeklyWorkoutPlan,
   type BodyType,
   type Goal,
-  generateWorkoutPlan,
 } from '../../utils/workoutGenerator';
 
 interface WorkoutPlannerProps {
   onHome: () => void;
-  onGeneratePlan: (plan: WeeklyWorkoutPlan) => void;
 }
 
 
-export default function WorkoutPlanner({ onHome, onGeneratePlan }: WorkoutPlannerProps) {
+export default function WorkoutPlanner({ onHome }: WorkoutPlannerProps) {
   const navigate = useNavigate();
   const [selectedTime, setSelectedTime] = useState<number | null>(null);
   const [bodyType, setBodyType] = useState<BodyType | null>(null);
@@ -27,78 +24,55 @@ export default function WorkoutPlanner({ onHome, onGeneratePlan }: WorkoutPlanne
   const timeOptions = [15, 30, 45, 60];
 
   const handleGeneratePlan = async () => {
-    if (!selectedTime || !bodyType || !goal || isGenerating) {
-      alert('Please complete all required fields');
-      return;
+
+    if (!selectedTime || !bodyType || !goal) {
+      alert('Please complete all required fields')
+      return
     }
 
-    const plan = generateWorkoutPlan({
-      bodyType,
-      goal,
-      dailyTime: selectedTime,
-      medicalCondition,
-    });
-
-    onGeneratePlan(plan);
-
-    setIsGenerating(true);
-
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
+
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
       if (!token) {
-        alert('Please login first');
-        setIsGenerating(false);
-        return;
+        alert('Please login first')
+        return
       }
 
-      // 1. เรียก AI API จาก Backend
-      const aiResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/ai/generate-workout`, {
+      // save preference
+      await fetch(`${import.meta.env.VITE_API_URL}/api/workout/preferences`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
+          dailyTime: selectedTime,
           bodyType,
           goal,
-          dailyTime: selectedTime,
           medicalCondition,
         })
-      });
+      }).catch(err => console.error(err))
 
-      if (!aiResponse.ok) {
-        const errorData = await aiResponse.json().catch(() => ({}));
-        throw new Error(errorData.error || `AI Generation failed (Status: ${aiResponse.status})`);
-      }
-
-      const aiEnhancedPlan = await aiResponse.json();
-
-      onGeneratePlan(aiEnhancedPlan as any);
-
-      // 2. บันทึกข้อมูลลง API ในพื้นหลัง
-      if (token) {
-        fetch(`${import.meta.env.VITE_API_URL}/api/workout/preferences`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            dailyTime: selectedTime,
+      // navigate ไป schedule
+      navigate('/workouts/schedule', {
+        state: {
+          loading: true,
+          preferences: {
             bodyType,
             goal,
-            medicalCondition,
-          })
-        }).catch(err => console.error('Background save failed:', err));
-      }
-    } catch (err: any) {
-      console.error('AI Generation error:', err);
-      alert(`ไม่สามารถเจนเนอร์เรทแผนได้: ${err.message}`);
-    } finally {
-      setIsGenerating(false);
+            dailyTime: selectedTime,
+            medicalCondition
+          }
+        }
+      })
+
+    } catch (err) {
+      console.error(err)
+      alert('Something went wrong')
     }
-  };
+  }
 
   useEffect(() => {
     const loadPreference = async () => {

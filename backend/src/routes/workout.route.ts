@@ -158,6 +158,7 @@ router.delete('/active-plan', async (req, res) => {
         // ลบทั้งแผน Active และรายการใน Schedule (Wipe total)
         await Promise.all([
             supabase.from('active_workout_plan').delete().eq('user_id', user_id),
+            supabase.from('workout_preferences').delete().eq('user_id', user_id),
             supabase.from('workout_schedules').delete().eq('user_id', user_id)
         ])
 

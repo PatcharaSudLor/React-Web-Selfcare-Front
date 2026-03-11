@@ -7,7 +7,6 @@ export const CATEGORIES = [
   { key: 'Breakfast', label: 'อาหารเช้า', icon: '🍳' },
   { key: 'Grilled', label: 'อาหารย่าง', icon: '🔥' },
   { key: 'Soup', label: 'ซุป / ต้ม', icon: '🍲' },
-  { key: 'Dessert', label: 'ของหวาน', icon: '🍮' },
 ]
 
 export const HEALTHY_TAGS = [
@@ -21,7 +20,7 @@ export const HEALTHY_TAGS = [
   { key: 'high-fiber', label: '🌾 High Fiber' },
 ]
 
-export const LIMIT = 9
+export const LIMIT = 15
 
 export const DIFFICULTY_CONFIG = {
     Easy: { label: 'ง่าย', color: '#22c55e', bg: '#f0fdf4', dot: '#16a34a' },

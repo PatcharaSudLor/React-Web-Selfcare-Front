@@ -27,6 +27,7 @@ import MealSchedule from './components/pages/MealSchedule'
 import { SchedulePage } from './components/pages/SchedulePage'
 import RecipePage from './components/pages/RecipePage'
 import RecipeDetailPage from './components/pages/RecipeDetailPage'
+import ChatPage from './components/pages/ChatPage'
 
 import { FavoritePage } from './components/pages/FavoritePage'
 
@@ -126,8 +127,9 @@ function AppContent() {
         <Route path="/tips" element={<TipsPage />} />
         <Route path="/tips/:id" element={<TipDetailPage />} />
         <Route path="/recipes" element={<RecipePage />} />
-        <Route path="/recipes/:id" element={<RecipeDetailPage/>} />
+        <Route path="/recipes/:id" element={<RecipeDetailPage />} />
         <Route path="/favorite" element={<FavoritePage onBack={() => navigate('/home')} />} />
+        <Route path="/chat" element={<ChatPage />} />
       </Route>
     </Routes>
   )

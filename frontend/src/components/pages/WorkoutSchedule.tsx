@@ -1,6 +1,8 @@
-import { ArrowLeft, Share2, Dumbbell, Calendar } from 'lucide-react';
+import { ArrowLeft, Share2, Dumbbell, Calendar, Loader2 } from 'lucide-react';
 import { supabase } from '../../utils/supabase';
 import type { WeeklyWorkoutPlan } from '../../utils/workoutGenerator';
+import { useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react';
 
 interface WorkoutScheduleProps {
   onBack: () => void;
@@ -9,6 +11,47 @@ interface WorkoutScheduleProps {
 }
 
 export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: WorkoutScheduleProps) {
+  const location = useLocation()
+
+  const preferences = location.state?.preferences
+  const loading = location.state?.loading
+  const [workoutPlan, setWorkoutPlan] = useState<WeeklyWorkoutPlan | null>(plan)
+  const [hasGenerated, setHasGenerated] = useState(false)
+
+  useEffect(() => {
+
+    const generateAIPlan = async () => {
+
+      if (!loading || !preferences || hasGenerated) return
+
+      try {
+
+        const { data: { session } } = await supabase.auth.getSession()
+        const token = session?.access_token
+
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ai/generate-workout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(preferences)
+        })
+
+        const data = await response.json()
+
+        setWorkoutPlan(data)
+        setHasGenerated(true)
+
+      } catch (err) {
+        console.error(err)
+      }
+
+    }
+
+    generateAIPlan()
+
+  }, [loading, preferences, hasGenerated])
 
   const dayThMap: Record<string, string> = {
     Monday: 'จันทร์',
@@ -21,14 +64,14 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
   }
 
   // Generate schedule based on user preferences
-  const schedule = plan.days.map((day: any) => ({
+  const schedule = workoutPlan?.days?.map((day: any) => ({
     day: day.day,
     dayTh: day.dayTh || dayThMap[day.day] || day.day,
     workout: day.workout || day.focus,
     duration: day.duration,
     exercises: day.exercises,
     color: 'bg-emerald-100 border-emerald-200',
-  }));
+  })) || []
 
 
   const handleSave = async () => {
@@ -39,7 +82,7 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
       workout: item.workout,
       duration: `${item.duration} นาที`,
       exercises: item.exercises.map((ex: any) =>
- typeof ex === 'string' ? ex : `${ex.name} (${ex.sets} x ${ex.reps})`),
+        typeof ex === 'string' ? ex : `${ex.name} (${ex.sets} x ${ex.reps})`),
       color: dayCardColorMap[item.day] ?? 'border-gray-200 bg-gray-50',
     }));
     localStorage.setItem('active_workout_plan', JSON.stringify(activePlanData));
@@ -79,7 +122,7 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             planData: schedulePayload,
             plan_data: schedulePayload // ส่งทั้ง 2 ชื่อเพื่อรองรับ Backend ทุกเวอร์ชัน
           })
@@ -239,6 +282,26 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
     Saturday: 'border-purple-200 bg-purple-50',
     Sunday: 'border-red-200 bg-red-50',
   };
+
+  if (!workoutPlan) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center space-y-3">
+
+          <Loader2 className="w-10 h-10 animate-spin text-emerald-500 mx-auto" />
+
+          <p className="text-lg font-semibold">
+            AI is generating your workout plan...
+          </p>
+
+          <p className="text-sm text-gray-500">
+            Analyzing your body type and goal
+          </p>
+
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="fixed inset-0 h-screen w-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col overflow-hidden">

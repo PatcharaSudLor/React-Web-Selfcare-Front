@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Dumbbell, Utensils, TrendingUp, ChevronRight, Activity, Flame, PlayCircle } from 'lucide-react';
+import { Dumbbell, Utensils, TrendingUp, ChevronRight, Activity, Flame, PlayCircle, Bookmark } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
 
 const tips = [
@@ -47,17 +47,26 @@ export default function HomePage() {
   const bmiStatus = getBMIStatus(userInfo.bmi);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-2">
-        <div className="space-y-6">
+    <div className="fixed inset-0 h-screen w-screen h-screen bg-gradient-to-b from-emerald-50 to-white overflow-y-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
+        <div className="space-y-5">
           {/* Welcome Card */}
-          <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-8 shadow-lg text-white">
-            <h1 className="text-3xl font-bold mb-2">
-              ยินดีต้อนรับกลับมา, {userInfo.username || 'User'}! 👋
-            </h1>
-            <p className="text-emerald-50 text-lg">
-              พร้อมดูแลสุขภาพของคุณวันนี้แล้วหรือยัง?
-            </p>
+          <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-8 shadow-lg text-white flex items-center justify-between">
+            <div className="flex flex-col">
+              <h1 className="text-3xl font-bold mb-2">
+                ยินดีต้อนรับกลับมา, {userInfo.username || 'User'}! 👋
+              </h1>
+              <p className="text-emerald-50 text-lg">
+                พร้อมดูแลสุขภาพของคุณวันนี้แล้วหรือยัง?
+              </p>
+            </div>
+
+            <img
+              onClick={() => navigate('/profile')}
+              src={userInfo.avatarUrl || `https://ui-avatars.com/api/?name=${userInfo.username}`}
+              alt="avatar"
+              className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-md cursor-pointer hover:scale-105 transition"
+            />
           </div>
 
           {/* Health Metrics - 3 Cards in Row */}
@@ -65,7 +74,7 @@ export default function HomePage() {
             {/* BMI Card */}
             <button
               onClick={() => navigate('/bmiviews')}
-              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all active:scale-95 text-left"
+              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all active:scale-95 text-left hover:scale-105 transition"
             >
               <div className="flex items-center justify-between mb-4">
                 <span className="text-gray-600 font-medium">BMI</span>
@@ -86,7 +95,7 @@ export default function HomePage() {
             {/* BMR Card */}
             <button
               onClick={() => navigate('/bmrviews')}
-              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all active:scale-95 text-left"
+              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all active:scale-95 text-left hover:scale-105 transition"
             >
               <div className="flex items-center justify-between mb-4">
                 <span className="text-gray-600 font-medium">BMR</span>
@@ -105,7 +114,7 @@ export default function HomePage() {
             {/* TDEE Card */}
             <button
               onClick={() => navigate('/tdeeresults')}
-              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all active:scale-95 text-left"
+              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all active:scale-95 text-left hover:scale-105 transition"
             >
               <div className="flex items-center justify-between mb-4">
                 <span className="text-gray-600 font-medium">TDEE</span>
@@ -158,8 +167,8 @@ export default function HomePage() {
                     key={index}
                     onClick={() => setCurrentTipIndex(index)}
                     className={`h-2 rounded-full transition-all ${index === currentTipIndex
-                        ? 'bg-emerald-600 w-6'
-                        : 'bg-gray-300 w-2'
+                      ? 'bg-emerald-600 w-6'
+                      : 'bg-gray-300 w-2'
                       }`}
                     aria-label={`Go to tip ${index + 1}`}
                   />
@@ -175,18 +184,29 @@ export default function HomePage() {
               {/* Workouts */}
               <button
                 onClick={() => navigate('/workouts/planner')}
-                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
+                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4 hover:scale-105 transition"
               >
                 <div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-3xl flex items-center justify-center">
                   <Dumbbell className="w-10 h-10 text-emerald-600" />
                 </div>
-                <span className="text-gray-800 font-medium">ออกกำลังกาย</span>
+                <span className="text-gray-800 font-medium">ตารางออกกำลังกาย</span>
+              </button>
+
+              {/* Meals */}
+              <button
+                onClick={() => navigate('/meals/planner')}
+                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4 hover:scale-105 transition"
+              >
+                <div className="w-20 h-20 bg-gradient-to-br from-amber-100 to-orange-200 rounded-3xl flex items-center justify-center">
+                  <Utensils className="w-10 h-10 text-orange-600" />
+                </div>
+                <span className="text-gray-800 font-medium">ตารางอาหาร</span>
               </button>
 
               {/* Videos */}
               <button
                 onClick={() => navigate('/workouts/videos?part=upper-body')}
-                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
+                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4 hover:scale-105 transition"
               >
                 <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-sky-200 rounded-3xl flex items-center justify-center">
                   <PlayCircle className="w-10 h-10 text-sky-600" />
@@ -194,26 +214,15 @@ export default function HomePage() {
                 <span className="text-gray-800 font-medium">วิดีโอ</span>
               </button>
 
-              {/* Meals */}
-              <button
-                onClick={() => navigate('/meals/planner')}
-                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
-              >
-                <div className="w-20 h-20 bg-gradient-to-br from-amber-100 to-orange-200 rounded-3xl flex items-center justify-center">
-                  <Utensils className="w-10 h-10 text-orange-600" />
-                </div>
-                <span className="text-gray-800 font-medium">รวมเมนูอาหาร</span>
-              </button>
-
               {/* Favorite */}
               <button
                 onClick={() => navigate('/favorite')}
-                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4"
+                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all active:scale-95 flex flex-col items-center gap-4 hover:scale-105 transition"
               >
                 <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-rose-200 rounded-3xl flex items-center justify-center">
-                  <Heart className="w-10 h-10 text-pink-600" />
+                  <Bookmark className="w-10 h-10 text-pink-600" />
                 </div>
-                <span className="text-gray-800 font-medium">รายการโปรด</span>
+                <span className="text-gray-800 font-medium">ที่บันทึกไว้</span>
               </button>
             </div>
           </div>

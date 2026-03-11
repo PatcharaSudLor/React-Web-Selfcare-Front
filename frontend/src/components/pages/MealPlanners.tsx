@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
-import { Utensils } from 'lucide-react';
+import { ArrowLeft, Utensils, Sparkles, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../utils/supabase';
 
 interface MealPlannerProps {
@@ -12,6 +12,7 @@ export interface MealPlanData {
   likedMeals: string[];
   allergicFoods: string[];
   budget: string;
+  goal: string;
 }
 
 type MealType = {
@@ -57,9 +58,18 @@ const proteinAllergies = allergyTypes.filter(a => a.group === 'protein');
 const otherAllergies = allergyTypes.filter(a => a.group === 'other');
 
 export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps) {
+  const navigate = useNavigate();
   const [likedMeals, setLikedMeals] = useState<string[]>([]);
   const [allergicFoods, setAllergicFoods] = useState<string[]>([]);
   const [budget, setBudget] = useState('');
+  const [goal, setGoal] = useState('maintain');
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const goals = [
+    { id: 'lose', label: 'Lose Weight', labelTh: 'ลดน้ำหนัก', icon: '🔥' },
+    { id: 'gain', label: 'Muscle Gain', labelTh: 'เพิ่มกล้ามเนื้อ', icon: '💪' },
+    { id: 'maintain', label: 'Maintain', labelTh: 'รักษาสุขภาพ', icon: '⚖️' },
+  ];
 
   const toggleMeal = (mealId: string) => {
     setLikedMeals((prev) =>
@@ -74,13 +84,18 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
   };
 
   const handleGeneratePlan = async () => {
-    if (likedMeals.length === 0 || !budget) {
+    if (likedMeals.length === 0 || !budget || !goal || isGenerating) {
       alert('Please complete all required fields')
       return
     }
 
+    setIsGenerating(true);
+
+    // จำลองสถานะ AI Analyzing (2 วินาที)
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
     // 1. ส่งข้อมูลไปสร้างแผนทันที
-    onGeneratePlan({ likedMeals, allergicFoods, budget });
+    onGeneratePlan({ likedMeals, allergicFoods, budget, goal });
 
     // 2. บันทึกข้อมูลลง API ในพื้นหลัง (Background)
     try {
@@ -105,15 +120,15 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
     }
   };
 
-  const isFormComplete = likedMeals.length > 0 && budget;
+  const isFormComplete = likedMeals.length > 0 && budget && goal;
 
   const AllergyButton = ({ allergy }: { allergy: AllergyType }) => (
     <button
       key={allergy.id}
       onClick={() => toggleAllergy(allergy.id)}
       className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all hover:shadow-md ${allergicFoods.includes(allergy.id)
-          ? 'border-red-500 bg-red-50 shadow-sm'
-          : 'border-gray-200 hover:border-red-300 bg-white'
+        ? 'border-red-500 bg-red-50 shadow-sm'
+        : 'border-gray-200 hover:border-red-300 bg-white'
         }`}
     >
       <span className="text-3xl">{allergy.icon}</span>
@@ -160,8 +175,8 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
                     key={meal.id}
                     onClick={() => toggleMeal(meal.id)}
                     className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all hover:shadow-md ${likedMeals.includes(meal.id)
-                        ? 'border-emerald-500 bg-emerald-50 shadow-sm'
-                        : 'border-gray-200 hover:border-emerald-300 bg-white'
+                      ? 'border-emerald-500 bg-emerald-50 shadow-sm'
+                      : 'border-gray-200 hover:border-emerald-300 bg-white'
                       }`}
                   >
                     <span className="text-3xl">{meal.icon}</span>
@@ -201,6 +216,32 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
               </div>
             </div>
 
+            {/* Goals */}
+            <div className="mb-8">
+              <h3 className="text-gray-800 font-semibold mb-1 flex items-center gap-2">
+                <span className="text-emerald-500 text-3xl">•</span>
+                <span className="text-xl">Fitness Goal</span>
+              </h3>
+              <p className="text-xm text-left text-gray-500 mb-4 ml-4">Select your primary fitness objective</p>
+              <div className="grid grid-cols-3 gap-3">
+                {goals.map((g) => (
+                  <button
+                    key={g.id}
+                    onClick={() => setGoal(g.id)}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all hover:shadow-md ${goal === g.id
+                      ? 'border-emerald-500 bg-emerald-50 shadow-sm'
+                      : 'border-gray-200 hover:border-emerald-300 bg-white'
+                      }`}
+                  >
+                    <span className="text-3xl">{g.icon}</span>
+                    <span className={`text-sm font-medium ${goal === g.id ? 'text-emerald-700' : 'text-gray-600'}`}>
+                      {g.labelTh}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Budget */}
             <div className="mb-8">
               <h3 className="text-gray-800 font-semibold mb-1 flex items-center gap-2">
@@ -220,17 +261,42 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
               </div>
             </div>
 
-            {/* Generate Plan Button */}
-            <div className="pt-4 border-t border-gray-200">
+            {/* Action Buttons */}
+            <div className="pt-4 border-t border-gray-200 flex flex-col gap-3">
               <button
                 onClick={handleGeneratePlan}
-                disabled={!isFormComplete}
-                className={`w-full py-4 rounded-2xl font-semibold transition-all shadow-sm ${isFormComplete
-                    ? 'bg-emerald-500 hover:bg-emerald-600 text-white hover:shadow-md active:scale-98'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'
+                disabled={!isFormComplete || isGenerating}
+                className={`w-full py-4 rounded-2xl font-semibold transition-all shadow-sm flex items-center justify-center gap-2 ${isFormComplete && !isGenerating
+                  ? 'bg-emerald-500 hover:bg-emerald-600 text-white hover:shadow-md active:scale-98'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'
                   }`}
               >
-                Generate Meal Plan
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>AI Analyzing...</span>
+                  </>
+                ) : (
+                  <span>Generate Meal Plan</span>
+                )}
+              </button>
+
+              <button
+                onClick={() => {
+                  if (!isFormComplete) {
+                    alert('Please complete all required fields for AI analysis');
+                    return;
+                  }
+                  const initialQuery = `ช่วยวางแผนอาหารให้หน่อยครับ ฉันชอบกิน ${likedMeals.map(m => mealTypes.find(t => t.id === m)?.labelTh).join(', ')} งบประมาณต่อมื้อคือ ฿${budget} ${allergicFoods.length > 0 ? `และฉันแพ้อาหารประเภท: ${allergicFoods.map(a => allergyTypes.find(t => t.id === a)?.labelTh).join(', ')}` : ''}`;
+                  navigate('/chat', { state: { initialQuery } });
+                }}
+                className={`w-full py-4 rounded-2xl font-medium transition-all flex items-center justify-center gap-2 ${isFormComplete
+                  ? 'bg-white border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50 shadow-sm'
+                  : 'bg-gray-50 border-2 border-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
+              >
+                <Sparkles className="w-5 h-5 text-emerald-500" />
+                Ask AI Assistant
               </button>
             </div>
           </div>

@@ -57,26 +57,81 @@ export function SchedulePage() {
     // Scroll to top when component mounts
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        
         const fetchPlans = async () => {
+            // 1. ดึงข้อมูลจาก Cache (LocalStorage) มาแสดงก่อนทันที
+            const cachedWorkout = localStorage.getItem('active_workout_plan');
+            const cachedMeal = localStorage.getItem('active_meal_plan');
+            
+            if (cachedWorkout) {
+                const parsed = JSON.parse(cachedWorkout);
+                if (Array.isArray(parsed) && parsed.length > 0) setWorkoutPlan(parsed);
+            }
+            if (cachedMeal) {
+                const parsed = JSON.parse(cachedMeal);
+                if (Array.isArray(parsed) && parsed.length > 0) setMealPlan(parsed);
+            }
+            
+            // ถ้ามีข้อมูลใน Cache แล้ว ให้หยุดหมุน Loader
+            if (cachedWorkout || cachedMeal) {
+                setIsLoading(false);
+            }
+
             const { data: { session } } = await supabase.auth.getSession()
             const token = session?.access_token
-            if (!token) { setIsLoading(false); return }
+            if (!token) { 
+                if (!cachedWorkout && !cachedMeal) setIsLoading(false); 
+                return; 
+            }
 
             const headers = { 'Authorization': `Bearer ${token}` }
 
-            const [workoutRes, mealRes] = await Promise.all([
-                fetch(`${import.meta.env.VITE_API_URL}/api/workout/active-plan`, { headers }),
-                fetch(`${import.meta.env.VITE_API_URL}/api/meal/active-plan`, { headers }),
-            ])
+            try {
+                const [workoutRes, mealRes] = await Promise.all([
+                    fetch(`${import.meta.env.VITE_API_URL}/api/workout/active-plan`, { headers }),
+                    fetch(`${import.meta.env.VITE_API_URL}/api/meal/active-plan`, { headers }),
+                ])
 
-            if (workoutRes.ok) {
-                const data = await workoutRes.json()
-                if (data?.plan_data) setWorkoutPlan(data.plan_data)
-            }
+                if (workoutRes.ok) {
+                    const data = await workoutRes.json()
+                    const actualPlanData = data ? (data.plan_data || data.planData) : null;
+                    if (actualPlanData && Array.isArray(actualPlanData) && actualPlanData.length > 0) {
+                        setWorkoutPlan(actualPlanData);
+                        localStorage.setItem('active_workout_plan', JSON.stringify(actualPlanData));
+                    } else {
+                        setWorkoutPlan(null);
+                        localStorage.removeItem('active_workout_plan');
+                        localStorage.removeItem('user_workout_plan');
+                        localStorage.removeItem('workout_plan');
+                    }
+                } else if (workoutRes.status === 404) {
+                    // หาก API แจ้งว่าไม่พบแผน (404) ให้ล้างข้อมูลทิ้งทันที
+                    setWorkoutPlan(null);
+                    localStorage.removeItem('active_workout_plan');
+                    localStorage.removeItem('user_workout_plan');
+                    localStorage.removeItem('workout_plan');
+                }
 
-            if (mealRes.ok) {
-                const data = await mealRes.json()
-                if (data?.plan_data) setMealPlan(data.plan_data)
+                if (mealRes.ok) {
+                    const data = await mealRes.json()
+                    const actualMealData = data ? (data.plan_data || data.planData) : null;
+                    if (actualMealData && Array.isArray(actualMealData) && actualMealData.length > 0) {
+                        setMealPlan(actualMealData);
+                        localStorage.setItem('active_meal_plan', JSON.stringify(actualMealData));
+                    } else {
+                        setMealPlan(null);
+                        localStorage.removeItem('active_meal_plan');
+                        localStorage.removeItem('user_meal_plan');
+                        localStorage.removeItem('meal_plan');
+                    }
+                } else if (mealRes.status === 404) {
+                    setMealPlan(null);
+                    localStorage.removeItem('active_meal_plan');
+                    localStorage.removeItem('user_meal_plan');
+                    localStorage.removeItem('meal_plan');
+                }
+            } catch (err) {
+                console.error("Background fetch failed:", err);
             }
 
             setIsLoading(false)
@@ -94,7 +149,22 @@ export function SchedulePage() {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         })
-        if (res.ok) setWorkoutPlan(null);
+        if (res.ok) {
+            // 1. ล้าง State
+            setWorkoutPlan(null);
+            
+            // 2. ล้าง LocalStorage ทั้งหมดที่เกี่ยวข้อง
+            localStorage.removeItem('active_workout_plan');
+            localStorage.removeItem('user_workout_plan');
+            localStorage.removeItem('workout_plan');
+            localStorage.removeItem('user_workout_preferences'); // เพิ่มคีย์อื่นๆ ที่อาจเกี่ยวข้อง
+            
+            alert('ลบแผนออกกำลังกายเรียบร้อยแล้ว');
+            // ไม่ต้องใช้ reload เพราะ React State อัตเดตแล้ว UI จะเปลี่ยนเอง
+        } else {
+            const errData = await res.json().catch(() => ({}));
+            alert(`ไม่สามารถลบแผนได้: ${errData.error || res.statusText}`);
+        }
     }
 
     const handleDeleteMeal = async () => {
@@ -107,12 +177,25 @@ export function SchedulePage() {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         })
-        if (res.ok) setMealPlan(null);
+        if (res.ok) {
+            // 1. ล้าง State
+            setMealPlan(null);
+            
+            // 2. ล้าง LocalStorage
+            localStorage.removeItem('active_meal_plan');
+            localStorage.removeItem('user_meal_plan');
+            localStorage.removeItem('meal_plan');
+            
+            alert('ลบแผนอาหารเรียบร้อยแล้ว');
+        } else {
+            const errData = await res.json().catch(() => ({}));
+            alert(`ไม่สามารถลบแผนอาหารได้: ${errData.error || res.statusText}`);
+        }
     }
 
     const todayWorkout = workoutPlan?.find(w => w.day === currentDay) ?? null
     const todayMeals = mealPlan?.find(m => m.day === currentDay) ?? null
-    const hasSchedules = !!workoutPlan || !!mealPlan
+    const hasSchedules = (workoutPlan && workoutPlan.length > 0) || (mealPlan && mealPlan.length > 0)
     const showWorkout = activeTab === 'all' || activeTab === 'workout';
     const showMeal = activeTab === 'all' || activeTab === 'meal';
 
@@ -355,7 +438,7 @@ export function SchedulePage() {
                         <div className="mt-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-5">
                             <h3 className="text-lg text-gray-800 mb-4">แผนที่ active อยู่</h3>
 
-                            {workoutPlan && (
+                            {workoutPlan && workoutPlan.length > 0 && (
                                 <div className="bg-white rounded-xl p-3 flex items-center justify-between mb-3">
                                     <div className="text-left min-w-[170px]">
                                         <p className="text-sm text-gray-800 flex items-center gap-2">
@@ -370,7 +453,7 @@ export function SchedulePage() {
                                 </div>
                             )}
 
-                            {mealPlan && (
+                            {mealPlan && mealPlan.length > 0 && (
                                 <div className="bg-white rounded-xl p-3 flex items-center justify-between">
                                     <div className="text-left min-w-[170px]">
                                         <p className="text-sm text-gray-800 flex items-center gap-2">

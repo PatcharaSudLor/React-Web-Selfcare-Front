@@ -11,6 +11,7 @@ import alertRoute from './routes/alert.route'
 import tipsRoute from './routes/tips.route'
 import recipesRoute from './routes/recipes.route'
 import workoutVideoBookmarksRoute from './routes/WorkoutVideoBookmarks.routes'
+import aiRoute from './routes/ai.route'
 
 dotenv.config()
 
@@ -24,23 +25,23 @@ app.use('/api/meal', authMiddleware, mealRoute)
 app.use('/api/alerts', authMiddleware, alertRoute)
 app.use('/api/tips', authMiddleware, tipsRoute)
 app.use('/api/recipes', authMiddleware, recipesRoute)
-
+app.use('/api/ai', aiRoute) // Middleware will be inside
 // authMiddleware ไม่จำเป็นสำหรับ public content
 app.use('/api/workout-videos', workoutVideosRoute)
 app.use('/api/workout-videos/bookmarks', authMiddleware, workoutVideoBookmarksRoute)
 
-app.get('/',  (req, res) => {
+app.get('/', (req, res) => {
     res.send('Backend is running🚀')
 })
 
-app.get('/test', async (req, res) =>{
+app.get('/test', async (req, res) => {
     const { data, error } = await supabase
-    .from('user_profile')
-    .select('*')
-    .limit(1)
+        .from('user_profile')
+        .select('*')
+        .limit(1)
 
-    if(error){
-        return res.status(500).json({error})
+    if (error) {
+        return res.status(500).json({ error })
     }
 
     res.json(data)

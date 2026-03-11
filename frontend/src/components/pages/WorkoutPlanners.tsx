@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { ArrowLeft, Info } from 'lucide-react';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, Info, Sparkles, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../utils/supabase';
-import { generateWorkoutPlan } from '../../utils/workoutGenerator';
-import type {
-  WeeklyWorkoutPlan,
-  BodyType,
-  Goal,
+import {
+  type WeeklyWorkoutPlan,
+  type BodyType,
+  type Goal,
+  generateWorkoutPlan,
 } from '../../utils/workoutGenerator';
 
 interface WorkoutPlannerProps {
@@ -16,16 +16,18 @@ interface WorkoutPlannerProps {
 
 
 export default function WorkoutPlanner({ onHome, onGeneratePlan }: WorkoutPlannerProps) {
+  const navigate = useNavigate();
   const [selectedTime, setSelectedTime] = useState<number | null>(null);
   const [bodyType, setBodyType] = useState<BodyType | null>(null);
   const [goal, setGoal] = useState<Goal | null>(null);
   const [medicalCondition, setMedicalCondition] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
   const [showBodyTypeInfo, setShowBodyTypeInfo] = useState(false);
 
   const timeOptions = [15, 30, 45, 60];
 
   const handleGeneratePlan = async () => {
-    if (!selectedTime || !bodyType || !goal) {
+    if (!selectedTime || !bodyType || !goal || isGenerating) {
       alert('Please complete all required fields');
       return;
     }
@@ -39,9 +41,42 @@ export default function WorkoutPlanner({ onHome, onGeneratePlan }: WorkoutPlanne
 
     onGeneratePlan(plan);
 
+    setIsGenerating(true);
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
+      if (!token) {
+        alert('Please login first');
+        setIsGenerating(false);
+        return;
+      }
+
+      // 1. เรียก AI API จาก Backend
+      const aiResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/ai/generate-workout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          bodyType,
+          goal,
+          dailyTime: selectedTime,
+          medicalCondition,
+        })
+      });
+
+      if (!aiResponse.ok) {
+        const errorData = await aiResponse.json().catch(() => ({}));
+        throw new Error(errorData.error || `AI Generation failed (Status: ${aiResponse.status})`);
+      }
+
+      const aiEnhancedPlan = await aiResponse.json();
+
+      onGeneratePlan(aiEnhancedPlan as any);
+
+      // 2. บันทึกข้อมูลลง API ในพื้นหลัง
       if (token) {
         fetch(`${import.meta.env.VITE_API_URL}/api/workout/preferences`, {
           method: 'POST',
@@ -57,8 +92,11 @@ export default function WorkoutPlanner({ onHome, onGeneratePlan }: WorkoutPlanne
           })
         }).catch(err => console.error('Background save failed:', err));
       }
-    } catch (err) {
-      console.error('Preference save error:', err);
+    } catch (err: any) {
+      console.error('AI Generation error:', err);
+      alert(`ไม่สามารถเจนเนอร์เรทแผนได้: ${err.message}`);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -271,17 +309,44 @@ export default function WorkoutPlanner({ onHome, onGeneratePlan }: WorkoutPlanne
               />
             </div>
 
-            {/* Generate Plan Button */}
-            <button
-              onClick={handleGeneratePlan}
-              disabled={!isFormComplete}
-              className={`w-full py-4 rounded-2xl font-medium transition-all ${isFormComplete
-                ? 'bg-emerald-500 text-white hover:bg-emerald-600 active:scale-[0.98] shadow-md'
-                : 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'
-                }`}
-            >
-              Generate plan
-            </button>
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={handleGeneratePlan}
+                disabled={!isFormComplete || isGenerating}
+                className={`w-full py-4 rounded-2xl font-medium transition-all flex items-center justify-center gap-2 ${isFormComplete && !isGenerating
+                  ? 'bg-emerald-500 text-white hover:bg-emerald-600 active:scale-[0.98] shadow-md'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'
+                  }`}
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>AI Analyzing...</span>
+                  </>
+                ) : (
+                  <span>Generate plan</span>
+                )}
+              </button>
+
+              <button
+                onClick={() => {
+                  if (!isFormComplete) {
+                    alert('Please complete all required fields for AI analysis');
+                    return;
+                  }
+                  const initialQuery = `ช่วยวางแผนออกกำลังกายให้หน่อยครับ ฉันมีเวลา ${selectedTime} นาทีต่อวัน รูปร่างแบบ ${bodyType} เป้าหมายคือ ${goal === 'gain' ? 'เพิ่มน้ำหนัก' : goal === 'lose' ? 'ลดน้ำหนัก' : 'รักษาสุขภาพ'} ${medicalCondition ? `และมีข้อจำกัดทางร่างกายคือ ${medicalCondition}` : ''}`;
+                  navigate('/chat', { state: { initialQuery } });
+                }}
+                className={`w-full py-4 rounded-2xl font-medium transition-all flex items-center justify-center gap-2 ${isFormComplete
+                  ? 'bg-white border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50 shadow-sm'
+                  : 'bg-gray-50 border-2 border-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
+              >
+                <Sparkles className="w-5 h-5 text-emerald-500" />
+                Ask AI Assistant
+              </button>
+            </div>
           </div>
         </div>
       </div>

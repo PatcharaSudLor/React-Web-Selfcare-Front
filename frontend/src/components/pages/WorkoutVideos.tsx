@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Clock, TrendingUp, Play, X, Bookmark } from 'lucide-react'
 import { supabase } from '../../utils/supabase'
+import Pagination from '../recipes/Pagination'
 
 
 interface Video {
@@ -116,6 +117,11 @@ export default function WorkoutVideos() {
   const [userBodyType, setUserBodyType] = useState('')
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set())
   const [prefsLoaded, setPrefsLoaded] = useState(false)
+  const LIMIT = 6
+
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
 
   // fetch workout preferences + bookmarks
   useEffect(() => {
@@ -151,57 +157,76 @@ export default function WorkoutVideos() {
   useEffect(() => {
     if (!prefsLoaded) return
     fetchVideos()
-  }, [prefsLoaded, activeCategory, selectedGoals, selectedDifficulty, selectedEquipment, selectedDuration])
+  }, [prefsLoaded, activeCategory, selectedGoals, selectedDifficulty, selectedEquipment, selectedDuration, currentPage])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [
+    activeCategory,
+    selectedGoals,
+    selectedDifficulty,
+    selectedEquipment,
+    selectedDuration
+  ])
 
   const fetchVideos = async () => {
-  setIsLoading(true)
+    setIsLoading(true)
 
-  try {
-    const params = new URLSearchParams()
+    try {
+      const params = new URLSearchParams()
 
-    // category
-    if (activeCategory !== 'for-you' && activeCategory !== 'all') {
-      params.set('category', activeCategory)
-    }
+      if (activeCategory !== 'for-you' && activeCategory !== 'all') {
+        params.set('category', activeCategory)
+      }
 
-    // รวม goal tags
-    const goalTags =
-      selectedGoals.length > 0
-        ? selectedGoals
-        : activeCategory === 'for-you'
-        ? recommendedTags
-        : []
+      const goalTags =
+        selectedGoals.length > 0
+          ? selectedGoals
+          : activeCategory === 'for-you'
+            ? recommendedTags
+            : []
 
-    if (goalTags.length > 0) {
-      params.set('goal', goalTags.join(','))
-    }
+      if (goalTags.length > 0) {
+        params.set('goal', goalTags.join(','))
+      }
 
-    if (selectedDifficulty.length > 0)
-      params.set('difficulty', selectedDifficulty.join(','))
+      if (userBodyType) {
+        params.set('bodyType', userBodyType)
+      }
 
-    if (selectedEquipment.length > 0)
-      params.set('equipment', selectedEquipment.join(','))
+      if (selectedDifficulty.length > 0)
+        params.set('difficulty', selectedDifficulty.join(','))
 
-    if (selectedDuration.length > 0)
-      params.set('duration', selectedDuration.join(','))
+      if (selectedEquipment.length > 0)
+        params.set('equipment', selectedEquipment.join(','))
 
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/workout-videos?${params}`
-    )
+      if (selectedDuration.length > 0)
+        params.set('duration', selectedDuration.join(','))
 
-    if (res.ok) {
-      const data = await res.json()
-      setVideos(data)
-    } else {
+      // ⭐ pagination
+      params.set('page', String(currentPage))
+      params.set('limit', String(LIMIT))
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/workout-videos?${params}`
+      )
+
+      if (res.ok) {
+        const json = await res.json()
+
+        setVideos(json.data ?? [])
+        setTotalPages(json.totalPages ?? 1)
+        setTotalCount(json.total ?? 0)
+      } else {
+        setVideos([])
+      }
+    } catch (err) {
+      console.error(err)
       setVideos([])
+    } finally {
+      setIsLoading(false)
     }
-  } catch (err) {
-    console.error(err)
-    setVideos([])
-  } finally {
-    setIsLoading(false)
   }
-}
 
   const toggleBookmark = async (e: React.MouseEvent, videoId: string) => {
     e.preventDefault()
@@ -275,14 +300,10 @@ export default function WorkoutVideos() {
     return matchesGoal || matchesBodyType
   }
 
-  const displayedVideos = activeCategory === 'for-you'
-    ? recommendedTags.length === 0
-      ? videos
-      : videos.filter(isRecommended)
-    : videos
+  const displayedVideos = videos
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-4 pb-12">
+    <div className="min-h-screen bg-gray-50 pt-4 pb-12 mt-5">
       <div className="max-w-6xl mx-auto px-6">
 
         {/* Filter Section */}
@@ -342,7 +363,7 @@ export default function WorkoutVideos() {
           {/* Active filter summary */}
           {hasActiveFilters && (
             <div className="flex items-center justify-between pt-1 border-t border-gray-100">
-              <p className="text-xs text-gray-400">พบ <span className="font-semibold text-emerald-600">{displayedVideos.length}</span> วิดีโอ</p>
+              <p className="text-xs text-gray-400">พบ <span className="font-semibold text-emerald-600">{totalCount}</span> วิดีโอ</p>
               <button onClick={clearFilters} className="text-xs text-red-400 hover:text-red-500 flex items-center gap-1 transition-colors">
                 <X className="w-3 h-3" /> ล้างตัวกรอง
               </button>
@@ -352,7 +373,7 @@ export default function WorkoutVideos() {
 
         {/* For You Banner */}
         {activeCategory === 'for-you' && userGoal && (
-          <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-4 mb-6 text-white">
+          <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-4 mb-6 text-white text-center shadow-sm">
             <p className="text-sm font-semibold mb-1">⭐ แนะนำสำหรับคุณ</p>
             <p className="text-xs opacity-90">
               จาก Body Type: <span className="font-medium capitalize">{userBodyType}</span>
@@ -366,7 +387,7 @@ export default function WorkoutVideos() {
           </div>
         )}
         {activeCategory === 'for-you' && !userGoal && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl text-center p-4 mb-6">
             <p className="text-sm text-yellow-700">
               ยังไม่ได้ตั้งค่าเป้าหมายการออกกำลังกาย
             </p>
@@ -408,7 +429,7 @@ export default function WorkoutVideos() {
               </div>
             ))}
           </div>
-        ) : displayedVideos.length === 0 ? (
+        ) : totalCount === 0 ? (
           <div className="text-center py-24">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Play className="w-7 h-7 text-gray-300" />
@@ -517,6 +538,13 @@ export default function WorkoutVideos() {
               </div>
             ))}
           </div>
+        )}
+        {!isLoading && totalPages > 1 && (
+          <Pagination
+            current={currentPage}
+            total={totalPages}
+            onChange={setCurrentPage}
+          />
         )}
       </div>
     </div>

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Search, ChefHat, Filter, X, Soup, SlidersHorizontal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../utils/supabase';
-import type { Recipe} from "../../types/recipe"
+import type { Recipe } from "../../types/recipe"
 import { CATEGORIES, HEALTHY_TAGS, LIMIT } from "../../constants/recipeConstants"
 import RecipeCard from "../../components/recipes/RecipeCard"
 import Pagination from "../../components/recipes/Pagination"
@@ -124,12 +124,12 @@ export default function RecipePage() {
     }
 
     return (
-        <div style={{ minHeight: '100vh', background: '#f8faf9',marginTop: -28}}>
+        <div style={{ minHeight: '100vh', background: '#f8faf9', marginTop: 29}}>
             <style>{`@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
 
             {/* ── Sticky Nav ── */}
             <div style={{ position: 'sticky', top: 64, zIndex: 40, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #e5e7eb', padding: '0 40px' }}>
-                <div style={{ maxWidth: 1280, margin: '0 auto', height: 64, display: 'flex', alignItems: 'center', gap: 24 }}>
+                <div style={{ maxWidth: 1920, margin: '0 auto', height: 64, display: 'flex', alignItems: 'center', gap: 24 }}>
                     {/* Logo */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                         <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #059669, #34d399)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -179,7 +179,7 @@ export default function RecipePage() {
             </div>
 
             {/* ── Content ── */}
-            <div style={{ maxWidth: 1280, margin: '0 auto',padding: '12px 40px 32px' }}>
+            <div style={{ width: '100%', margin: '0 auto', padding: '12px 40px 32px' }}>
                 <div style={{ display: 'flex', gap: 32 }}>
 
                     {/* ── Sidebar ── */}

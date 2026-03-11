@@ -51,10 +51,11 @@ export default function MainLayout({
             />
 
             {/* Main Content */}
-            <main className="pt-16">
-                <div className="max-w-7xl mx-auto pb-8">
-                    <Outlet />
-                </div>
+            <main
+                className={`pt-10 h-[calc(100vh-64px)] transition-all duration-300 
+                ${isSidebarOpen ? "lg:ml-64" : "ml-0"}`}
+            >
+                <Outlet />
             </main>
 
             {/* Overlay when sidebar is open on mobile */}

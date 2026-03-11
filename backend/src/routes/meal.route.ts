@@ -83,9 +83,10 @@ router.get('/active-plan', async (req, res) => {
 router.post('/active-plan', async (req, res) => {
     try {
         const user_id = (req as any).user.id
-        const { planData } = req.body
+        const { planData, plan_data } = req.body
+        const actualPlanData = planData || plan_data
 
-        if (!planData || !Array.isArray(planData)) {
+        if (!actualPlanData || !Array.isArray(actualPlanData)) {
             return res.status(400).json({ error: 'Missing plan data' })
         }
 
@@ -93,7 +94,7 @@ router.post('/active-plan', async (req, res) => {
             .from('active_meal_plan')
             .upsert({
                 user_id,
-                plan_data: planData,
+                plan_data: actualPlanData,
                 updated_at: new Date().toISOString(),
             }, { onConflict: 'user_id' })
 
@@ -111,8 +112,8 @@ router.post('/schedule', async (req, res) => {
         const user_id = (req as any).user.id
         const { schedule, plan } = req.body
 
-        if (!schedule || !plan) {
-            return res.status(400).json({ error: 'Missing schedule or plan' })
+        if (!schedule) {
+            return res.status(400).json({ error: 'Missing schedule' })
         }
 
         const { error } = await supabase
@@ -120,7 +121,7 @@ router.post('/schedule', async (req, res) => {
             .upsert({
                 user_id,
                 schedule,
-                plan,
+                plan: plan || null,
                 updated_at: new Date().toISOString(),
             }, { onConflict: 'user_id' })
 
@@ -172,12 +173,12 @@ router.get('/items', async (req, res) => {
 router.delete('/active-plan', async (req, res) => {
     try {
         const user_id = (req as any).user.id
-        const { error } = await supabase
-            .from('active_meal_plan')
-            .delete()
-            .eq('user_id', user_id)
+        // ลบทั้งแผน Active และรายการใน Schedule (Wipe total)
+        await Promise.all([
+            supabase.from('active_meal_plan').delete().eq('user_id', user_id),
+            supabase.from('meal_schedules').delete().eq('user_id', user_id)
+        ])
 
-        if (error) return res.status(500).json({ error: error.message })
         return res.json({ message: 'Deleted successfully' })
     } catch (err) {
         return res.status(500).json({ error: 'Server Error' })

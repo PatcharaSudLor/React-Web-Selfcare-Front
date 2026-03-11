@@ -21,10 +21,10 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
   }
 
   // Generate schedule based on user preferences
-  const schedule = plan.days.map(day => ({
+  const schedule = plan.days.map((day: any) => ({
     day: day.day,
-    dayTh: dayThMap[day.day] ?? day.day,
-    workout: day.focus,
+    dayTh: day.dayTh || dayThMap[day.day] || day.day,
+    workout: day.workout || day.focus,
     duration: day.duration,
     exercises: day.exercises,
     color: 'bg-emerald-100 border-emerald-200',
@@ -32,26 +32,28 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
 
 
   const handleSave = async () => {
-    if (onSaveToSchedule) {
-      const localSchedule = schedule.map((item) => ({
-        day: item.day,
-        dayTh: item.dayTh,
-        workout: item.workout,
-        duration: `${item.duration} นาที`,
-        exercises: item.exercises.length === 0
-          ? ['Recovery / Stretching']
-          : item.exercises.map((exercise) => `${exercise.name} (${exercise.sets} x ${exercise.reps})`),
-        color: dayCardColorMap[item.day] ?? 'border-gray-200 bg-gray-50',
-      }));
+    // 1. บันทึกลง LocalCache ทันที (Dual Save) เพื่อให้หน้า Schedule โหลดได้ไว
+    const activePlanData = schedule.map(item => ({
+      day: item.day,
+      dayTh: item.dayTh,
+      workout: item.workout,
+      duration: `${item.duration} นาที`,
+      exercises: item.exercises.map((ex: any) =>
+ typeof ex === 'string' ? ex : `${ex.name} (${ex.sets} x ${ex.reps})`),
+      color: dayCardColorMap[item.day] ?? 'border-gray-200 bg-gray-50',
+    }));
+    localStorage.setItem('active_workout_plan', JSON.stringify(activePlanData));
 
-      onSaveToSchedule(localSchedule);
+    // 2. ส่งข้อมูลให้ Parent component (ถ้ามี)
+    if (onSaveToSchedule) {
+      onSaveToSchedule(activePlanData);
     }
 
+    // 3. บันทึกลง API ในพื้นหลัง
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token
-      if (!token) return
-
+      const token = session?.access_token;
+      if (!token) return;
 
       const schedulePayload = schedule.map(item => ({
         day: item.day,
@@ -68,31 +70,23 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ schedule: schedulePayload })
-      })
+      });
 
-      if (!scheduleRes.ok) {
-        const err = await scheduleRes.json()
-        alert(err.error || 'Failed to save schedule')
-        return
+      if (scheduleRes.ok) {
+        await fetch(`${import.meta.env.VITE_API_URL}/api/workout/active-plan`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ 
+            planData: schedulePayload,
+            plan_data: schedulePayload // ส่งทั้ง 2 ชื่อเพื่อรองรับ Backend ทุกเวอร์ชัน
+          })
+        });
       }
-
-      const activePlanRes = await fetch(`${import.meta.env.VITE_API_URL}/api/workout/active-plan`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ planData: schedulePayload })
-      })
-
-      if (!activePlanRes.ok) {
-        const err = await activePlanRes.json()
-        alert(err.error || 'Failed to save active plan')
-        return
-      }
-
     } catch (err) {
-      console.error(err)
+      console.error('Save to API failed:', err);
     }
 
     alert('บันทึกลงตารางเรียบร้อยแล้ว!');
@@ -298,7 +292,7 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
                       </div>
                     ) : (
                       <div className="flex flex-wrap gap-2">
-                        {item.exercises.map((exercise, idx) => (
+                        {item.exercises.map((exercise: any, idx: number) => (
                           <div
                             key={idx}
                             className="flex items-center gap-2 text-xs text-gray-700 bg-white bg-opacity-70 px-3 py-1.5 rounded-full shadow-sm"

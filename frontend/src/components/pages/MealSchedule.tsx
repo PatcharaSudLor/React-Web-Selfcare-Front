@@ -28,98 +28,62 @@ interface MealScheduleProps {
     mealPlanData: MealPlanData
 }
 
-const DEFAULT_MEALS: Meal[] = [
-    { id: 'd1', name: 'Chicken Breast with Rice', name_th: 'อกไก่ข้าวกล้อง', price: 60, type: 'rice', ingredients: ['อกไก่', 'ข้าวกล้อง'] },
-    { id: 'd2', name: 'Stir-fried Basil with Pork', name_th: 'กะเพราหมูสับ', price: 50, type: 'rice', ingredients: ['หมูสับ', 'ใบกะเพรา'] },
-    { id: 'd3', name: 'Salmon Salad', name_th: 'สลัดแซลมอน', price: 120, type: 'salad', ingredients: ['แซลมอน', 'ผักสลัด'] },
-    { id: 'd4', name: 'Chicken Noodles', name_th: 'ก๋วยเตี๋ยวไก่', price: 45, type: 'noodles', ingredients: ['เส้นก๋วยเตี๋ยว', 'ไก่'] },
-    { id: 'd5', name: 'Beef Steak', name_th: 'สเต็กเนื้อ', price: 180, type: 'steak', ingredients: ['เนื้อวัว', 'มันฝรั่ง'] },
-]
 
-const weekDays = [
-    { day: 'Monday', dayTh: 'จันทร์' },
-    { day: 'Tuesday', dayTh: 'อังคาร' },
-    { day: 'Wednesday', dayTh: 'พุธ' },
-    { day: 'Thursday', dayTh: 'พฤหัสบดี' },
-    { day: 'Friday', dayTh: 'ศุกร์' },
-    { day: 'Saturday', dayTh: 'เสาร์' },
-    { day: 'Sunday', dayTh: 'อาทิตย์' },
-] as const
-
-const dayColorMap: Record<string, string> = {
-    Monday: 'bg-yellow-50',
-    Tuesday: 'bg-pink-50',
-    Wednesday: 'bg-green-50',
-    Thursday: 'bg-orange-50',
-    Friday: 'bg-blue-50',
-    Saturday: 'bg-purple-50',
-    Sunday: 'bg-red-50',
-}
 
 export default function MealSchedule({ onBack, onSaveToSchedule, mealPlanData }: MealScheduleProps) {
-    const { likedMeals, allergicFoods, budget } = mealPlanData
-    const budgetNumber = parseInt(budget) || 100
+    const { likedMeals, allergicFoods, budget, goal } = mealPlanData
 
     const [weekSchedule, setWeekSchedule] = useState<DayMeals[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
     useEffect(() => {
-        const fetchMeals = async () => {
-            const { data: { session } } = await supabase.auth.getSession()
-            const token = session?.access_token
-            if (!token) return
-
-            const params = new URLSearchParams({
-                types: likedMeals.join(','),
-                budget: String(budgetNumber),
-            })
-            if (allergicFoods.length > 0) {
-                params.set('allergies', allergicFoods.join(','))
-            }
-
-            let meals: Meal[] = []
+        const fetchAIPlan = async () => {
+            setIsLoading(true)
             try {
-                const res = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/meal/items?${params}`,
-                    { headers: { 'Authorization': `Bearer ${token}` } }
-                )
-                if (res.ok) {
-                    meals = await res.json()
+                const { data: { session } } = await supabase.auth.getSession()
+                const token = session?.access_token
+                if (!token) {
+                    setIsLoading(false)
+                    return
+                }
+
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ai/generate-meal`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ likedMeals, allergicFoods, budget, goal })
+                })
+
+                if (response.ok) {
+                    const data = await response.json()
+                    console.log('Meal API response:', data)
+                    if (data.days && Array.isArray(data.days)) {
+                        setWeekSchedule(data.days)
+                    } else {
+                        setErrorMsg(`รูปแบบข้อมูลไม่ถูกต้อง (ไม่มี "days" ใน response)`)
+                    }
+                } else {
+                    const errorData = await response.json()
+                    console.error('AI Meal Generation failed:', errorData)
+                    setErrorMsg(errorData.error || `เจนแผนไม่สำเร็จ (${response.status}): ${errorData.error || ''}`)
                 }
             } catch (err) {
-                console.error('Fetch meals error, using defaults:', err)
+                console.error('Fetch AI meals error:', err)
+            } finally {
+                setIsLoading(false)
             }
-
-            // ถ้าไม่มีข้อมูลจาก API ให้ใช้ตัวสำรอง
-            if (meals.length === 0) {
-                meals = DEFAULT_MEALS.filter(m => m.price <= budgetNumber)
-                if (meals.length === 0) meals = DEFAULT_MEALS // ถ้าถูกเกินจนไม่มี ให้เอาทั้งหมดมาสำรองไว้ก่อน
-            }
-
-            const getRandomMeal = (seed: number): Meal => {
-                if (meals.length === 0) {
-                    return { id: '', name: 'No meal', name_th: 'ไม่มีเมนู', price: 0, type: '', ingredients: [] }
-                }
-                return meals[seed % meals.length]
-            }
-
-            const schedule: DayMeals[] = weekDays.map(({ day, dayTh }, index) => ({
-                day,
-                dayTh,
-                breakfast: getRandomMeal(index * 3),
-                lunch: getRandomMeal(index * 3 + 1),
-                dinner: getRandomMeal(index * 3 + 2),
-                color: dayColorMap[day] ?? 'bg-gray-50',
-            }))
-
-            setWeekSchedule(schedule)
-            setIsLoading(false)
         }
 
-        fetchMeals()
-    }, [])
+        fetchAIPlan()
+    }, [likedMeals, allergicFoods, budget, goal])
 
     const handleSave = async () => {
+        // 1. บันทึกลง LocalCache ทันที (Dual Save)
+        localStorage.setItem('active_meal_plan', JSON.stringify(weekSchedule));
+
         try {
             const { data: { session } } = await supabase.auth.getSession()
             const token = session?.access_token
@@ -139,7 +103,10 @@ export default function MealSchedule({ onBack, onSaveToSchedule, mealPlanData }:
             const activePlanRes = await fetch(`${import.meta.env.VITE_API_URL}/api/meal/active-plan`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ planData: weekSchedule })
+                body: JSON.stringify({
+                    planData: weekSchedule,
+                    plan_data: weekSchedule
+                })
             })
             if (!activePlanRes.ok) {
                 const err = await activePlanRes.json()
@@ -279,7 +246,7 @@ export default function MealSchedule({ onBack, onSaveToSchedule, mealPlanData }:
             </div>
             <div className="flex-1 min-w-0">
                 <p className="text-xs text-gray-500">{timeLabel}</p>
-                <p className="text-sm text-gray-800 truncate">{meal.name_th}</p>
+                <p className="text-sm text-gray-800 truncate">{meal.name_th || (meal as any).name}</p>
             </div>
             <div className="text-xs text-emerald-600 font-medium flex-shrink-0">
                 ฿{meal.price}
@@ -318,7 +285,15 @@ export default function MealSchedule({ onBack, onSaveToSchedule, mealPlanData }:
 
                         {weekSchedule.length === 0 ? (
                             <div className="text-center py-12">
-                                <p className="text-gray-500">ไม่มีเมนูที่ตรงกับเงื่อนไข กรุณาปรับ preferences</p>
+                                {errorMsg ? (
+                                    <>
+                                        <p className="text-red-500 font-medium">⚠️ เกิดข้อผิดพลาด</p>
+                                        <p className="text-red-400 text-sm mt-1">{errorMsg}</p>
+                                        <button onClick={() => { setErrorMsg(null); setIsLoading(true); }} className="mt-4 px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm">ลองใหม่</button>
+                                    </>
+                                ) : (
+                                    <p className="text-gray-500">ไม่มีเมนูที่ตรงกับเงื่อนไข กรุณาปรับ preferences</p>
+                                )}
                             </div>
                         ) : (
                             <div className="space-y-4">

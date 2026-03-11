@@ -127,9 +127,10 @@ router.get('/active-plan', async (req, res) => {
 router.post('/active-plan', async (req, res) => {
     try {
         const user_id = (req as any).user.id
-        const { planData } = req.body
+        const { planData, plan_data } = req.body
+        const actualPlanData = planData || plan_data
 
-        if (!planData || !Array.isArray(planData)) {
+        if (!actualPlanData || !Array.isArray(actualPlanData)) {
             return res.status(400).json({ error: 'Missing plan data' })
         }
 
@@ -137,7 +138,7 @@ router.post('/active-plan', async (req, res) => {
             .from('active_workout_plan')
             .upsert({
                 user_id,
-                plan_data: planData,
+                plan_data: actualPlanData,
                 updated_at: new Date().toISOString(),
             }, { onConflict: 'user_id' })
 
@@ -154,12 +155,12 @@ router.delete('/active-plan', async (req, res) => {
     try {
         const user_id = (req as any).user.id
         console.log('DELETE active-plan user_id:', user_id)  // เพิ่มบรรทัดนี้
-        const { error } = await supabase
-            .from('active_workout_plan')
-            .delete()
-            .eq('user_id', user_id)
-        console.log('DELETE error:', error)  // เพิ่มบรรทัดนี้
-        if (error) return res.status(500).json({ error: error.message })
+        // ลบทั้งแผน Active และรายการใน Schedule (Wipe total)
+        await Promise.all([
+            supabase.from('active_workout_plan').delete().eq('user_id', user_id),
+            supabase.from('workout_schedules').delete().eq('user_id', user_id)
+        ])
+
         return res.json({ message: 'Deleted successfully' })
     } catch (err) {
         console.error('DELETE catch:', err)  // เพิ่มบรรทัดนี้

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Clock, TrendingUp, Play, X, Bookmark } from 'lucide-react'
 import { supabase } from '../../utils/supabase'
 
@@ -99,8 +98,13 @@ function getBodyTypeTags(bodyType: string): string[] {
   }
 }
 
+function hasAnyTagMatch(videoTags: string[] | undefined, requiredTags: string[]) {
+  if (!requiredTags.length) return true
+  if (!videoTags?.length) return false
+  return videoTags.some(tag => requiredTags.includes(tag))
+}
+
 export default function WorkoutVideos() {
-  const navigate = useNavigate()
   const [videos, setVideos] = useState<Video[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('for-you')
@@ -234,9 +238,19 @@ export default function WorkoutVideos() {
     ...getBodyTypeTags(userBodyType),
   ]))
 
-  const isRecommended = (video: Video) =>
-    recommendedTags.length > 0 &&
-    video.goal_tags?.some(tag => recommendedTags.includes(tag))
+  const goalBasedTags = getGoalTags(userGoal)
+  const bodyTypeBasedTags = getBodyTypeTags(userBodyType)
+
+  const isRecommended = (video: Video) => {
+    if (!goalBasedTags.length && !bodyTypeBasedTags.length) return false
+    const matchesGoal = hasAnyTagMatch(video.goal_tags, goalBasedTags)
+    const matchesBodyType = hasAnyTagMatch(video.goal_tags, bodyTypeBasedTags)
+    return matchesGoal && matchesBodyType
+  }
+
+  const displayedVideos = activeCategory === 'for-you'
+    ? videos.filter(isRecommended)
+    : videos
 
   return (
     <div className="min-h-screen bg-gray-50 pt-4 pb-12">
@@ -299,7 +313,7 @@ export default function WorkoutVideos() {
           {/* Active filter summary */}
           {hasActiveFilters && (
             <div className="flex items-center justify-between pt-1 border-t border-gray-100">
-              <p className="text-xs text-gray-400">พบ <span className="font-semibold text-emerald-600">{videos.length}</span> วิดีโอ</p>
+              <p className="text-xs text-gray-400">พบ <span className="font-semibold text-emerald-600">{displayedVideos.length}</span> วิดีโอ</p>
               <button onClick={clearFilters} className="text-xs text-red-400 hover:text-red-500 flex items-center gap-1 transition-colors">
                 <X className="w-3 h-3" /> ล้างตัวกรอง
               </button>
@@ -337,7 +351,7 @@ export default function WorkoutVideos() {
               </div>
             ))}
           </div>
-        ) : videos.length === 0 ? (
+        ) : displayedVideos.length === 0 ? (
           <div className="text-center py-24">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Play className="w-7 h-7 text-gray-300" />
@@ -349,7 +363,7 @@ export default function WorkoutVideos() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {videos.map(video => (
+            {displayedVideos.map(video => (
               <div key={video.id} className={`bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all border group ${isRecommended(video)
                 ? 'border-emerald-400 ring-2 ring-emerald-100'
                 : 'border-gray-100'
@@ -359,7 +373,7 @@ export default function WorkoutVideos() {
                   className="relative block overflow-hidden" style={{ aspectRatio: '16/9' }}>
 
                   {/* For You badge */}
-                  {isRecommended(video) && activeCategory !== 'for-you' && (
+                  {isRecommended(video) && activeCategory === 'for-you' && (
                     <div className="absolute top-2.5 left-2.5 z-10">
                       <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500 text-white shadow-sm">
                         ⭐ For You

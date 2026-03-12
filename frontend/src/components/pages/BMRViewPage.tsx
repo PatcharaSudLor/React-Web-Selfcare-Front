@@ -19,7 +19,7 @@ export default function BMRViewPage() {
   const bmr = userInfo.bmr || 0
 
   const getBMRDescription = () => {
-    return <>This is the amount of calories your body needs to maintain basic physiological functions like breathing, circulation, and cell production while <br /> at rest.</>;
+    return <>นี่คือปริมาณแคลอรี่ที่ร่างกายต้องใช้เพื่อคงการทำงานพื้นฐาน เช่น การหายใจ การไหลเวียนเลือด และการสร้างเซลล์ <br /> ในขณะพัก</>;
   };
 
   const handleTDEEView = () => {
@@ -42,7 +42,7 @@ export default function BMRViewPage() {
           className="flex items-center gap-2 text-gray-500 hover:text-emerald-500 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span className="text-sm">Back</span>
+          <span className="text-sm">ย้อนกลับ</span>
         </motion.button>
       </div>
 
@@ -96,7 +96,7 @@ export default function BMRViewPage() {
 
                 <div className="space-y-4 text-gray-600">
                   <p className="text-base leading-relaxed text-left">
-                    <strong className="text-gray-800 ">Basal Metabolic Rate (BMR)</strong> <br /> is the number of calories your body needs to accomplish its most basic life-sustaining functions.
+                    <strong className="text-gray-800 ">Basal Metabolic Rate (BMR)</strong> <br /> คือจำนวนแคลอรี่ที่ร่างกายต้องใช้เพื่อคงการทำงานพื้นฐานที่จำเป็นต่อการมีชีวิต
                   </p>
 
                   <div className="space-y-2">
@@ -116,26 +116,26 @@ export default function BMRViewPage() {
                     <ul className="space-y-2 text-sm">
                       <li className="flex items-start gap-2">
                         <span className="text-orange-500 mt-1">•</span>
-                        <span className="leading-relaxed">Breathing and circulation</span>
+                        <span className="leading-relaxed">การหายใจและการไหลเวียนเลือด</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-orange-500 mt-1">•</span>
-                        <span className="leading-relaxed">Cell production and repair</span>
+                        <span className="leading-relaxed">การสร้างและซ่อมแซมเซลล์</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-orange-500 mt-1">•</span>
-                        <span className="leading-relaxed">Processing nutrients</span>
+                        <span className="leading-relaxed">การเผาผลาญและใช้งานสารอาหาร</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-orange-500 mt-1">•</span>
-                        <span className="leading-relaxed">Brain and nerve function</span>
+                        <span className="leading-relaxed">การทำงานของสมองและระบบประสาท</span>
                       </li>
                     </ul>
                   </div>
 
                   <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4">
                     <p className="text-orange-800 text-sm leading-relaxed text-left">
-                      <strong>Note:</strong> <br /> BMR represents calories burned at complete rest. <br /> Your actual daily calorie needs will be higher when you account for physical activity (TDEE).
+                      <strong>หมายเหตุ:</strong> <br /> BMR คือพลังงานที่เผาผลาญขณะพักอย่างสมบูรณ์ <br /> ความต้องการพลังงานต่อวันจริงจะสูงกว่านี้เมื่อรวมกิจกรรมทางกาย (TDEE)
                     </p>
                   </div>
                 </div>
@@ -146,7 +146,7 @@ export default function BMRViewPage() {
                   whileTap={{ scale: 0.98 }}
                   className="w-full mt-7 py-4 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg transition-colors shadow-lg hover:shadow-xl"
                 >
-                  Got it!
+                  เข้าใจแล้ว
                 </motion.button>
               </motion.div>
             </div>
@@ -159,23 +159,23 @@ export default function BMRViewPage() {
             transition={{ duration: 0.6, delay: 0.15 }}
           >
             <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-              <p className="text-sm text-gray-500 mb-1">Gender</p>
-              <p className="text-2xl font-bold text-gray-800 capitalize">{gender}</p>
+              <p className="text-sm text-gray-500 mb-1">เพศ</p>
+              <p className="text-2xl font-bold text-gray-800 capitalize">{gender === 'male' ? 'ชาย' : gender === 'female' ? 'หญิง' : gender === 'other' ? 'อื่นๆ' : gender}</p>
             </div>
             <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-              <p className="text-sm text-gray-500 mb-1">Age</p>
+              <p className="text-sm text-gray-500 mb-1">อายุ</p>
               <p className="text-2xl font-bold text-gray-800">
-                {age} <span className="text-base font-normal text-gray-500">years</span>
+                {age} <span className="text-base font-normal text-gray-500">ปี</span>
               </p>
             </div>
             <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-              <p className="text-sm text-gray-500 mb-1">Height</p>
+              <p className="text-sm text-gray-500 mb-1">ส่วนสูง</p>
               <p className="text-2xl font-bold text-gray-800">
                 {height} <span className="text-base font-normal text-gray-500">cm</span>
               </p>
             </div>
             <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-              <p className="text-sm text-gray-500 mb-1">Weight</p>
+              <p className="text-sm text-gray-500 mb-1">น้ำหนัก</p>
               <p className="text-2xl font-bold text-gray-800">
                 {weight} <span className="text-base font-normal text-gray-500">kg</span>
               </p>
@@ -195,10 +195,10 @@ export default function BMRViewPage() {
               <p className="text-base uppercase tracking-wide opacity-90">Your Basal Metabolic Rate</p>
               <div className="flex items-baseline justify-center gap-3">
                 <span className="text-6xl font-bold">{bmr}</span>
-                <span className="text-xl font-medium opacity-90">calories/day</span>
+                <span className="text-xl font-medium opacity-90">แคลอรี่/วัน</span>
               </div>
               <p className="text-base opacity-90 max-w-md mx-auto pt-1">
-                Calories burned while at complete rest
+                พลังงานที่เผาผลาญในขณะพักอย่างสมบูรณ์
               </p>
             </div>
           </motion.div>
@@ -235,15 +235,15 @@ export default function BMRViewPage() {
             <ul className="space-y-3 text-base text-gray-700">
               <li className="flex items-start gap-2">
                 <span className="text-orange-500 mt-1">•</span>
-                <span>Your brain uses about 20% of your BMR calories</span>
+                <span>สมองของคุณใช้พลังงานประมาณ 20% ของแคลอรี่จาก BMR</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-orange-500 mt-1">•</span>
-                <span>Muscle tissue burns more calories at rest than fat tissue</span>
+                <span>มวลกล้ามเนื้อเผาผลาญพลังงานขณะพักมากกว่าเนื้อเยื่อไขมัน</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-orange-500 mt-1">•</span>
-                <span>BMR typically decreases by 1-2% per decade after age 20</span>
+                <span>โดยทั่วไป BMR จะลดลงประมาณ 1-2% ต่อทุกช่วงอายุ 10 ปีหลังอายุ 20 ปี</span>
               </li>
             </ul>
           </motion.div>
@@ -257,7 +257,7 @@ export default function BMRViewPage() {
             transition={{ duration: 0.6, delay: 0.55 }}
             className="w-full py-5 rounded-2xl bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold text-lg transition-all shadow-lg shadow-emerald-200 hover:shadow-xl"
           >
-            Continue to TDEE
+            ไปต่อที่ TDEE
           </motion.button>
 
           <motion.div

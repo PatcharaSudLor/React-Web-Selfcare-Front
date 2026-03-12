@@ -107,7 +107,7 @@ export default function HomePage() {
                 <p className="text-4xl font-bold text-gray-900">
                   {userInfo.bmr ? userInfo.bmr.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '-'}
                 </p>
-                <p className="text-sm text-gray-500">kcal/วัน</p>
+                <p className="text-sm text-gray-500">กิโลแคลอรี่/วัน</p>
               </div>
             </button>
 
@@ -126,7 +126,7 @@ export default function HomePage() {
                 <p className="text-4xl font-bold text-gray-900">
                   {userInfo.tdee ? userInfo.tdee.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '-'}
                 </p>
-                <p className="text-sm text-gray-500">kcal/วัน</p>
+                <p className="text-sm text-gray-500">กิโลแคลอรี่/วัน</p>
               </div>
             </button>
           </div>

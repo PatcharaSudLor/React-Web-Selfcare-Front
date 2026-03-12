@@ -133,12 +133,6 @@ export default function TipsPage() {
         }
     }
 
-    const goalBadgeLabel = userGoal === 'lose'
-        ? 'เป้าหมาย: ลดน้ำหนัก'
-        : userGoal === 'gain'
-            ? 'เป้าหมาย: เพิ่มกล้ามเนื้อ'
-            : 'เป้าหมาย: สุขภาพโดยรวม'
-
     const featuredTip = recommendedTips[0] ?? tips[0]
 
     return (
@@ -176,9 +170,6 @@ export default function TipsPage() {
                             <div className="mt-4 flex flex-wrap items-center gap-2">
                                 <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">
                                     บทความ {tips.length} รายการ
-                                </span>
-                                <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-                                    {goalBadgeLabel}
                                 </span>
                             </div>
                         </div>
@@ -270,9 +261,6 @@ export default function TipsPage() {
                                 <h2 className="text-lg font-bold text-slate-900">แนะนำสำหรับคุณ</h2>
                                 <p className="text-xs text-slate-500">คัดตามเป้าหมายสุขภาพของคุณ</p>
                             </div>
-                            <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-                                {goalBadgeLabel}
-                            </span>
                         </div>
 
                         <div className="-mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">

@@ -83,13 +83,13 @@ function getStrengthLabel(score: number) {
   switch (score) {
     case 0:
     case 1:
-      return { label: 'Weak', color: 'bg-red-500', text: 'text-red-600' };
+      return { label: 'อ่อน', color: 'bg-red-500', text: 'text-red-600' };
     case 2:
-      return { label: 'Fair', color: 'bg-yellow-500', text: 'text-yellow-600' };
+      return { label: 'ปานกลาง', color: 'bg-yellow-500', text: 'text-yellow-600' };
     case 3:
-      return { label: 'Good', color: 'bg-blue-500', text: 'text-blue-600' };
+      return { label: 'ดี', color: 'bg-blue-500', text: 'text-blue-600' };
     case 4:
-      return { label: 'Strong', color: 'bg-emerald-500', text: 'text-emerald-600' };
+      return { label: 'แข็งแรง', color: 'bg-emerald-500', text: 'text-emerald-600' };
     default:
       return { label: '', color: '', text: '' };
   }
@@ -272,13 +272,13 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
 
       if (isActuallyChangingPassword) {
         if (!isStrongPassword) {
-          setPasswordError('Password must be Strong');
+          setPasswordError('รหัสผ่านต้องอยู่ในระดับแข็งแรง');
           setIsSaving(false);
           return;
         }
 
         if (trimmedPassword !== confirmPassword) {
-          setPasswordError('Passwords do not match');
+          setPasswordError('รหัสผ่านไม่ตรงกัน');
           setIsSaving(false);
           return;
         }
@@ -298,7 +298,7 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
       const { data: { session } } = await supabase.auth.getSession()
       const token = session?.access_token
       if (!token) {
-        alert('Session expired, please login again')
+        alert('เซสชันหมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง')
         setIsSaving(false)
         return
       }
@@ -402,11 +402,11 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
                 <ArrowLeft className="w-6 h-6" />
               </button>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent text-left">My Profile</h1>
-                <p className="text-sm text-gray-500 mt-1">Manage and customize your account</p>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent text-left">โปรไฟล์ของฉัน</h1>
+                <p className="text-sm text-gray-500 mt-1">จัดการและปรับแต่งบัญชีของคุณ</p>
               </div>
             </div>
-            <button onClick={handleLogout} className="px-5 py-2.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-semibold transition-all duration-200 border border-red-200">Sign Out</button>
+            <button onClick={handleLogout} className="px-5 py-2.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-semibold transition-all duration-200 border border-red-200">ออกจากระบบ</button>
           </div>
         </div>
       </div>
@@ -420,7 +420,7 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
               <div className="relative aspect-square bg-gradient-to-br from-emerald-50 to-emerald-100/50 flex flex-col items-center justify-center p-8">
                 <div className="relative mb-6">
                   <div className="w-48 h-48 rounded-full overflow-hidden ring-8 ring-emerald-100 shadow-2xl">
-                    <img src={previewUrl || profileImage} alt="avatar" className="w-full h-full object-cover" />
+                    <img src={previewUrl || profileImage} alt="รูปโปรไฟล์" className="w-full h-full object-cover" />
                   </div>
                   <input id="avatarInput" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
                   {isEditing ? (
@@ -437,8 +437,23 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
                   <h2 className="text-2xl font-bold text-gray-800 truncate">{formData.username}</h2>
                   <p className="text-sm text-gray-500 mt-1 truncate">{formData.email}</p>
                   <div className="mt-4 flex justify-center gap-2">
-                    <div className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold">Age: {formData.age}</div>
-                    <div className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">{formData.gender}</div>
+                    <div className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold">อายุ: {formData.age}</div>
+                    <div
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        formData.gender === 'Female'
+                          ? 'bg-pink-200 text-pink-800'
+                          : formData.gender === 'Male'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'text-white'
+                        }`}
+                      style={
+                        formData.gender === 'Other'
+                          ? { background: 'linear-gradient(90deg, #ef4444, #f59e0b, #22c55e, #3b82f6, #a855f7)' }
+                          : undefined
+                      }
+                    >
+                      {formData.gender === 'Male' ? 'ชาย' : formData.gender === 'Female' ? 'หญิง' : 'อื่นๆ'}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -450,7 +465,7 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
             <div className="bg-white rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-emerald-50">
               <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 px-8 py-6">
                 <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                  <span className="text-2xl"></span> Profile Information
+                  <span className="text-2xl"></span> ข้อมูลโปรไฟล์
                 </h3>
               </div>
 
@@ -459,7 +474,7 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
                   {/* Email */}
                   <div className="md:col-span-1">
                     <label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-3">
-                      <Mail className="w-5 h-5 text-emerald-500" /> Email
+                      <Mail className="w-5 h-5 text-emerald-500" /> อีเมล
                     </label>
                     <input
                       type="email"
@@ -473,7 +488,7 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
                   {/* Username */}
                   <div className="md:col-span-1">
                     <label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-3">
-                      <User className="w-5 h-5 text-emerald-500" /> Username
+                      <User className="w-5 h-5 text-emerald-500" /> ชื่อผู้ใช้
                     </label>
                     <input
                       type="text"
@@ -487,7 +502,7 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
                   {/* Age */}
                   <div className="md:col-span-1">
                     <label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-3">
-                      <Calendar className="w-5 h-5 text-emerald-500" /> Age
+                      <Calendar className="w-5 h-5 text-emerald-500" /> อายุ
                     </label>
                     <input
                       type="number"
@@ -501,7 +516,7 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
                   {/* Gender */}
                   <div className="md:col-span-1">
                     <label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-3">
-                      <User className="w-5 h-5 text-emerald-500" /> Gender
+                      <User className="w-5 h-5 text-emerald-500" /> เพศ
                     </label>
 
                     <div className="relative">
@@ -515,9 +530,9 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
                             : 'border-gray-200 bg-gray-50 cursor-not-allowed text-gray-600'
                           }`}
                       >
-                        <option value="Male">Male ♂</option>
-                        <option value="Female">Female ♀</option>
-                        <option value="Other">Other</option>
+                        <option value="Male">ชาย ♂</option>
+                        <option value="Female">หญิง ♀</option>
+                        <option value="Other">อื่นๆ</option>
                       </select>
 
                       {/* Arrow */}
@@ -528,7 +543,7 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
                   {/* Password Section */}
                   <div className="md:col-span-1">
                     <label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-3">
-                      <Lock className="w-5 h-5 text-emerald-500" /> Password
+                      <Lock className="w-5 h-5 text-emerald-500" /> รหัสผ่าน
                     </label>
                     <div className="flex gap-3 items-center">
                       <input
@@ -547,7 +562,7 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
                           className="mt-3 block text-left text-sm font-semibold text-emerald-600
                                      hover:text-emerald-700 hover:underline transition"
                         >
-                          Change password
+                          เปลี่ยนรหัสผ่าน
                         </button>
 
                       </>
@@ -559,7 +574,7 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
                             type={showPassword ? 'text' : 'password'}
                             name="new-password"
                             autoComplete="new-password"
-                            placeholder="New password (optional)"
+                            placeholder="รหัสผ่านใหม่ (ไม่บังคับ)"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             className="w-full px-5 py-3.5 rounded-xl border-2 border-emerald-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none font-medium"
@@ -598,22 +613,22 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
                                 }`}
                             >
                               <li className={hasLower ? 'text-emerald-600' : 'text-gray-400'}>
-                                ✓ lowercase
+                                ✓ ตัวพิมพ์เล็ก
                               </li>
                               <li className={hasUpper ? 'text-emerald-600' : 'text-gray-400'}>
-                                ✓ uppercase
+                                ✓ ตัวพิมพ์ใหญ่
                               </li>
                               <li className={hasNumber ? 'text-emerald-600' : 'text-gray-400'}>
-                                ✓ number
+                                ✓ ตัวเลข
                               </li>
                               <li className={hasLength ? 'text-emerald-600' : 'text-gray-400'}>
-                                ✓ 8+ chars
+                                ✓ อย่างน้อย 8 ตัวอักษร
                               </li>
                             </ul>
 
                             {isStrongPassword && (
                               <p className="mt-2 text-xs text-left font-semibold text-emerald-600">
-                                ✓ Strong password
+                                ✓ รหัสผ่านแข็งแรง
                               </p>
                             )}
                           </div>
@@ -624,7 +639,7 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
                           <input
                             type={showPassword ? 'text' : 'password'}
                             name="confirm-password"
-                            placeholder="Confirm new password"
+                            placeholder="ยืนยันรหัสผ่านใหม่"
                             value={confirmPassword}
                             onChange={(e) => {
                               setConfirmPassword(e.target.value);
@@ -659,7 +674,7 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
                   {/* Blood Type */}
                   <div className="md:col-span-1">
                     <label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-3">
-                      <User className="w-5 h-5 text-emerald-500" /> Blood Type
+                      <User className="w-5 h-5 text-emerald-500" /> กรุ๊ปเลือด
                     </label>
 
                     <div className="relative">
@@ -712,7 +727,7 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
                           }}
                           className="flex-1 py-3.5 px-6 rounded-xl border-2 border-gray-300 hover:bg-gray-50 transition-all duration-200 font-semibold text-gray-700"
                         >
-                          Cancel
+                          ยกเลิก
                         </button>
 
                         {/* Save Button */}
@@ -721,21 +736,21 @@ export default function ProfilePage({ onHome, profileImage, onLogout }: ProfileP
                           disabled={isSaving || !canSave}
                           className="flex-1 py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-700 hover:to-emerald-600 disabled:opacity-60 font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
                         >
-                          {isSaving ? 'Saving...' : 'Save Changes'}
+                          {isSaving ? 'กำลังบันทึก...' : 'บันทึกการเปลี่ยนแปลง'}
                         </button>
                       </div>
                     ) : (
                       <div className="w-full flex flex-col gap-3">
                         {/* 👆 ข้อความอยู่ด้านบนปุ่ม */}
                         <p className="text-sm text-gray-500 text-center font-medium">
-                          💡 Click the pencil icon to start editing
+                          💡 กดไอคอนดินสอเพื่อเริ่มแก้ไข
                         </p>
 
                         <button
                           onClick={() => setIsEditing(true)}
                           className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-700 hover:to-emerald-600 font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
                         >
-                          Edit Profile
+                          แก้ไขโปรไฟล์
                         </button>
                       </div>
                     )}

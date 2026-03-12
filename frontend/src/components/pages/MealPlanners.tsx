@@ -11,6 +11,7 @@ interface MealPlannerProps {
 export interface MealPlanData {
   likedMeals: string[];
   allergicFoods: string[];
+  otherAllergies: string;
   budget: string;
   goal: string;
 }
@@ -55,12 +56,13 @@ const allergyTypes: AllergyType[] = [
 ];
 
 const proteinAllergies = allergyTypes.filter(a => a.group === 'protein');
-const otherAllergies = allergyTypes.filter(a => a.group === 'other');
+const otherAllergiesList = allergyTypes.filter(a => a.group === 'other');
 
 export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps) {
   const navigate = useNavigate();
   const [likedMeals, setLikedMeals] = useState<string[]>([]);
   const [allergicFoods, setAllergicFoods] = useState<string[]>([]);
+  const [otherAllergies, setOtherAllergies] = useState('');
   const [budget, setBudget] = useState('');
   const [goal, setGoal] = useState('maintain');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -95,7 +97,7 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     // 1. ส่งข้อมูลไปสร้างแผนทันที
-    onGeneratePlan({ likedMeals, allergicFoods, budget, goal });
+    onGeneratePlan({ likedMeals, allergicFoods, otherAllergies, budget, goal });
 
     // 2. บันทึกข้อมูลลง API ในพื้นหลัง (Background)
     try {
@@ -111,6 +113,7 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
           body: JSON.stringify({
             likedMeals,
             allergicFoods,
+            otherAllergies,
             budget: Number(budget),
           })
         }).catch(err => console.error('Background meal save failed:', err));
@@ -168,7 +171,7 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
                 <span className="text-emerald-500 text-3xl">•</span>
                 <span className="text-xl">Liked Meals</span>
               </h3>
-              <p className="text-xm text-left text-gray-500 mb-4 ml-4">Select your preferred meal types</p>
+              <p className="text-xm text-left text-gray-500 mb-4 ml-4">เลือกประเภทอาหารที่คุณชื่นชอบ</p>
               <div className="grid grid-cols-3 gap-3">
                 {mealTypes.map((meal) => (
                   <button
@@ -196,7 +199,7 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
                 <span className="text-xl">Allergic Foods</span>
               </h3>
               <p className="text-xm text-left text-gray-500 mb-4 ml-4">
-                Select foods you're allergic to (optional)
+                เลือกอาหารที่คุณแพ้ (ระบุได้มากกว่า 1 อย่าง)
               </p>
 
               {/* โปรตีน */}
@@ -210,19 +213,34 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
               {/* วัตถุดิบอื่น */}
               <p className="text-xm font-semibold text-gray-400 uppercase tracking-wide mb-2 ml-1">🌿 วัตถุดิบอื่น</p>
               <div className="grid grid-cols-3 gap-3">
-                {otherAllergies.map((allergy) => (
+                {otherAllergiesList.map((allergy) => (
                   <AllergyButton key={allergy.id} allergy={allergy} />
                 ))}
               </div>
+            </div>
+
+            {/* Other Allergies Text Input */}
+            <div className="mb-8">
+              <h3 className="text-lg text-left font-medium text-gray-700 mb-3 flex items-center gap-2">
+                <span className="text-emerald-500 text-3xl">•</span>
+                <span className="text-xl">More</span>
+              </h3>
+              <input
+                type="text"
+                value={otherAllergies}
+                onChange={(e) => setOtherAllergies(e.target.value)}
+                placeholder="ระบุข้อมูลอาหารที่แพ้อื่นๆ (ระบุหรือไม่ก็ได้)"
+                className="w-full px-4 py-3 rounded-2xl bg-emerald-50 border-2 border-transparent focus:border-emerald-300 outline-none transition-colors text-gray-700 placeholder:text-gray-400"
+              />
             </div>
 
             {/* Goals */}
             <div className="mb-8">
               <h3 className="text-gray-800 font-semibold mb-1 flex items-center gap-2">
                 <span className="text-emerald-500 text-3xl">•</span>
-                <span className="text-xl">Fitness Goal</span>
+                <span className="text-xl">เป้าหมายสุขภาพ</span>
               </h3>
-              <p className="text-xm text-left text-gray-500 mb-4 ml-4">Select your primary fitness objective</p>
+              <p className="text-xm text-left text-gray-500 mb-4 ml-4">เลือกเป้าหมายหลักในการกิน</p>
               <div className="grid grid-cols-3 gap-3">
                 {goals.map((g) => (
                   <button
@@ -248,7 +266,7 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
                 <span className="text-amber-500 text-3xl">•</span>
                 <span className="text-xl">Budget per Meal</span>
               </h3>
-              <p className="text-xm text-left text-gray-500 mb-4 ml-4">Enter your budget for each meal (฿)</p>
+              <p className="text-xm text-left text-gray-500 mb-4 ml-4">ระบุงบประมาณสำหรับอาหารแต่ละมื้อ (฿)</p>
               <div className="relative">
                 <input
                   type="number"
@@ -287,7 +305,7 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
                     alert('Please complete all required fields for AI analysis');
                     return;
                   }
-                  const initialQuery = `ช่วยวางแผนอาหารให้หน่อยครับ ฉันชอบกิน ${likedMeals.map(m => mealTypes.find(t => t.id === m)?.labelTh).join(', ')} งบประมาณต่อมื้อคือ ฿${budget} ${allergicFoods.length > 0 ? `และฉันแพ้อาหารประเภท: ${allergicFoods.map(a => allergyTypes.find(t => t.id === a)?.labelTh).join(', ')}` : ''}`;
+                  const initialQuery = `ช่วยวางแผนอาหารให้หน่อยครับ ฉันชอบกิน ${likedMeals.map(m => mealTypes.find(t => t.id === m)?.labelTh).join(', ')} งบประมาณต่อมื้อคือ ฿${budget} ${allergicFoods.length > 0 ? `ฉันแพ้อาหารประเภท: ${allergicFoods.map(a => allergyTypes.find(t => t.id === a)?.labelTh).join(', ')}` : ''} ${otherAllergies ? `และแพ้อาหารอื่นๆ คือ: ${otherAllergies}` : ''}`;
                   navigate('/chat', { state: { initialQuery } });
                 }}
                 className={`w-full py-4 rounded-2xl font-medium transition-all flex items-center justify-center gap-2 ${isFormComplete

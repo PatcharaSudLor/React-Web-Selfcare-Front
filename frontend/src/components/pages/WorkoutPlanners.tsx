@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft, Info, Sparkles, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../utils/supabase';
-import {
-  type BodyType,
-  type Goal,
-} from '../../utils/workoutGenerator';
+import AiGenerating from './AiGenerating';
+
+type BodyType = 'ectomorph' | 'mesomorph' | 'endomorph';
+type Goal = 'gain' | 'maintain' | 'lose';
 
 interface WorkoutPlannerProps {
   onHome: () => void;
@@ -20,10 +20,14 @@ export default function WorkoutPlanner({ onHome }: WorkoutPlannerProps) {
   const [medicalCondition, setMedicalCondition] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [showBodyTypeInfo, setShowBodyTypeInfo] = useState(false);
+  const [loading, setLoading] = useState(false)
+
 
   const timeOptions = [15, 30, 45, 60];
 
   const handleGeneratePlan = async () => {
+
+    setLoading(true)
 
     if (!selectedTime || !bodyType || !goal) {
       alert('Please complete all required fields')
@@ -31,6 +35,8 @@ export default function WorkoutPlanner({ onHome }: WorkoutPlannerProps) {
     }
 
     try {
+
+      setIsGenerating(true)
 
       const { data: { session } } = await supabase.auth.getSession()
       const token = session?.access_token
@@ -40,7 +46,7 @@ export default function WorkoutPlanner({ onHome }: WorkoutPlannerProps) {
         return
       }
 
-      // save preference
+      // save preference ก่อน
       await fetch(`${import.meta.env.VITE_API_URL}/api/workout/preferences`, {
         method: 'POST',
         headers: {
@@ -51,26 +57,43 @@ export default function WorkoutPlanner({ onHome }: WorkoutPlannerProps) {
           dailyTime: selectedTime,
           bodyType,
           goal,
-          medicalCondition,
+          medicalCondition
         })
-      }).catch(err => console.error(err))
+      })
 
-      // navigate ไป schedule
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ai/generate-workout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          dailyTime: selectedTime,
+          bodyType,
+          goal,
+          medicalCondition
+        })
+      })
+
+      if (!response.ok) {
+        const text = await response.text()
+        console.error('API Error:', text)
+        throw new Error('Failed to generate plan')
+
+
+      }
+
+      const plan = await response.json()
+
       navigate('/workouts/schedule', {
-        state: {
-          loading: true,
-          preferences: {
-            bodyType,
-            goal,
-            dailyTime: selectedTime,
-            medicalCondition
-          }
-        }
+        state: { plan }
       })
 
     } catch (err) {
       console.error(err)
       alert('Something went wrong')
+    } finally {
+      setIsGenerating(false)
     }
   }
 
@@ -99,6 +122,10 @@ export default function WorkoutPlanner({ onHome }: WorkoutPlannerProps) {
   }, []);
 
   const isFormComplete = selectedTime && bodyType && goal;
+
+  if (loading) {
+    return <AiGenerating />
+  }
 
   return (
     <div className="fixed inset-0 h-screen w-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col overflow-hidden pt-16">

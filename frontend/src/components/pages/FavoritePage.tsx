@@ -174,7 +174,7 @@ export function FavoritePage({ onBack }: FavoritePageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white">
-      <div className="px-6 py-4 bg-white border-b border-gray-100">
+      <div className="px-6 py-4 bg-white border-b border-gray-100 mt-6">
         <button onClick={onBack} className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors">
           <ArrowLeft className="w-5 h-5" />
           <span className="text-sm font-medium">Back</span>

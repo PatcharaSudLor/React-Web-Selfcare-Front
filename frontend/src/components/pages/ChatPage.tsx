@@ -181,9 +181,9 @@
     }, []);
 
     return (
-      <div className="flex flex-col h-full bg-gray-50">
+      <div className="flex flex-col h-auto bg-gray-50">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b p-4 flex items-center gap-3 shadow-sm">
+        <div className="sticky top-0 bg-white border-b p-4 flex items-center gap-3 shadow-sm mt-6">
           <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
             <ChevronLeft size={24} className="text-gray-600" />
           </button>
@@ -213,7 +213,7 @@
         </div>
 
         {/* ช่องแชทโชว์ข้อความ */}
-        <div className="flex-1  p-4 space-y-4">
+        <div className="flex-1 p-4 space-y-4">
           {messages.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
               <div className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>

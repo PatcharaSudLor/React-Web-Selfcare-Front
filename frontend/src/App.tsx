@@ -82,14 +82,7 @@ function AppContent() {
         <Route path="/home" element={<HomePage />} />
         <Route
           path="/workouts/planner"
-          element={
-            <WorkoutPlanner
-              onHome={handleHome}
-              onGeneratePlan={(plan) =>
-                navigate('/workouts/schedule', { state: { plan } })
-              }
-            />
-          }
+          element={<WorkoutPlanner onHome={handleHome} />}
         />
         <Route
           path="/workouts/schedule"
@@ -121,8 +114,8 @@ function AppContent() {
           }
         />
         <Route path="/schedule" element={<SchedulePage />} />
-        <Route path="/alerts" element={<AlertPage onBack={() => navigate(-1)} />} />
-        <Route path="/profile" element={<ProfilePage onBack={() => navigate('/home')} profileImage="https://api.dicebear.com/7.x/avataaars/svg?seed=default" onLogout={handleLogout} />} />
+        <Route path="/alerts" element={<AlertPage onHome={() => navigate('/home')} />} />
+        <Route path="/profile" element={<ProfilePage onHome={() => navigate('/home')} profileImage="https://api.dicebear.com/7.x/avataaars/svg?seed=default" onLogout={handleLogout} />} />
         <Route path="/workouts/videos" element={<WorkoutVideos />} />
         <Route path="/tips" element={<TipsPage />} />
         <Route path="/tips/:id" element={<TipDetailPage />} />

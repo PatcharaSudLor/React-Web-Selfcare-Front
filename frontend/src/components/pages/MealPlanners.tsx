@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../utils/supabase';
 
 interface MealPlannerProps {
-  onBack: () => void;
+  onHome: () => void;
   onGeneratePlan: (data: MealPlanData) => void;
 }
 
@@ -58,7 +58,7 @@ const allergyTypes: AllergyType[] = [
 const proteinAllergies = allergyTypes.filter(a => a.group === 'protein');
 const otherAllergiesList = allergyTypes.filter(a => a.group === 'other');
 
-export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps) {
+export default function MealPlanner({ onHome, onGeneratePlan }: MealPlannerProps) {
   const navigate = useNavigate();
   const [likedMeals, setLikedMeals] = useState<string[]>([]);
   const [allergicFoods, setAllergicFoods] = useState<string[]>([]);
@@ -149,7 +149,7 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
           {/* Back Button */}
           <div className="mb-6">
             <button
-              onClick={onBack}
+              onClick={onHome}
               className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />

@@ -74,10 +74,10 @@ function getYoutubeThumbnail(youtubeUrl: string) {
 }
 
 interface FavoritePageProps {
-  onBack: () => void
+  onHome: () => void
 }
 
-export function FavoritePage({ onBack }: FavoritePageProps) {
+export function FavoritePage({ onHome }: FavoritePageProps) {
   const [activeTab, setActiveTab] = useState<TabType>('all')
   const [bookmarkedTips, setBookmarkedTips] = useState<Tip[]>([])
   const [bookmarkedVideos, setBookmarkedVideos] = useState<Video[]>([])
@@ -174,12 +174,18 @@ export function FavoritePage({ onBack }: FavoritePageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white">
-      <div className="px-6 py-4 bg-white border-b border-gray-100 mt-6">
-        <button onClick={onBack} className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors">
-          <ArrowLeft className="w-5 h-5" />
-          <span className="text-sm font-medium">Back</span>
-        </button>
+      <div className="mx-auto max-w-4xl px-4 pt-6">
+        <div className=" mt-3">
+          <button
+            onClick={onHome}
+            className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            <span className="text-sm font-medium">ย้อนกลับ</span>
+          </button>
+        </div>
       </div>
+
 
       <div className="container mx-auto px-4 py-6 max-w-4xl pb-24">
         {/* Header */}

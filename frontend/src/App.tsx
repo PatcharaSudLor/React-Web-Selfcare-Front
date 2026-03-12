@@ -89,7 +89,6 @@ function AppContent() {
           element={
             <WorkoutSchedule
               onBack={() => navigate('/workouts/planner')}
-              plan={location.state?.plan}
               onSaveToSchedule={() => navigate('/schedule')}
             />
           }
@@ -98,7 +97,7 @@ function AppContent() {
           path="/meals/planner"
           element={
             <MealPlanner
-              onBack={() => navigate(-1)}
+              onHome={() => navigate('/home')}
               onGeneratePlan={(data) => navigate('/meals/schedule', { state: { mealPlanData: data } })}
             />
           }
@@ -121,7 +120,7 @@ function AppContent() {
         <Route path="/tips/:id" element={<TipDetailPage />} />
         <Route path="/recipes" element={<RecipePage />} />
         <Route path="/recipes/:id" element={<RecipeDetailPage />} />
-        <Route path="/favorite" element={<FavoritePage onBack={() => navigate('/home')} />} />
+        <Route path="/favorite" element={<FavoritePage onHome={() => navigate('/home')} />} />
         <Route path="/chat" element={<ChatPage />} />
       </Route>
     </Routes>

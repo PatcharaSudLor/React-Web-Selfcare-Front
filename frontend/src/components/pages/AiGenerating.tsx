@@ -2,9 +2,9 @@ import { Loader2 } from "lucide-react"
 
 export default function AiGenerating() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-emerald-50 to-white">
+    <div className="flex items-center justify-center min-h-screen w-full bg-gradient-to-br from-emerald-50 to-white">
 
-      <div className="bg-white shadow-xl rounded-2xl p-10 w-[420px] text-center space-y-6">
+      <div className="bg-white shadow-xl rounded-2xl p-10 w-[500px] text-center space-y-6">
 
         {/* Spinner */}
         <div className="flex justify-center">

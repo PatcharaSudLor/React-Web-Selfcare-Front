@@ -35,15 +35,15 @@ export default function BMIResultPage({ onBack }: BMIResultPageProps) {
 
   const getBMIDescription = () => {
     if (bmi < 18.5) {
-      return 'Your BMI indicates you are underweight. Consider consulting with a healthcare professional for personalized advice.';
+      return 'ค่าดัชนีมวลกาย (BMI) ของคุณอยู่ในเกณฑ์น้ำหนักน้อย แนะนำให้ปรึกษาผู้เชี่ยวชาญด้านสุขภาพเพื่อรับคำแนะนำที่เหมาะสมกับคุณ';
     } else if (bmi < 25) {
-      return 'Great! Your BMI is in the normal range. Keep maintaining a healthy lifestyle!';
+      return 'ยอดเยี่ยม! ค่า BMI ของคุณอยู่ในเกณฑ์ปกติ รักษาพฤติกรรมการใช้ชีวิตที่ดีต่อสุขภาพแบบนี้ต่อไป';
     } else if (bmi < 30) {
-      return 'Your BMI indicates you are overweight. Consider incorporating more physical activity and a balanced diet.';
+      return 'ค่า BMI ของคุณอยู่ในเกณฑ์น้ำหนักเกิน แนะนำให้เพิ่มการออกกำลังกายและเลือกรับประทานอาหารที่สมดุลมากขึ้น';
     } else if (bmi < 35) {
-      return 'Your BMI indicates obesity. We recommend consulting with a healthcare professional for guidance.';
+      return 'ค่า BMI ของคุณอยู่ในเกณฑ์โรคอ้วน แนะนำให้ปรึกษาผู้เชี่ยวชาญด้านสุขภาพเพื่อรับคำแนะนำที่เหมาะสม';
     } else {
-      return 'Your BMI indicates severe obesity. Please consult with a healthcare professional for personalized support.';
+      return 'ค่า BMI ของคุณอยู่ในเกณฑ์โรคอ้วนระดับรุนแรง ควรปรึกษาผู้เชี่ยวชาญด้านสุขภาพเพื่อรับการดูแลและคำแนะนำที่เหมาะสมกับคุณ';
     }
   };
 
@@ -61,7 +61,7 @@ export default function BMIResultPage({ onBack }: BMIResultPageProps) {
           className="flex items-center gap-2 text-gray-500 hover:text-emerald-500 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span className="text-sm">Back</span>
+          <span className="text-sm">ย้อนกลับ</span>
         </motion.button>
       </div>
 
@@ -72,7 +72,7 @@ export default function BMIResultPage({ onBack }: BMIResultPageProps) {
               <Info className="w-8 h-8 text-emerald-600" />
             </div>
             <motion.h1 initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="text-5xl font-bold text-gray-800">Your BMI Result</motion.h1>
-            <p className="text-gray-500 text-lg">Based on your height and weight</p>
+            <p className="text-gray-500 text-lg">คำนวณจากส่วนสูงและน้ำหนักของคุณ</p>
           </div>
 
           <motion.button
@@ -82,7 +82,7 @@ export default function BMIResultPage({ onBack }: BMIResultPageProps) {
             className="mx-auto flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 hover:bg-emerald-200 transition-colors "
           >
             <Info className="w-4 h-4 text-emerald-600" />
-            <span className="text-sm font-medium text-emerald-600">What is BMI?</span>
+            <span className="text-sm font-medium text-emerald-600">BMI คืออะไร?</span>
           </motion.button>
 
           {showInfo && (
@@ -93,7 +93,7 @@ export default function BMIResultPage({ onBack }: BMIResultPageProps) {
                     <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
                       <Info className="w-5 h-5 text-emerald-600" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-800">What is BMI?</h3>
+                    <h3 className="text-xl font-bold text-gray-800">BMI คืออะไร?</h3>
                   </div>
                   <button
                     onClick={() => setShowInfo(false)}
@@ -104,17 +104,17 @@ export default function BMIResultPage({ onBack }: BMIResultPageProps) {
                 </div>
                 <div className="space-y-3 text-gray-600 text-sm text-left">
                   <p>
-                    <strong className="text-gray-800">Body Mass Index (BMI)</strong> <br/> is a simple calculation using a person's height and weight.
+                    <strong className="text-gray-800">ดัชนีมวลกาย (Body Mass Index: BMI)</strong> <br/> เป็นการคำนวณอย่างง่ายโดยใช้ส่วนสูงและน้ำหนักของบุคคล
                   </p>
                   <p>
-                    Formula: <span className="font-mono bg-gray-100 px-2 py-1 rounded">BMI = weight(kg) / [height(m)]²</span>
+                    สูตรคำนวณ: <span className="font-mono bg-gray-100 px-2 py-1 rounded">BMI = น้ำหนัก (กก.) / [ส่วนสูง (ม.)]²</span>
                   </p>
                   <p>
-                    BMI is a screening tool that can indicate whether a person is underweight, normal weight, overweight, or obese.
+                    BMI เป็นเครื่องมือคัดกรองที่ใช้ประเมินเบื้องต้นว่าน้ำหนักของบุคคลอยู่ในเกณฑ์น้ำหนักน้อย ปกติ น้ำหนักเกิน หรือโรคอ้วน
                   </p>
                   <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 mt-4">
                     <p className="text-emerald-800 text-xs">
-                      <strong>Note:</strong> <br/> BMI is not a diagnostic tool. It doesn't account for muscle mass, bone density, or overall body composition. Always consult with healthcare professionals for personalized advice.
+                      <strong>หมายเหตุ:</strong> <br/> BMI ไม่ใช่เครื่องมือสำหรับการวินิจฉัยโรค และไม่ได้คำนึงถึงมวลกล้ามเนื้อ ความหนาแน่นของกระดูก หรือองค์ประกอบของร่างกายโดยรวม ควรปรึกษาผู้เชี่ยวชาญด้านสุขภาพเพื่อรับคำแนะนำที่เหมาะสมกับคุณ
                     </p>
                   </div>
                 </div>
@@ -132,12 +132,12 @@ export default function BMIResultPage({ onBack }: BMIResultPageProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-              <p className="text-xs text-gray-500 mb-1">Height</p>
-              <p className="text-2xl font-bold text-gray-800">{height} <span className="text-sm font-normal text-gray-500">cm</span></p>
+              <p className="text-xs text-gray-500 mb-1">ส่วนสูง</p>
+              <p className="text-2xl font-bold text-gray-800">{height} <span className="text-sm font-normal text-gray-500">ซม.</span></p>
             </div>
             <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-              <p className="text-xs text-gray-500 mb-1">Weight</p>
-              <p className="text-2xl font-bold text-gray-800">{weight} <span className="text-sm font-normal text-gray-500">kg</span></p>
+              <p className="text-xs text-gray-500 mb-1">น้ำหนัก</p>
+              <p className="text-2xl font-bold text-gray-800">{weight} <span className="text-sm font-normal text-gray-500">กก.</span></p>
             </div>
           </div>
 
@@ -150,7 +150,7 @@ export default function BMIResultPage({ onBack }: BMIResultPageProps) {
                 </span>
                 <div className="text-left">
                   <p className="text-xl font-bold text-gray-800">{bmiCategory}</p>
-                  <p className="text-sm text-gray-500">kg/m²</p>
+                  <p className="text-sm text-gray-500">กก./ม²</p>
                 </div>
               </div>
             </div>
@@ -172,19 +172,19 @@ export default function BMIResultPage({ onBack }: BMIResultPageProps) {
 
               <div className="grid grid-cols-4 gap-1 text-center text-xs text-gray-600">
                 <div>
-                  <p className="font-semibold text-blue-600">Underweight</p>
+                  <p className="font-semibold text-blue-600">น้ำหนักน้อย</p>
                   <p className="text-[10px]">&lt;18.5</p>
                 </div>
                 <div>
-                  <p className="font-semibold text-green-600">Normal</p>
+                  <p className="font-semibold text-green-600">ปกติ</p>
                   <p className="text-[10px]">18.5-24.9</p>
                 </div>
                 <div>
-                  <p className="font-semibold text-yellow-600">Overweight</p>
+                  <p className="font-semibold text-yellow-600">น้ำหนักเกิน</p>
                   <p className="text-[10px]">25-29.9</p>
                 </div>
                 <div>
-                  <p className="font-semibold text-red-600">Obese</p>
+                  <p className="font-semibold text-red-600">โรคอ้วน</p>
                   <p className="text-[10px]">30+</p>
                 </div>
               </div>

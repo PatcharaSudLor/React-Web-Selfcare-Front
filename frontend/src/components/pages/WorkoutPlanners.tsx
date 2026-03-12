@@ -139,7 +139,7 @@ export default function WorkoutPlanner({ onHome }: WorkoutPlannerProps) {
             className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
-            <span className="text-sm font-medium">Back</span>
+            <span className="text-sm font-medium">ย้อนกลับ</span>
           </button>
         </div>
 
@@ -149,10 +149,11 @@ export default function WorkoutPlanner({ onHome }: WorkoutPlannerProps) {
 
           {/* Daily Free Time */}
           <div className="mb-8">
-            <h3 className="text-lg font-medium text-gray-700 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-medium text-gray-700 mb-1 flex items-center gap-2">
               <span className="text-pink-500">•</span>
               Daily Free Time
             </h3>
+            <p className="text-sm text-left text-gray-500 mb-4 ml-5">ระยะเวลาที่คุณว่างเพื่อใช้ในการออกกำลังกาย</p>
             <div className="flex gap-3 flex-wrap">
               {timeOptions.map((time) => (
                 <button
@@ -163,7 +164,7 @@ export default function WorkoutPlanner({ onHome }: WorkoutPlannerProps) {
                     : 'border-gray-300 text-gray-600 hover:border-emerald-300'
                     }`}
                 >
-                  {time} min
+                  {time} นาที/วัน
                 </button>
               ))}
             </div>
@@ -322,7 +323,7 @@ export default function WorkoutPlanner({ onHome }: WorkoutPlannerProps) {
           {/* Medical Condition */}
           <div className="mb-8">
             <h3 className="text-lg text-left font-medium text-gray-700 mb-3">Medical Condition</h3>
-            <p className="text-sm text-left text-gray-500 mb-4 ml-5">ปัญหาเกี่ยวกับสุขภาพที่ตัวเองเป็น / กำลังเป็นช่วงนี้ / ที่ต้องการระวังเป็นพิเศษ / เป้าหมายในการดูแลสุขภาพอื่นๆ</p>
+            <p className="text-sm text-left text-gray-500 mb-4 ml-5">ปัญหาเกี่ยวกับสุขภาพที่ตัวเองเป็น หรือ กำลังเป็นช่วงนี้ ที่ต้องการระวังเป็นพิเศษ / เป้าหมายในการดูแลสุขภาพอื่นๆ</p>
             <input
               type="text"
               value={medicalCondition}

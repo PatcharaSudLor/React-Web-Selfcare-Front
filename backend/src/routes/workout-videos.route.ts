@@ -121,10 +121,14 @@ router.get('/', async (req, res) => {
 
     })
 
-    // sort by score
-    scoredVideos.sort(
-      (a, b) => b.recommendation_score - a.recommendation_score
-    )
+    // sort by difficulty (beginner → intermediate → advanced), then by score
+    const difficultyOrder: Record<string, number> = { beginner: 0, intermediate: 1, advanced: 2 }
+    scoredVideos.sort((a, b) => {
+      const diffA = difficultyOrder[a.difficulty] ?? 99
+      const diffB = difficultyOrder[b.difficulty] ?? 99
+      if (diffA !== diffB) return diffA - diffB
+      return b.recommendation_score - a.recommendation_score
+    })
 
     // pagination
     const paginated = scoredVideos.slice(from, to)

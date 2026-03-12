@@ -47,13 +47,13 @@ const equipmentFilters = [
   { id: 'none', label: '🏠 ไม่ใช้อุปกรณ์' },
   { id: 'dumbbell', label: '🏋️ ดัมเบล' },
   { id: 'resistance-band', label: '🔗 ยางยืด' },
-  { id: 'machine', label: '⚙️ เครื่อง' },
+  { id: 'machine', label: '⚙️ เครื่องออกกำลังกาย' },
 ]
 
 const durationFilters = [
-  { id: '10-15', label: '⏱ 10-15 นาที' },
-  { id: '20-30', label: '⏱ 20-30 นาที' },
-  { id: '45+', label: '⏱ 45+ นาที' },
+  { id: 'under-15', label: '⏱ น้อยกว่า 15 นาที' },
+  { id: '15-30', label: '⏱ 15-30 นาที' },
+  { id: 'over-30', label: '⏱ มากกว่า 30 นาที' },
 ]
 
 function getDifficultyColor(difficulty: string) {

@@ -28,7 +28,7 @@ export default function RecipePage() {
     const [categoryFilter, setCategoryFilter] = useState('all')
     const [difficultyFilter, setDifficultyFilter] = useState('all')
     const [healthyTagFilter, setHealthyTagFilter] = useState('all')
-    const [sortBy, setSortBy] = useState('latest')
+    const [sortBy, setSortBy] = useState('calories')
     const [currentPage, setCurrentPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [totalCount, setTotalCount] = useState(0)

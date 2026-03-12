@@ -31,12 +31,10 @@ const categories = [
 export default function TipsPage() {
     const navigate = useNavigate()
     const [tips, setTips] = useState<Tip[]>([])
-    const [recommendedTips, setRecommendedTips] = useState<Tip[]>([])
     const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set())
     const [selectedCategory, setSelectedCategory] = useState('All')
     const [searchQuery, setSearchQuery] = useState('')
     const [isLoading, setIsLoading] = useState(true)
-    const [userGoal, setUserGoal] = useState('')
     const [debouncedSearch, setDebouncedSearch] = useState('')
 
     useEffect(() => {
@@ -46,13 +44,6 @@ export default function TipsPage() {
             if (!token) return
 
             const headers = { 'Authorization': `Bearer ${token}` }
-
-            // ดึง goal จาก workout preferences
-            const prefRes = await fetch(`${import.meta.env.VITE_API_URL}/api/workout/preferences`, { headers })
-            if (prefRes.ok) {
-                const pref = await prefRes.json()
-                setUserGoal(pref.goal ?? '')
-            }
 
             // ดึง bookmarks
             const bmRes = await fetch(`${import.meta.env.VITE_API_URL}/api/tips/bookmarks/list`, { headers })
@@ -74,25 +65,6 @@ export default function TipsPage() {
     useEffect(() => {
         fetchTips()
     }, [selectedCategory, debouncedSearch])
-
-    // fetch recommended แยก เมื่อ userGoal พร้อม
-    useEffect(() => {
-        if (!userGoal) return
-        const fetchRecommended = async () => {
-            const { data: { session } } = await supabase.auth.getSession()
-            const token = session?.access_token
-            if (!token) return
-            const res = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/tips?goal=${userGoal}`,
-                { headers: { 'Authorization': `Bearer ${token}` } }
-            )
-            if (res.ok) {
-                const data = await res.json()
-                setRecommendedTips(data.slice(0, 3))
-            }
-        }
-        fetchRecommended()
-    }, [userGoal])
 
     const fetchTips = async () => {
         setIsLoading(true)
@@ -133,7 +105,7 @@ export default function TipsPage() {
         }
     }
 
-    const featuredTip = recommendedTips[0] ?? tips[0]
+    const featuredTip = tips[0]
 
     return (
         <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_right,_#d7f6ef,_#f5f7fb_45%,_#eef2ff_100%)] pb-16">
@@ -143,11 +115,11 @@ export default function TipsPage() {
             <div className="relative mx-auto max-w-6xl px-4 py-7 sm:px-6 lg:px-8">
                 <div className="mb-5">
                     <button
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate('/home')}
                         className="flex items-center gap-2 text-emerald-600 transition-colors hover:text-emerald-700"
                     >
                         <ArrowLeft className="h-5 w-5" />
-                        <span className="text-sm font-medium">Back</span>
+                        <span className="text-sm font-medium">ย้อนกลับ</span>
                     </button>
                 </div>
 
@@ -254,52 +226,8 @@ export default function TipsPage() {
                     </div>
                 </section>
 
-                {selectedCategory === 'All' && !searchQuery && recommendedTips.length > 0 && (
-                    <section className="mb-10">
-                        <div className="mb-4 flex items-center justify-between gap-4">
-                            <div>
-                                <h2 className="text-lg font-bold text-slate-900">แนะนำสำหรับคุณ</h2>
-                                <p className="text-xs text-slate-500">คัดตามเป้าหมายสุขภาพของคุณ</p>
-                            </div>
-                        </div>
-
-                        <div className="-mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-                            <div
-                                className="flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-hide"
-                                style={{ scrollPaddingLeft: '16px' }}
-                            >
-                                {recommendedTips.map((tip) => (
-                                    <article
-                                        key={tip.id}
-                                        className="group relative h-[220px] w-[84vw] max-w-[360px] shrink-0 cursor-pointer snap-start overflow-hidden rounded-2xl border border-white/60 shadow-lg"
-                                        onClick={() => navigate(`/tips/${tip.id}`, { state: { tip } })}
-                                    >
-                                        <img
-                                            src={tip.image_url}
-                                            alt={tip.title_th}
-                                            className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                                            onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/600x338?text=No+Image' }}
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/20 to-transparent" />
-
-
-                                        <div className="absolute inset-x-0 bottom-0 p-4">
-                                            <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-medium text-emerald-200 backdrop-blur">
-                                                {tip.category_th}
-                                            </span>
-                                            <h3 className="mt-2 line-clamp-2 text-sm font-semibold leading-5 text-white">
-                                                {tip.title_th}
-                                            </h3>
-                                        </div>
-                                    </article>
-                                ))}
-                            </div>
-                        </div>
-                    </section>
-                )}
-
                 {isLoading ? (
-                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
                         {[1, 2, 3, 4, 5, 6].map(i => (
                             <div key={i} className="overflow-hidden rounded-2xl border border-slate-100 bg-white animate-pulse">
                                 <div className="aspect-video bg-slate-200" />
@@ -331,11 +259,11 @@ export default function TipsPage() {
                             <p className="text-xs text-slate-500">คลิกการ์ดเพื่ออ่านรายละเอียด</p>
                         </div>
 
-                        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
                             {tips.map(tip => (
-                                <article key={tip.id} className="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_10px_35px_-24px_rgba(15,23,42,0.8)] transition-all hover:-translate-y-1 hover:shadow-[0_22px_45px_-22px_rgba(15,23,42,0.55)]">
-                                    <button onClick={() => navigate(`/tips/${tip.id}`, { state: { tip } })} className="w-full text-left">
-                                        <div className="relative w-full aspect-[16/9] overflow-hidden">
+                                <article key={tip.id} className="group flex min-h-[580px] h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_10px_35px_-24px_rgba(15,23,42,0.8)] transition-all hover:-translate-y-1 hover:shadow-[0_22px_45px_-22px_rgba(15,23,42,0.55)]">
+                                    <button onClick={() => navigate(`/tips/${tip.id}`, { state: { tip } })} className="flex w-full flex-1 flex-col text-left">
+                                        <div className="relative w-full aspect-[5/4] overflow-hidden">
                                             <img
                                                 src={tip.image_url}
                                                 alt={tip.title_th}
@@ -348,14 +276,14 @@ export default function TipsPage() {
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className="p-4 pb-2">
-                                            <h3 className="mb-1.5 line-clamp-2 text-sm font-semibold text-slate-800 transition-colors group-hover:text-emerald-600">
+                                        <div className="flex-1 p-5 pb-3">
+                                            <h3 className="mb-2 line-clamp-2 text-base font-semibold text-slate-800 transition-colors group-hover:text-emerald-600">
                                                 {tip.title_th}
                                             </h3>
-                                            <p className="line-clamp-2 text-xs leading-relaxed text-slate-500">{tip.excerpt_th}</p>
+                                            <p className="line-clamp-3 text-sm leading-relaxed text-slate-500">{tip.excerpt_th}</p>
                                         </div>
                                     </button>
-                                    <div className="mt-1 flex items-center justify-between px-4 pb-4">
+                                    <div className="mt-auto flex items-center justify-between border-t border-slate-100 px-5 pt-4 pb-5">
                                         <div className="flex items-center gap-1 text-xs text-slate-400">
                                             <Clock className="h-3.5 w-3.5" />
                                             <span>{tip.read_time}</span>
@@ -372,7 +300,7 @@ export default function TipsPage() {
                                     </div>
                                     <button
                                         onClick={() => navigate(`/tips/${tip.id}`, { state: { tip } })}
-                                        className="flex w-full items-center justify-between border-t border-slate-100 px-4 py-2 text-xs font-medium text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
+                                        className="flex w-full items-center justify-between border-t border-slate-100 px-5 py-3.5 text-sm font-medium text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
                                     >
                                         อ่านต่อ
                                         <ArrowRight className="h-3.5 w-3.5" />

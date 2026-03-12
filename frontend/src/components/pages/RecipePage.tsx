@@ -135,7 +135,7 @@ export default function RecipePage() {
                         <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #059669, #34d399)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <ChefHat style={{ width: 20, height: 20, color: '#fff' }} />
                         </div>
-                        <span style={{ fontWeight: 800, fontSize: 18, color: '#111827' }}>สูตรอาหาร</span>
+                        <span style={{ fontWeight: 800, fontSize: 20, color: '#111827' }}>สูตรอาหาร</span>
                     </div>
 
                     {/* Search */}
@@ -168,11 +168,11 @@ export default function RecipePage() {
                     <div style={{ marginLeft: 'auto', display: 'flex', gap: 20 }}>
                         <div style={{ textAlign: 'center' }}>
                             <div style={{ fontSize: 18, fontWeight: 800, color: '#059669' }}>{totalCount}</div>
-                            <div style={{ fontSize: 11, color: '#9ca3af' }}>สูตรทั้งหมด</div>
+                            <div style={{ fontSize: 12, color: '#9ca3af' }}>สูตรทั้งหมด</div>
                         </div>
                         <div style={{ textAlign: 'center' }}>
                             <div style={{ fontSize: 18, fontWeight: 800, color: '#059669' }}>{bookmarkCount}</div>
-                            <div style={{ fontSize: 11, color: '#9ca3af' }}>บันทึกแล้ว</div>
+                            <div style={{ fontSize: 12, color: '#9ca3af' }}>บันทึกแล้ว</div>
                         </div>
                     </div>
                 </div>
@@ -187,7 +187,7 @@ export default function RecipePage() {
 
                         {/* Category */}
                         <div style={{ marginBottom: 28 }}>
-                            <h4 style={{ margin: '0 0 12px', fontSize: 12, fontWeight: 700, color: '#9ca3af', letterSpacing: '0.06em', textTransform: 'uppercase' }}>หมวดหมู่</h4>
+                            <h4 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700, color: '#9ca3af', letterSpacing: '0.06em', textTransform: 'uppercase' }}>หมวดหมู่</h4>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                 {CATEGORIES.map((cat) => (
                                     <button key={cat.key} onClick={() => setCategoryFilter(cat.key)}
@@ -207,7 +207,7 @@ export default function RecipePage() {
 
                         {/* Difficulty */}
                         <div style={{ marginBottom: 28 }}>
-                            <h4 style={{ margin: '0 0 12px', fontSize: 12, fontWeight: 700, color: '#9ca3af', letterSpacing: '0.06em', textTransform: 'uppercase' }}>ระดับความยาก</h4>
+                            <h4 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700, color: '#9ca3af', letterSpacing: '0.06em', textTransform: 'uppercase' }}>ระดับความยาก</h4>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                 {[
                                     { key: 'all', label: 'ทั้งหมด', color: '#6b7280' },
@@ -226,7 +226,7 @@ export default function RecipePage() {
 
                         {/* Healthy Tags */}
                         <div style={{ marginBottom: 28 }}>
-                            <h4 style={{ margin: '0 0 12px', fontSize: 12, fontWeight: 700, color: '#9ca3af', letterSpacing: '0.06em', textTransform: 'uppercase' }}>สุขภาพ</h4>
+                            <h4 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700, color: '#9ca3af', letterSpacing: '0.06em', textTransform: 'uppercase' }}>สุขภาพ</h4>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                 <button onClick={() => setHealthyTagFilter('all')}
                                     style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 14px', borderRadius: 12, border: 'none', cursor: 'pointer', textAlign: 'left', background: healthyTagFilter === 'all' ? '#ecfdf5' : 'transparent', color: healthyTagFilter === 'all' ? '#059669' : '#374151', fontWeight: healthyTagFilter === 'all' ? 700 : 400, fontSize: 14 }}>
@@ -254,7 +254,7 @@ export default function RecipePage() {
                         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <Filter style={{ width: 16, height: 16, color: '#9ca3af' }} />
-                                <span style={{ fontSize: 14, color: '#6b7280' }}>
+                                <span style={{ fontSize: 15, color: '#6b7280' }}>
                                     พบ <strong style={{ color: '#111827' }}>{totalCount}</strong> สูตรอาหาร
                                     {search && <span> สำหรับ "<strong>{search}</strong>"</span>}
                                 </span>
@@ -268,8 +268,8 @@ export default function RecipePage() {
                         ) : recipes.length === 0 ? (
                             <div style={{ textAlign: 'center', padding: '80px 24px', background: '#fff', borderRadius: 20, border: '1px solid #f3f4f6' }}>
                                 <Soup style={{ width: 56, height: 56, color: '#d1fae5', margin: '0 auto 16px' }} />
-                                <p style={{ color: '#6b7280', fontSize: 16, margin: 0 }}>ไม่พบสูตรอาหารที่ค้นหา</p>
-                                <p style={{ color: '#9ca3af', fontSize: 14, marginTop: 4 }}>ลองเปลี่ยนคำค้นหาหรือตัวกรอง</p>
+                                <p style={{ color: '#6b7280', fontSize: 18, margin: 0 }}>ไม่พบสูตรอาหารที่ค้นหา</p>
+                                <p style={{ color: '#9ca3af', fontSize: 16, marginTop: 4 }}>ลองเปลี่ยนคำค้นหาหรือตัวกรอง</p>
                                 <button onClick={clearFilters} style={{ marginTop: 16, padding: '8px 20px', borderRadius: 10, border: 'none', background: '#ecfdf5', color: '#059669', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
                                     ล้างตัวกรองทั้งหมด
                                 </button>

@@ -100,7 +100,7 @@ function RecipeCard({ recipe, isBookmarked, onSelect, onToggleBookmark }: {
                 {recipe.healthy_tags?.length > 0 && (
                     <div style={{ position: 'absolute', bottom: 10, left: 10, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                         {recipe.healthy_tags.slice(0, 2).map(tag => (
-                            <span key={tag} style={{ background: 'rgba(5,150,105,0.85)', color: '#fff', fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, backdropFilter: 'blur(4px)' }}>
+                            <span key={tag} style={{ background: 'rgba(5,150,105,0.85)', color: '#fff', fontSize: 12, fontWeight: 600, padding: '2px 8px', borderRadius: 99, backdropFilter: 'blur(4px)' }}>
                                 {tag}
                             </span>
                         ))}

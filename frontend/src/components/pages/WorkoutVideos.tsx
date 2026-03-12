@@ -28,6 +28,7 @@ const categories = [
   { id: 'core', label: '🧱 Core & Abs' },
   { id: 'cardio', label: '❤️ Cardio' },
   { id: 'stretching', label: '🧘 Stretching' },
+  { id: 'warm-up', label: '⚡ Warm-up' },
 ]
 
 const goalFilters = [

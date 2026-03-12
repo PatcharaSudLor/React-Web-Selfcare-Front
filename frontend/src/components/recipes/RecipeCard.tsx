@@ -12,12 +12,18 @@ import StarRating from "./StarRating"
 import type { Recipe } from "../../types/recipe"
 
 // ─── Recipe Card ──────────────────────────────────────────────────────────────
-function RecipeCard({ recipe, isBookmarked, onSelect, onToggleBookmark }: {
+function RecipeCard({ recipe, isBookmarked, activeTag, onSelect, onToggleBookmark }: {
     recipe: Recipe
     isBookmarked: boolean
+    activeTag: string // รับค่า filter ปัจจุบัน
     onSelect: () => void
     onToggleBookmark: (e: React.MouseEvent) => void
 }) {
+    const displayTags = [...(recipe.healthy_tags || [])].sort((a, b) => {
+    if (a === activeTag) return -1; // ถ้าชื่อ tag ตรงกับที่เลือก ให้ขยับไปหน้าสุด
+    if (b === activeTag) return 1;
+    return 0;
+    });
     const [imgError, setImgError] = useState(false)
     const diff = DIFFICULTY_CONFIG[recipe.difficulty as keyof typeof DIFFICULTY_CONFIG]
 
@@ -97,10 +103,16 @@ function RecipeCard({ recipe, isBookmarked, onSelect, onToggleBookmark }: {
                 </button>
 
                 {/* Healthy tags */}
-                {recipe.healthy_tags?.length > 0 && (
+                {displayTags?.length > 0 && (
                     <div style={{ position: 'absolute', bottom: 10, left: 10, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                        {recipe.healthy_tags.slice(0, 2).map(tag => (
-                            <span key={tag} style={{ background: 'rgba(5,150,105,0.85)', color: '#fff', fontSize: 12, fontWeight: 600, padding: '2px 8px', borderRadius: 99, backdropFilter: 'blur(4px)' }}>
+                        {displayTags.slice(0, 3).map(tag => (
+                            <span key={tag} style={{ background: tag === activeTag ? '#fde047' : 'rgba(5,150,105,0.85)', 
+                                color: tag === activeTag ? '#064e3b' : '#fff', 
+                                fontSize: 11, 
+                                fontWeight: 700, 
+                                padding: '2px 8px', 
+                                borderRadius: 99, 
+                                backdropFilter: 'blur(4px)' }}>
                                 {tag}
                             </span>
                         ))}

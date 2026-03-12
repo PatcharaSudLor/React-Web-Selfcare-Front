@@ -10,14 +10,14 @@ export const CATEGORIES = [
 ]
 
 export const HEALTHY_TAGS = [
-  { key: 'high-protein', label: '💪 High Protein' },
-  { key: 'low-carb', label: '🥑 Low Carb' },
-  { key: 'low-fat', label: '💧 Low Fat' },
-  { key: 'low-calorie', label: '🔥 Low Calorie' },
-  { key: 'vegan', label: '🌱 Vegan' },
-  { key: 'vegetarian', label: '🥦 Vegetarian' },
-  { key: 'gluten-free', label: '🍚 Gluten Free' },
-  { key: 'high-fiber', label: '🌾 High Fiber' },
+  { key: 'high-protein', label: '💪 โปรตีนสูง' },
+  { key: 'low-carb', label: '🥑 คาร์โบไฮเดรตต่ำ' },
+  { key: 'low-fat', label: '💧 ไขมันต่ำ' },
+  { key: 'low-calorie', label: '🔥 แคลอรี่ต่ำ' },
+  { key: 'vegan', label: '🌱 วีแกน' },
+  { key: 'vegetarian', label: '🥦 เวอร์จีเทเรียน' },
+  { key: 'gluten-free', label: '🍚 ไม่มีกลูเตน' },
+  { key: 'high-fiber', label: '🌾 ไฟเบอร์สูง' },
 ]
 
 export const LIMIT = 15

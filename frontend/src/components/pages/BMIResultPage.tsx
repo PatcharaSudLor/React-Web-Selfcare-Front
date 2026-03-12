@@ -124,7 +124,7 @@ export default function BMIResultPage({ onBack }: BMIResultPageProps) {
                   whileTap={{ scale: 0.98 }}
                   className="w-full mt-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-colors"
                 >
-                  Got it!
+                  เข้าใจแล้ว
                 </motion.button>
               </motion.div>
             </div>
@@ -143,7 +143,7 @@ export default function BMIResultPage({ onBack }: BMIResultPageProps) {
 
           <div className="bg-white rounded-2xl p-8 shadow-xl border-2" style={{ borderColor: getBMIColor(bmi) }}>
             <div className="text-center space-y-3 mb-6">
-              <p className="text-sm text-gray-500 uppercase tracking-wide">Your BMI</p>
+              <p className="text-sm text-gray-500 uppercase tracking-wide">ค่า BMI ของคุณ</p>
               <div className="flex items-center justify-center gap-4">
                 <span className="text-6xl font-bold" style={{ color: getBMIColor(bmi) }}>
                   {bmi.toFixed(1)}
@@ -206,7 +206,7 @@ export default function BMIResultPage({ onBack }: BMIResultPageProps) {
             transition={{ duration: 0.35, delay: 0.15 }}
             className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-semibold transition-all shadow-lg shadow-emerald-200 hover:shadow-xl"
           >
-            Continue
+            ไปต่อ
           </motion.button>
 
           <div className="flex items-center justify-center gap-2 pt-4">

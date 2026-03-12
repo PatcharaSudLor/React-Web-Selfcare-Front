@@ -35,35 +35,35 @@ export default function TDEEViewPage() {
   const activityLevels: ActivityLevelOption[] = [
     {
       id: 'sedentary',
-      label: 'Sedentary',
+      label: 'ไม่ค่อยเคลื่อนไหว',
       description: 'แทบไม่ได้ออกกำลังกาย',
       multiplier: 1.2,
       icon: '🪑'
     },
     {
       id: 'light',
-      label: 'Lightly Active',
+      label: 'เคลื่อนไหวเล็กน้อย',
       description: 'ออกกำลังกาย 1-3 วัน/สัปดาห์',
       multiplier: 1.375,
       icon: '🚶'
     },
     {
       id: 'moderate',
-      label: 'Moderately Active',
+      label: 'เคลื่อนไหวปานกลาง',
       description: 'ออกกำลังกาย 3-5 วัน/สัปดาห์',
       multiplier: 1.55,
       icon: '🏃'
     },
     {
       id: 'very',
-      label: 'Very Active',
+      label: 'เคลื่อนไหวมาก',
       description: 'ออกกำลังกาย 6-7 วัน/สัปดาห์',
       multiplier: 1.725,
       icon: '💪'
     },
     {
       id: 'extra',
-      label: 'Extra Active',
+      label: 'เคลื่อนไหวหนักมาก',
       description: 'ออกกำลังกายหนักมากทุกวัน',
       multiplier: 1.9,
       icon: '🔥'
@@ -114,7 +114,7 @@ export default function TDEEViewPage() {
               <Zap className="w-8 h-8 text-blue-600" />
             </div>
             <h1 className="text-5xl font-bold text-gray-800">Your TDEE Result</h1>
-            <p className="text-gray-500 text-lg">Total Daily Energy Expenditure</p>
+            <p className="text-gray-500 text-lg">พลังงานที่ใช้ต่อวันทั้งหมด</p>
           </div>
 
           <motion.button
@@ -124,7 +124,7 @@ export default function TDEEViewPage() {
             className="mx-auto flex items-center gap-2 px-5 py-3 rounded-2xl bg-blue-100 hover:bg-blue-200 transition-colors"
           >
             <Info className="w-5 h-5 text-blue-600" />
-            <span className="text-base font-semibold text-blue-600">What is TDEE?</span>
+            <span className="text-base font-semibold text-blue-600">TDEE คืออะไร?</span>
           </motion.button>
 
           {showInfo && (
@@ -140,7 +140,7 @@ export default function TDEEViewPage() {
                     <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
                       <Info className="w-6 h-6 text-blue-600" />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-800">What is TDEE?</h3>
+                    <h3 className="text-2xl font-bold text-gray-800">TDEE คืออะไร?</h3>
                   </div>
                   <button
                     onClick={() => setShowInfo(false)}
@@ -264,7 +264,7 @@ export default function TDEEViewPage() {
               </div>
 
               <p className="text-base uppercase tracking-wide opacity-90">
-                Your Total Daily Energy Expenditure
+                พลังงานที่ใช้ต่อวันทั้งหมดของคุณ
               </p>
 
               <div className="flex items-baseline justify-center gap-3">
@@ -290,7 +290,7 @@ export default function TDEEViewPage() {
               <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
                 <TrendingUp className="w-6 h-6 text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800">Your Calorie Goals</h3>
+              <h3 className="text-xl font-bold text-gray-800">เป้าหมายแคลอรี่ของคุณ</h3>
             </div>
 
             <div className="space-y-4">

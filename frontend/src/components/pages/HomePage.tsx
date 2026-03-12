@@ -54,7 +54,7 @@ export default function HomePage() {
           <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-8 shadow-lg text-white flex items-center justify-between">
             <div className="flex flex-col">
               <h1 className="text-3xl font-bold mb-2">
-                ยินดีต้อนรับกลับมา, {userInfo.username || 'User'}! 👋
+                ยินดีต้อนรับกลับมา, {userInfo.username || 'ผู้ใช้'}! 👋
               </h1>
               <p className="text-emerald-50 text-lg">
                 พร้อมดูแลสุขภาพของคุณวันนี้แล้วหรือยัง?
@@ -64,7 +64,7 @@ export default function HomePage() {
             <img
               onClick={() => navigate('/profile')}
               src={userInfo.avatarUrl || `https://ui-avatars.com/api/?name=${userInfo.username}`}
-              alt="avatar"
+              alt="รูปโปรไฟล์"
               className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-md cursor-pointer hover:scale-105 transition"
             />
           </div>
@@ -170,7 +170,7 @@ export default function HomePage() {
                       ? 'bg-emerald-600 w-6'
                       : 'bg-gray-300 w-2'
                       }`}
-                    aria-label={`Go to tip ${index + 1}`}
+                    aria-label={`ไปที่เคล็ดลับ ${index + 1}`}
                   />
                 ))}
               </div>

@@ -36,35 +36,35 @@ export default function TDEEViewPage() {
     {
       id: 'sedentary',
       label: 'Sedentary',
-      description: 'Little or no exercise',
+      description: 'แทบไม่ได้ออกกำลังกาย',
       multiplier: 1.2,
       icon: '🪑'
     },
     {
       id: 'light',
       label: 'Lightly Active',
-      description: 'Exercise 1-3 days/week',
+      description: 'ออกกำลังกาย 1-3 วัน/สัปดาห์',
       multiplier: 1.375,
       icon: '🚶'
     },
     {
       id: 'moderate',
       label: 'Moderately Active',
-      description: 'Exercise 3-5 days/week',
+      description: 'ออกกำลังกาย 3-5 วัน/สัปดาห์',
       multiplier: 1.55,
       icon: '🏃'
     },
     {
       id: 'very',
       label: 'Very Active',
-      description: 'Exercise 6-7 days/week',
+      description: 'ออกกำลังกาย 6-7 วัน/สัปดาห์',
       multiplier: 1.725,
       icon: '💪'
     },
     {
       id: 'extra',
       label: 'Extra Active',
-      description: 'Very intense exercise daily',
+      description: 'ออกกำลังกายหนักมากทุกวัน',
       multiplier: 1.9,
       icon: '🔥'
     }
@@ -98,7 +98,7 @@ export default function TDEEViewPage() {
           className="flex items-center gap-2 text-gray-500 hover:text-emerald-500 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span className="text-sm">Back</span>
+          <span className="text-sm">ย้อนกลับ</span>
         </motion.button>
       </div>
 
@@ -153,7 +153,7 @@ export default function TDEEViewPage() {
                 <div className="space-y-4 text-gray-600 text-base text-left">
                   <p>
                     <strong className="text-gray-800 ">Total Daily Energy Expenditure (TDEE)</strong> <br />
-                    is the total number of calories you burn in a day, including all activities.
+                    คือจำนวนแคลอรี่ทั้งหมดที่คุณเผาผลาญใน 1 วัน รวมทุกกิจกรรม
                   </p>
 
                   <div className="space-y-2">
@@ -166,17 +166,17 @@ export default function TDEEViewPage() {
                   <div>
                     <p className="font-semibold text-gray-800 mb-2">Your TDEE includes:</p>
                     <ul className="list-disc list-inside space-y-1 text-sm ml-2">
-                      <li>BMR (calories at rest)</li>
-                      <li>Exercise and physical activity</li>
-                      <li>Daily movements (walking, standing)</li>
-                      <li>Digestion (thermic effect of food)</li>
+                      <li>BMR (พลังงานที่ใช้ขณะพัก)</li>
+                      <li>การออกกำลังกายและกิจกรรมทางกาย</li>
+                      <li>การเคลื่อนไหวระหว่างวัน (เดิน ยืน)</li>
+                      <li>การย่อยอาหาร (ผลของความร้อนจากอาหาร)</li>
                     </ul>
                   </div>
 
                   <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
                     <p className="text-blue-800 text-sm">
-                      <strong>Note:</strong> To maintain your current weight, eat approximately your
-                      TDEE in calories. To lose weight, eat less. To gain weight, eat more.
+                      <strong>หมายเหตุ:</strong> หากต้องการคงน้ำหนักปัจจุบัน ควรรับพลังงานใกล้เคียงกับ
+                      TDEE ของคุณ หากต้องการลดน้ำหนักให้กินน้อยลง และหากต้องการเพิ่มน้ำหนักให้กินมากขึ้น
                     </p>
                   </div>
                 </div>
@@ -187,7 +187,7 @@ export default function TDEEViewPage() {
                   whileTap={{ scale: 0.98 }}
                   className="w-full mt-7 py-4 rounded-2xl bg-blue-500 hover:bg-blue-600 text-white font-bold text-lg transition-colors"
                 >
-                  Got it!
+                  เข้าใจแล้ว
                 </motion.button>
               </motion.div>
             </div>
@@ -199,9 +199,9 @@ export default function TDEEViewPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.15 }}
           >
-            <p className="text-sm text-gray-500 mb-1">Your BMR</p>
+            <p className="text-sm text-gray-500 mb-1">ค่า BMR ของคุณ</p>
             <p className="text-2xl font-bold text-gray-800">
-              {bmr} <span className="text-base font-normal text-gray-500">cal/day</span>
+              {bmr} <span className="text-base font-normal text-gray-500">แคลอรี่/วัน</span>
             </p>
           </motion.div>
 
@@ -212,7 +212,7 @@ export default function TDEEViewPage() {
             transition={{ duration: 0.6, delay: 0.22 }}
           >
             <label className="block text-base font-semibold text-gray-700">
-              Select Your Activity Level
+              เลือกระดับกิจกรรมของคุณ
             </label>
 
             <div className="space-y-4">
@@ -269,7 +269,7 @@ export default function TDEEViewPage() {
 
               <div className="flex items-baseline justify-center gap-3">
                 <span className="text-6xl font-bold">{tdee}</span>
-                <span className="text-xl font-medium opacity-90">calories/day</span>
+                <span className="text-xl font-medium opacity-90">แคลอรี่/วัน</span>
               </div>
 
               <div className="bg-white bg-opacity-20 rounded-2xl px-5 py-3 inline-block">
@@ -296,51 +296,51 @@ export default function TDEEViewPage() {
             <div className="space-y-4">
               <div className="bg-red-50 border border-red-200 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-base font-bold text-red-700">Weight Loss</p>
-                  <p className="text-sm text-red-600">-0.5 kg/week</p>
+                  <p className="text-base font-bold text-red-700">ลดน้ำหนัก</p>
+                  <p className="text-sm text-red-600">-0.5 กก./สัปดาห์</p>
                 </div>
                 <p className="text-3xl font-bold text-red-600">
-                  {weightLoss} <span className="text-base font-normal">cal/day</span>
+                  {weightLoss} <span className="text-base font-normal">แคลอรี่/วัน</span>
                 </p>
               </div>
 
               <div className="bg-orange-50 border border-orange-200 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-base font-bold text-orange-700">Mild Weight Loss</p>
-                  <p className="text-sm text-orange-600">-0.25 kg/week</p>
+                  <p className="text-base font-bold text-orange-700">ลดน้ำหนักเล็กน้อย</p>
+                  <p className="text-sm text-orange-600">-0.25 กก./สัปดาห์</p>
                 </div>
                 <p className="text-3xl font-bold text-orange-600">
-                  {mildWeightLoss} <span className="text-base font-normal">cal/day</span>
+                  {mildWeightLoss} <span className="text-base font-normal">แคลอรี่/วัน</span>
                 </p>
               </div>
 
               <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-base font-bold text-emerald-700">Maintain Weight</p>
-                  <p className="text-sm text-emerald-600">0 kg/week</p>
+                  <p className="text-base font-bold text-emerald-700">คงน้ำหนัก</p>
+                  <p className="text-sm text-emerald-600">0 กก./สัปดาห์</p>
                 </div>
                 <p className="text-3xl font-bold text-emerald-600">
-                  {maintainWeight} <span className="text-base font-normal">cal/day</span>
+                  {maintainWeight} <span className="text-base font-normal">แคลอรี่/วัน</span>
                 </p>
               </div>
 
               <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-base font-bold text-blue-700">Mild Weight Gain</p>
-                  <p className="text-sm text-blue-600">+0.25 kg/week</p>
+                  <p className="text-base font-bold text-blue-700">เพิ่มน้ำหนักเล็กน้อย</p>
+                  <p className="text-sm text-blue-600">+0.25 กก./สัปดาห์</p>
                 </div>
                 <p className="text-3xl font-bold text-blue-600">
-                  {mildWeightGain} <span className="text-base font-normal">cal/day</span>
+                  {mildWeightGain} <span className="text-base font-normal">แคลอรี่/วัน</span>
                 </p>
               </div>
 
               <div className="bg-purple-50 border border-purple-200 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-base font-bold text-purple-700">Weight Gain</p>
-                  <p className="text-sm text-purple-600">+0.5 kg/week</p>
+                  <p className="text-base font-bold text-purple-700">เพิ่มน้ำหนัก</p>
+                  <p className="text-sm text-purple-600">+0.5 กก./สัปดาห์</p>
                 </div>
                 <p className="text-3xl font-bold text-purple-600">
-                  {weightGain} <span className="text-base font-normal">cal/day</span>
+                  {weightGain} <span className="text-base font-normal">แคลอรี่/วัน</span>
                 </p>
               </div>
             </div>
@@ -357,8 +357,8 @@ export default function TDEEViewPage() {
               <span>Tip</span>
             </h3>
             <p className="text-base text-gray-700 leading-relaxed text-left">
-              These calorie goals are estimates. Monitor your progress and adjust as needed. <br /> For best results,
-              combine proper nutrition with regular exercise and adequate sleep.
+              เป้าหมายแคลอรี่เหล่านี้เป็นค่าประมาณ ควรติดตามผลลัพธ์ของตัวเองและปรับตามความเหมาะสม <br />
+              เพื่อผลลัพธ์ที่ดี ควรรับประทานอาหารให้เหมาะสม ควบคู่กับการออกกำลังกายสม่ำเสมอและนอนหลับให้เพียงพอ
             </p>
           </motion.div>
 
@@ -371,7 +371,7 @@ export default function TDEEViewPage() {
             transition={{ duration: 0.6, delay: 0.55 }}
             className="w-full py-5 rounded-2xl bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold text-lg transition-all shadow-lg shadow-emerald-200 hover:shadow-xl"
           >
-            Back To Home
+            กลับหน้าหลัก
           </motion.button>
 
           <motion.div

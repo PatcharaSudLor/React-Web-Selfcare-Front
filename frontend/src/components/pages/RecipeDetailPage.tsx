@@ -149,7 +149,7 @@ export default function RecipeDetailPage() {
     const progress = totalSteps > 0 ? Math.round((doneCount / totalSteps) * 100) : 0
 
     return (
-        <div style={{ minHeight: '100vh', background: '#f8faf9', paddingBottom: 80 }}>
+        <div style={{ minHeight: '100vh', background: '#f8faf9', paddingBottom: 80, marginTop: '10px' }}>
             <style>{`
                 @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
                 @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
@@ -217,20 +217,20 @@ export default function RecipeDetailPage() {
 
                 {/* Title overlay */}
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '24px 28px', animation: 'fadeUp 0.5s ease' }}>
-                    <p style={{ margin: '0 0 4px', fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>{recipe.name}</p>
-                    <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: '#fff', lineHeight: 1.25 }}>{recipe.name_th}</h1>
+                    <p style={{ margin: '0 0 4px', fontSize: 25, color: 'rgba(255,255,255,0.75)' }}>{recipe.name}</p>
+                    <h1 style={{ margin: 0, fontSize: 45, fontWeight: 800, color: '#fff', lineHeight: 1.25 }}>{recipe.name_th}</h1>
 
                     {/* Tags row */}
                     <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
-                        <span style={{ background: diff.bg, color: diff.color, padding: '3px 10px', borderRadius: 99, fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ background: diff.bg, color: diff.color, padding: '3px 10px', borderRadius: 99, fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
                             <span style={{ width: 6, height: 6, borderRadius: '50%', background: diff.dot, display: 'inline-block' }} />
                             {diff.label}
                         </span>
-                        <span style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(4px)', color: '#fff', padding: '3px 10px', borderRadius: 99, fontSize: 12 }}>
+                        <span style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(4px)', color: '#fff', padding: '3px 10px', borderRadius: 99, fontSize: 14 }}>
                             {recipe.category_th}
                         </span>
                         {recipe.healthy_tags?.slice(0, 3).map(tag => (
-                            <span key={tag} style={{ background: 'rgba(5,150,105,0.75)', backdropFilter: 'blur(4px)', color: '#fff', padding: '3px 10px', borderRadius: 99, fontSize: 12, fontWeight: 500 }}>
+                            <span key={tag} style={{ background: 'rgba(5,150,105,0.75)', backdropFilter: 'blur(4px)', color: '#fff', padding: '3px 10px', borderRadius: 99, fontSize: 14, fontWeight: 500 }}>
                                 {tag}
                             </span>
                         ))}
@@ -239,20 +239,20 @@ export default function RecipeDetailPage() {
             </div>
 
             {/* ── Content ── */}
-            <div style={{ maxWidth: 760, margin: '0 auto', padding: '28px 24px', animation: 'fadeUp 0.4s ease' }}>
+            <div style={{ maxWidth: 900, margin: '0 auto', padding: '28px 24px', animation: 'fadeUp 0.4s ease' }}>
 
                 {/* ── Stats Row ── */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 28 }}>
                     {[
-                        { icon: <Clock style={{ width: 18, height: 18, color: '#059669' }} />, label: 'เวลาทำ', value: recipe.cook_time },
-                        { icon: <Users style={{ width: 18, height: 18, color: '#3b82f6' }} />, label: 'จำนวน', value: `${recipe.servings} ที่` },
-                        { icon: <Flame style={{ width: 18, height: 18, color: '#f59e0b' }} />, label: 'แคลอรี่', value: `${recipe.calories} cal` },
-                        { icon: <Star style={{ width: 18, height: 18, color: '#f59e0b' }} fill="#f59e0b" />, label: 'Rating', value: recipe.rating > 0 ? `${recipe.rating}/5` : 'N/A' },
+                        { icon: <Clock style={{ width: 22, height: 22, color: '#059669' }} />, label: 'เวลาทำ', value: recipe.cook_time },
+                        { icon: <Users style={{ width: 22, height: 22, color: '#3b82f6' }} />, label: 'จำนวน', value: `${recipe.servings} ที่` },
+                        { icon: <Flame style={{ width: 22, height: 22, color: '#f59e0b' }} />, label: 'แคลอรี่', value: `${recipe.calories} cal` },
+                        { icon: <Star style={{ width: 22, height: 22, color: '#f59e0b' }} fill="#f59e0b" />, label: 'Rating', value: recipe.rating > 0 ? `${recipe.rating}/5` : 'N/A' },
                     ].map((s, i) => (
                         <div key={i} style={{ background: '#fff', borderRadius: 16, padding: '14px 12px', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', border: '1px solid #f3f4f6' }}>
                             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>{s.icon}</div>
-                            <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>{s.value}</div>
-                            <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{s.label}</div>
+                            <div style={{ fontSize: 20, fontWeight: 700, color: '#111827' }}>{s.value}</div>
+                            <div style={{ fontSize: 16, color: '#9ca3af', marginTop: 2 }}>{s.label}</div>
                         </div>
                     ))}
                 </div>
@@ -260,8 +260,8 @@ export default function RecipeDetailPage() {
                 {/* ── Nutrition Card ── */}
                 <div style={{ background: '#fff', borderRadius: 20, padding: '20px 24px', marginBottom: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', border: '1px solid #f3f4f6' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-                        <ChefHat style={{ width: 16, height: 16, color: '#059669' }} />
-                        <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>โภชนาการต่อหนึ่งที่</span>
+                        <ChefHat style={{ width: 22, height: 22, color: '#059669' }} />
+                        <span style={{ fontSize: 18, fontWeight: 700, color: '#111827' }}>โภชนาการต่อหนึ่งที่</span>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
                         {[
@@ -274,12 +274,12 @@ export default function RecipeDetailPage() {
                             return (
                                 <div key={n.label} style={{ background: n.bg, borderRadius: 14, padding: '14px 16px' }}>
                                     <div style={{ fontSize: 22, fontWeight: 800, color: n.color }}>{n.value}<span style={{ fontSize: 13, fontWeight: 500 }}>{n.unit}</span></div>
-                                    <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{n.label}</div>
+                                    <div style={{ fontSize: 17, color: '#6b7280', marginTop: 2 }}>{n.label}</div>
                                     {/* mini bar */}
                                     <div style={{ height: 4, background: 'rgba(0,0,0,0.08)', borderRadius: 99, marginTop: 8, overflow: 'hidden' }}>
                                         <div style={{ height: '100%', width: `${pct}%`, background: n.bar, borderRadius: 99, transition: 'width 0.8s ease' }} />
                                     </div>
-                                    <div style={{ fontSize: 10, color: n.color, marginTop: 4, fontWeight: 600 }}>{pct}%</div>
+                                    <div style={{ fontSize: 16, color: n.color, marginTop: 4, fontWeight: 600 }}>{pct}%</div>
                                 </div>
                             )
                         })}
@@ -295,7 +295,7 @@ export default function RecipeDetailPage() {
                         <button key={t.key} onClick={() => setActiveTab(t.key as 'ingredients' | 'steps')}
                             style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 12, border: '1.5px solid', borderColor: activeTab === t.key ? '#059669' : '#e5e7eb', background: activeTab === t.key ? '#059669' : '#fff', color: activeTab === t.key ? '#fff' : '#6b7280', cursor: 'pointer', fontSize: 14, fontWeight: 600, transition: 'all 0.2s' }}>
                             {t.label}
-                            <span style={{ background: activeTab === t.key ? 'rgba(255,255,255,0.25)' : '#f3f4f6', color: activeTab === t.key ? '#fff' : '#9ca3af', fontSize: 12, fontWeight: 700, padding: '1px 7px', borderRadius: 99 }}>
+                            <span style={{ background: activeTab === t.key ? 'rgba(255,255,255,0.25)' : '#f3f4f6', color: activeTab === t.key ? '#fff' : '#9ca3af', fontSize: 16, fontWeight: 700, padding: '1px 7px', borderRadius: 99 }}>
                                 {t.count}
                             </span>
                         </button>
@@ -306,16 +306,16 @@ export default function RecipeDetailPage() {
                 {activeTab === 'ingredients' && (
                     <div style={{ background: '#fff', borderRadius: 20, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', border: '1px solid #f3f4f6' }}>
                         <div style={{ padding: '16px 20px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <ShoppingBasket style={{ width: 16, height: 16, color: '#059669' }} />
-                            <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>วัตถุดิบทั้งหมด</span>
-                            <span style={{ marginLeft: 'auto', fontSize: 12, color: '#9ca3af' }}>สำหรับ {recipe.servings} ที่</span>
+                            <ShoppingBasket style={{ width: 22, height: 22, color: '#059669' }} />
+                            <span style={{ fontSize: 18, fontWeight: 700, color: '#111827' }}>วัตถุดิบทั้งหมด</span>
+                            <span style={{ marginLeft: 'auto', fontSize: 16, color: '#9ca3af' }}>สำหรับ {recipe.servings} ที่</span>
                         </div>
                         <div>
                             {recipe.ingredients?.map((ing, i) => (
                                 <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 20px', borderBottom: i < recipe.ingredients.length - 1 ? '1px solid #f9fafb' : 'none', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                         <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#059669', flexShrink: 0 }} />
-                                        <span style={{ fontSize: 14, color: '#374151' }}>{ing.item}</span>
+                                        <span style={{ fontSize: 17, color: '#374151' }}>{ing.item}</span>
                                     </div>
                                     <span style={{ fontSize: 13, fontWeight: 600, color: '#059669', background: '#ecfdf5', padding: '3px 10px', borderRadius: 99 }}>
                                         {ing.amount}
@@ -333,14 +333,14 @@ export default function RecipeDetailPage() {
                         {totalSteps > 0 && (
                             <div style={{ background: '#fff', borderRadius: 16, padding: '14px 20px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', border: '1px solid #f3f4f6' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                                    <span style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>ความคืบหน้า</span>
-                                    <span style={{ fontSize: 13, fontWeight: 700, color: '#059669' }}>{doneCount}/{totalSteps} ขั้นตอน ({progress}%)</span>
+                                    <span style={{ fontSize: 16, fontWeight: 600, color: '#374151' }}>ความคืบหน้า</span>
+                                    <span style={{ fontSize: 14, fontWeight: 700, color: '#059669' }}>{doneCount}/{totalSteps} ขั้นตอน ({progress}%)</span>
                                 </div>
                                 <div style={{ height: 6, background: '#f3f4f6', borderRadius: 99, overflow: 'hidden' }}>
                                     <div style={{ height: '100%', width: `${progress}%`, background: 'linear-gradient(90deg, #059669, #34d399)', borderRadius: 99, transition: 'width 0.4s ease' }} />
                                 </div>
                                 {progress === 100 && (
-                                    <div style={{ marginTop: 10, padding: '8px 12px', background: '#ecfdf5', borderRadius: 10, fontSize: 13, color: '#059669', fontWeight: 600, textAlign: 'center' }}>
+                                    <div style={{ marginTop: 10, padding: '8px 12px', background: '#ecfdf5', borderRadius: 10, fontSize: 16, color: '#059669', fontWeight: 600, textAlign: 'center' }}>
                                         🎉 เสร็จแล้ว! สนุกกับมื้ออาหารนะ
                                     </div>
                                 )}
@@ -361,14 +361,14 @@ export default function RecipeDetailPage() {
                                         {/* Step number / check */}
                                         <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
                                             {done
-                                                ? <CheckCircle2 style={{ width: 28, height: 28, color: '#059669' }} />
-                                                : <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#f3f4f6', border: '2px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    <span style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af' }}>{i + 1}</span>
+                                                ? <CheckCircle2 style={{ width: 31, height: 31, color: '#059669' }} />
+                                                : <div style={{ width: 31, height: 31, borderRadius: '50%', background: '#f3f4f6', border: '2px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <span style={{ fontSize: 17, fontWeight: 700, color: '#9ca3af' }}>{i + 1}</span>
                                                 </div>
                                             }
                                             {/* connector line */}
                                             {i < recipe.instructions.length - 1 && (
-                                                <div style={{ width: 2, flex: 1, minHeight: 16, background: done ? '#a7f3d0' : '#f3f4f6', borderRadius: 99 }} />
+                                                <div style={{ width: 4, flex: 1, minHeight: 16, background: done ? '#a7f3d0' : '#f3f4f6', borderRadius: 99 }} />
                                             )}
                                         </div>
 

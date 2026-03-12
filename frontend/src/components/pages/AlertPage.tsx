@@ -15,7 +15,7 @@ interface Alert {
 }
 
 interface AlertPage {
-    onBack:() => void;
+  onHome: () => void;
 }
 
 interface AlertCardProps {
@@ -43,51 +43,50 @@ function getTodayQuote() {
 }
 
 function AlertCard({ alert, answered, onAnswer, onEdit }: AlertCardProps) {
-    return (
-        <div className={`${alert.bgColor} rounded-2xl p-4 shadow-sm transition-all ${answered ? 'opacity-90' : ''}`}>
-            <div className="flex items-start gap-3 mb-3">
-                <div className={`w-11 h-11 ${alert.iconColor} rounded-xl flex items-center justify-center flex-shrink-0`}>
-                    {alert.icon}
-                </div>
-                <div className="flex-1">
-                    <p className="text-base text-gray-800 font-medium leading-snug">{alert.questionTh}</p>
-                    {alert.detail && (
-                        <p className="text-xs text-gray-500 mt-0.5">{alert.detail}</p>
-                    )}
-                </div>
-            </div>
-
-            {!answered ? (
-                <div className="flex gap-2">
-                    <button onClick={() => onAnswer(alert.id, 'yes')}
-                        className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2.5 rounded-xl transition-colors text-sm font-medium">
-                        ใช่ ฉันทำแล้ว ✓
-                    </button>
-                    <button onClick={() => onAnswer(alert.id, 'no')}
-                        className="flex-1 bg-white bg-opacity-70 hover:bg-opacity-100 text-gray-600 py-2.5 rounded-xl transition-colors text-sm font-medium border border-gray-200">
-                        ยังเลย
-                    </button>
-                </div>
-            ) : (
-                <div className="flex gap-2">
-                    <div className={`flex-1 text-center py-2.5 rounded-xl text-sm font-medium ${
-                        answered === 'yes'
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-orange-100 text-orange-700'
-                    }`}>
-                        {answered === 'yes' ? 'เยี่ยมมาก! 🎉' : 'ไว้ครั้งหน้านะ! 💪'}
-                    </div>
-                    <button onClick={() => onEdit(alert.id)}
-                        className="px-4 bg-white bg-opacity-70 hover:bg-opacity-100 text-gray-600 py-2.5 rounded-xl transition-colors text-sm border border-gray-200">
-                        แก้ไข
-                    </button>
-                </div>
-            )}
+  return (
+    <div className={`${alert.bgColor} rounded-2xl p-4 shadow-sm transition-all ${answered ? 'opacity-90' : ''}`}>
+      <div className="flex items-start gap-3 mb-3">
+        <div className={`w-11 h-11 ${alert.iconColor} rounded-xl flex items-center justify-center flex-shrink-0`}>
+          {alert.icon}
         </div>
-    )
+        <div className="flex-1">
+          <p className="text-base text-gray-800 font-medium leading-snug">{alert.questionTh}</p>
+          {alert.detail && (
+            <p className="text-xs text-gray-500 mt-0.5">{alert.detail}</p>
+          )}
+        </div>
+      </div>
+
+      {!answered ? (
+        <div className="flex gap-2">
+          <button onClick={() => onAnswer(alert.id, 'yes')}
+            className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2.5 rounded-xl transition-colors text-sm font-medium">
+            ใช่ ฉันทำแล้ว ✓
+          </button>
+          <button onClick={() => onAnswer(alert.id, 'no')}
+            className="flex-1 bg-white bg-opacity-70 hover:bg-opacity-100 text-gray-600 py-2.5 rounded-xl transition-colors text-sm font-medium border border-gray-200">
+            ยังเลย
+          </button>
+        </div>
+      ) : (
+        <div className="flex gap-2">
+          <div className={`flex-1 text-center py-2.5 rounded-xl text-sm font-medium ${answered === 'yes'
+              ? 'bg-emerald-100 text-emerald-700'
+              : 'bg-orange-100 text-orange-700'
+            }`}>
+            {answered === 'yes' ? 'เยี่ยมมาก! 🎉' : 'ไว้ครั้งหน้านะ! 💪'}
+          </div>
+          <button onClick={() => onEdit(alert.id)}
+            className="px-4 bg-white bg-opacity-70 hover:bg-opacity-100 text-gray-600 py-2.5 rounded-xl transition-colors text-sm border border-gray-200">
+            แก้ไข
+          </button>
+        </div>
+      )}
+    </div>
+  )
 }
 
-export default function AlertPage({onBack} : AlertPage) {
+export default function AlertPage({ onHome }: AlertPage) {
   const { userInfo } = useUser()
   const currentHour = new Date().getHours();
   const greetingTh = currentHour < 12 ? 'สวัสดีตอนเช้า' : currentHour < 18 ? 'สวัสดีตอนบ่าย' : 'สวัสดีตอนเย็น';
@@ -274,73 +273,75 @@ export default function AlertPage({onBack} : AlertPage) {
   )
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-gray-100">
+      <div className="w-full  max-w-2xl mx-auto px-4 py-6">
 
-      <div className="mb-6">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span className="text-sm font-medium">Back</span>
-        </button>
-      </div>
+        <div className="mb-1 mt-4">
+          <button
+            onClick={onHome}
+            className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="text-sm font-medium">Back</span>
+          </button>
+        </div>
 
-      <div className="mb-6">
-        <h2 className="text-3xl text-gray-800 mb-1">Daily Check-in</h2>
-        <p className="text-base text-gray-500">
-          {greetingTh}{userName ? `, ${userName}` : ''} 👋
-        </p>
-        <p className="text-sm text-gray-400 mt-0.5">ตรวจสอบกิจกรรมสุขภาพของคุณวันนี้</p>
-      </div>
+        <div className="mb-2">
+          <h2 className="text-3xl text-gray-800 mb-1">Daily Check-in</h2>
+          <p className="text-base text-gray-500">
+            {greetingTh}{userName ? `, ${userName}` : ''} 👋
+          </p>
+          <p className="text-sm text-gray-400 mt-0.5">ตรวจสอบกิจกรรมสุขภาพของคุณวันนี้</p>
+        </div>
 
-      <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-3xl p-6 mb-6 text-white shadow-lg">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="text-sm text-left opacity-80 mb-1">Daily Progress</p>
-            <p className="text-2xl font-semibold">
-              {completedCount === alerts.length ? 'ครบแล้ววันนี้! 🎉' : 'Keep Going! 💪'}
-            </p>
-          </div>
-          <div className="flex items-center gap-1.5 bg-white bg-opacity-20 rounded-2xl px-4 py-3">
-            <Flame className="w-5 h-5 text-orange-300" />
-            <div className="text-center">
-              <p className="text-2xl font-bold leading-none">{streak}</p>
-              <p className="text-xs opacity-80">day streak</p>
+        <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-3xl p-6 mb-6 text-white shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-sm text-left opacity-80 mb-1">Daily Progress</p>
+              <p className="text-2xl font-semibold">
+                {completedCount === alerts.length ? 'ครบแล้ววันนี้! 🎉' : 'Keep Going! 💪'}
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5 bg-white bg-opacity-20 rounded-2xl px-4 py-3">
+              <Flame className="w-5 h-5 text-orange-300" />
+              <div className="text-center">
+                <p className="text-2xl font-bold leading-none">{streak}</p>
+                <p className="text-xs opacity-80">day streak</p>
+              </div>
             </div>
           </div>
+
+          <div className="bg-white bg-opacity-20 rounded-full h-3 overflow-hidden mb-2">
+            <div className="bg-white h-full rounded-full transition-all duration-500"
+              style={{ width: `${progressPercentage}%` }} />
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-sm opacity-90">
+              ทำได้ <span className="font-semibold">{completedCount}</span> จาก {alerts.length} กิจกรรม
+            </p>
+            <p className="text-sm opacity-80">{Math.round(progressPercentage)}%</p>
+          </div>
         </div>
 
-        <div className="bg-white bg-opacity-20 rounded-full h-3 overflow-hidden mb-2">
-          <div className="bg-white h-full rounded-full transition-all duration-500"
-            style={{ width: `${progressPercentage}%` }} />
+        <div className="space-y-3">
+          {alerts.map(alert => (
+            <AlertCard
+              key={alert.id}
+              alert={alert}
+              answered={answeredAlerts[alert.id] || null}
+              onAnswer={handleAlertAnswer}
+              onEdit={handleEditAlert}
+            />
+          ))}
         </div>
-        <div className="flex items-center justify-between">
-          <p className="text-sm opacity-90">
-            ทำได้ <span className="font-semibold">{completedCount}</span> จาก {alerts.length} กิจกรรม
-          </p>
-          <p className="text-sm opacity-80">{Math.round(progressPercentage)}%</p>
-        </div>
-      </div>
 
-      <div className="space-y-3">
-        {alerts.map(alert => (
-          <AlertCard
-            key={alert.id}
-            alert={alert}
-            answered={answeredAlerts[alert.id] || null}
-            onAnswer={handleAlertAnswer}
-            onEdit={handleEditAlert}
-          />
-        ))}
-      </div>
-
-      <div className="mt-6 bg-gradient-to-r from-pink-50 to-orange-50 rounded-2xl p-5 border border-pink-200">
-        <div className="flex items-start gap-3">
-          <div className="text-2xl">💡</div>
-          <div>
-            <p className="text-sm text-left font-semibold text-gray-700 mb-1">Quote of the Day</p>
-            <p className="text-sm text-gray-500 italic leading-relaxed">"{getTodayQuote()}"</p>
+        <div className="mt-6 bg-gradient-to-r from-pink-50 to-orange-50 rounded-2xl p-5 border border-pink-200">
+          <div className="flex items-start gap-3">
+            <div className="text-2xl">💡</div>
+            <div>
+              <p className="text-sm text-left font-semibold text-gray-700 mb-1">Quote of the Day</p>
+              <p className="text-sm text-gray-500 italic leading-relaxed">"{getTodayQuote()}"</p>
+            </div>
           </div>
         </div>
       </div>

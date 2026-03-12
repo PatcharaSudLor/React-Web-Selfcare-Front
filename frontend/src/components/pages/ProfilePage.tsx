@@ -96,14 +96,14 @@ function getStrengthLabel(score: number) {
 }
 
 interface ProfilePageProps {
-  onBack: () => void;
+  onHome: () => void;
   profileImage: string;
   onLogout: () => void;
   email?: string;
   username?: string;
 }
 
-export default function ProfilePage({ onBack, profileImage, onLogout }: ProfilePageProps) {
+export default function ProfilePage({ onHome, profileImage, onLogout }: ProfilePageProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -398,7 +398,7 @@ export default function ProfilePage({ onBack, profileImage, onLogout }: ProfileP
         <div className="container mx-auto px-6 py-20 max-w-6xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <button onClick={onBack} className="p-2 rounded-lg hover:bg-emerald-50 transition-all duration-200 text-emerald-600 hover:text-emerald-700">
+              <button onClick={onHome} className="p-2 rounded-lg hover:bg-emerald-50 transition-all duration-200 text-emerald-600 hover:text-emerald-700">
                 <ArrowLeft className="w-6 h-6" />
               </button>
               <div>

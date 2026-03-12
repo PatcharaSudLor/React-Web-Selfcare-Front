@@ -1,7 +1,7 @@
 import { ArrowLeft, Share2, Dumbbell, Calendar, Loader2 } from 'lucide-react';
 import { supabase } from '../../utils/supabase';
 import type { WeeklyWorkoutPlan } from '../../utils/workoutGenerator';
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react';
 
 interface WorkoutScheduleProps {
@@ -12,10 +12,12 @@ interface WorkoutScheduleProps {
 
 export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: WorkoutScheduleProps) {
   const location = useLocation()
-
+  const navigate = useNavigate()
   const preferences = location.state?.preferences
   const loading = location.state?.loading
-  const [workoutPlan, setWorkoutPlan] = useState<WeeklyWorkoutPlan | null>(plan)
+  const [workoutPlan, setWorkoutPlan] = useState<WeeklyWorkoutPlan | null>(
+    loading ? null : plan
+  )
   const [hasGenerated, setHasGenerated] = useState(false)
 
   useEffect(() => {
@@ -112,9 +114,14 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
         day: item.day,
         dayTh: item.dayTh,
         workout: item.workout,
-        duration: String(item.duration),
-        exercises: item.exercises,
-      }));
+        duration: `${item.duration} นาที`,
+        exercises: item.exercises.map((ex: any) =>
+          typeof ex === 'string'
+            ? ex
+            : `${ex.name} (${ex.sets} x ${ex.reps})`
+        ),
+        color: dayCardColorMap[item.day] ?? 'border-gray-200 bg-gray-50'
+      }))
 
       const scheduleRes = await fetch(`${import.meta.env.VITE_API_URL}/api/workout/schedule`, {
         method: 'POST',
@@ -142,7 +149,15 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
       console.error('Save to API failed:', err);
     }
 
-    alert('บันทึกลงตารางเรียบร้อยแล้ว!');
+    navigate('/schedule', {
+      state: {
+        newWorkoutPlan: activePlanData
+      }
+    })
+
+    setTimeout(() => {
+      alert('บันทึกลงตารางเรียบร้อยแล้ว!');
+    }, 300)
   };
 
   const handleShare = () => {
@@ -156,7 +171,12 @@ export default function WorkoutSchedule({ onBack, plan, onSaveToSchedule }: Work
 
     const getExerciseLines = (exercises: any[]) => {
       if (exercises.length === 0) return ['Recovery / Stretching'];
-      return exercises.map((exercise) => `${exercise.name} (${exercise.sets} x ${exercise.reps})`);
+
+      return exercises.map((exercise) =>
+        typeof exercise === 'string'
+          ? exercise
+          : `${exercise.name} (${exercise.sets} x ${exercise.reps})`
+      );
     };
 
     const cardHeights = schedule.map((item) => {

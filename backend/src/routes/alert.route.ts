@@ -7,7 +7,7 @@ const router = express.Router()
 router.get('/checkins', async (req, res) => {
     try {
         const user_id = (req as any).user.id
-        const date = (req.query.date as string) || new Date().toISOString().split('T')[0]
+        const date = (req.query.date as string) || new Date().toLocaleDateString('en-CA')
 
         const { data, error } = await supabase
             .from('daily_checkins')
@@ -32,7 +32,7 @@ router.post('/checkins', async (req, res) => {
             .from('daily_checkins')
             .upsert({
                 user_id,
-                date: date || new Date().toISOString().split('T')[0],
+                date: date || new Date().toLocaleDateString('en-CA'),
                 category,
                 answered,
             }, { onConflict: 'user_id,date,category' })
@@ -60,15 +60,18 @@ router.get('/streak', async (req, res) => {
 
         if (error) return res.status(500).json({ error: error.message })
 
-        // นับ streak — วันติดต่อกันที่มี checkin อย่างน้อย 1 รายการ
-        const uniqueDates = [...new Set((data ?? []).map(d => d.date))].sort().reverse()
-        let streak = 0
-        const today = new Date().toISOString().split('T')[0]
+        const uniqueDates = [...new Set((data ?? []).map(d => d.date as string))]
+            .sort()
+            .reverse()
 
+        const today = new Date().toLocaleDateString('en-CA') // ✅ ประกาศ today ก่อนใช้
+
+        let streak = 0
         for (let i = 0; i < uniqueDates.length; i++) {
             const expected = new Date()
             expected.setDate(expected.getDate() - i)
-            const expectedStr = expected.toISOString().split('T')[0]
+            const expectedStr = expected.toLocaleDateString('en-CA')
+
             if (uniqueDates[i] === expectedStr) {
                 streak++
             } else {
@@ -76,7 +79,6 @@ router.get('/streak', async (req, res) => {
             }
         }
 
-        // ถ้าวันนี้ยังไม่มี checkin แต่เมื่อวานมี ก็ยัง streak อยู่
         const hasToday = uniqueDates[0] === today
         return res.json({ streak, hasToday })
     } catch (err) {

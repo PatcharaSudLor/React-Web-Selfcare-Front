@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Calendar, Dumbbell, Utensils, Sun, CloudSun, Moon, Trash2 } from 'lucide-react';
 import { supabase } from '../../utils/supabase';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface Workout {
     day: string;
@@ -50,19 +50,39 @@ export function SchedulePage() {
     const [mealPlan, setMealPlan] = useState<MealDay[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
-
+    const location = useLocation();
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const currentDay = daysOfWeek[selectedDate.getDay()];
+
+    useEffect(() => {
+
+        const newPlan = location.state?.newWorkoutPlan
+
+        if (newPlan) {
+
+            setWorkoutPlan(newPlan)
+
+            localStorage.setItem(
+                'active_workout_plan',
+                JSON.stringify(newPlan)
+            )
+
+            // ⭐ clear location state ป้องกัน rerender
+            navigate('/schedule', { replace: true })
+
+        }
+
+    }, [location.state, navigate])
 
     // Scroll to top when component mounts
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        
+
         const fetchPlans = async () => {
             // 1. ดึงข้อมูลจาก Cache (LocalStorage) มาแสดงก่อนทันที
             const cachedWorkout = localStorage.getItem('active_workout_plan');
             const cachedMeal = localStorage.getItem('active_meal_plan');
-            
+
             if (cachedWorkout) {
                 const parsed = JSON.parse(cachedWorkout);
                 if (Array.isArray(parsed) && parsed.length > 0) setWorkoutPlan(parsed);
@@ -71,17 +91,20 @@ export function SchedulePage() {
                 const parsed = JSON.parse(cachedMeal);
                 if (Array.isArray(parsed) && parsed.length > 0) setMealPlan(parsed);
             }
-            
+
             // ถ้ามีข้อมูลใน Cache แล้ว ให้หยุดหมุน Loader
-            if (cachedWorkout || cachedMeal) {
-                setIsLoading(false);
+            if (
+                (cachedWorkout && JSON.parse(cachedWorkout).length > 0) ||
+                (cachedMeal && JSON.parse(cachedMeal).length > 0)
+            ) {
+                setIsLoading(false)
             }
 
             const { data: { session } } = await supabase.auth.getSession()
             const token = session?.access_token
-            if (!token) { 
-                if (!cachedWorkout && !cachedMeal) setIsLoading(false); 
-                return; 
+            if (!token) {
+                if (!cachedWorkout && !cachedMeal) setIsLoading(false);
+                return;
             }
 
             const headers = { 'Authorization': `Bearer ${token}` }
@@ -152,13 +175,13 @@ export function SchedulePage() {
         if (res.ok) {
             // 1. ล้าง State
             setWorkoutPlan(null);
-            
+
             // 2. ล้าง LocalStorage ทั้งหมดที่เกี่ยวข้อง
             localStorage.removeItem('active_workout_plan');
             localStorage.removeItem('user_workout_plan');
             localStorage.removeItem('workout_plan');
             localStorage.removeItem('user_workout_preferences'); // เพิ่มคีย์อื่นๆ ที่อาจเกี่ยวข้อง
-            
+
             alert('ลบแผนออกกำลังกายเรียบร้อยแล้ว');
             // ไม่ต้องใช้ reload เพราะ React State อัตเดตแล้ว UI จะเปลี่ยนเอง
         } else {
@@ -180,12 +203,12 @@ export function SchedulePage() {
         if (res.ok) {
             // 1. ล้าง State
             setMealPlan(null);
-            
+
             // 2. ล้าง LocalStorage
             localStorage.removeItem('active_meal_plan');
             localStorage.removeItem('user_meal_plan');
             localStorage.removeItem('meal_plan');
-            
+
             alert('ลบแผนอาหารเรียบร้อยแล้ว');
         } else {
             const errData = await res.json().catch(() => ({}));

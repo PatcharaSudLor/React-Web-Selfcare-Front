@@ -171,7 +171,7 @@ export default function MealSchedule({ onBack, onSaveToSchedule, mealPlanData }:
 
         ctx.fillStyle = '#6b7280'
         ctx.font = '400 24px Arial'
-        ctx.fillText(`Budget per meal: ฿${budgetNumber}`, padding, padding + 72)
+        ctx.fillText(`Budget per meal: ฿${budget}`, padding, padding + 72)
         ctx.fillText(`Weekly total: ฿${totalWeeklyBudget}`, padding, padding + 106)
 
         let y = padding + headerHeight
@@ -270,7 +270,7 @@ export default function MealSchedule({ onBack, onSaveToSchedule, mealPlanData }:
             </div>
 
             <div className="flex-1 px-4 overflow-y-auto pb-6">
-                <div className="max-w-2xl mx-auto pt-4">
+                <div className="max-w-4xl mx-auto pt-4">
                     <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
                         <div className="flex items-center justify-center gap-3 mb-6">
                             <Utensils className="w-6 h-6 text-emerald-600" />

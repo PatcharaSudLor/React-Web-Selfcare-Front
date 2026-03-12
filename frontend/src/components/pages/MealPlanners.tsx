@@ -171,7 +171,7 @@ export default function MealPlanner({ onBack, onGeneratePlan }: MealPlannerProps
                 <span className="text-emerald-500 text-3xl">•</span>
                 <span className="text-xl">Liked Meals</span>
               </h3>
-              <p className="text-xm text-left text-gray-500 mb-4 ml-4">เลือกประเภทอาหารที่คุณชื่นชอบ</p>
+              <p className="text-xm text-left text-gray-500 mb-4 ml-4">เลือกประเภทอาหารที่คุณชื่นชอบ(ระบุได้มากกว่า 1 อย่าง)</p>
               <div className="grid grid-cols-3 gap-3">
                 {mealTypes.map((meal) => (
                   <button

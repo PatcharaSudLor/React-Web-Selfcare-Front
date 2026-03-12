@@ -14,18 +14,28 @@ router.get('/', async (req, res) => {
 
         let query = supabase.from('recipes').select('*', { count: 'exact' })
 
-        if (category) query = query.eq('category', category as string)
-        if (difficulty) query = query.eq('difficulty', difficulty as string)
-        if (search) query = query.or(`name_th.ilike.%${search}%,name.ilike.%${search}%`)
+        if (category && category !== 'all') {
+            query = query.eq('category', category as string)
+        }
+        
+        if (difficulty && difficulty !== 'all') {
+            query = query.eq('difficulty', difficulty as string)
+        }
 
-        // sort
+        if (healthy_tag && healthy_tag !== 'all') {
+            query = query.contains('healthy_tags', [healthy_tag])
+        }
+
+        if (search) {
+            query = query.or(`name_th.ilike.%${search}%,name.ilike.%${search}%`)
+        }
+
         switch (sort) {
-            case 'rating':     query = query.order('rating', { ascending: false }); break
-            case 'calories':   query = query.order('calories', { ascending: false }); break
-            case 'cook_time':  query = query.order('cook_time_minutes', { ascending: true }); break
-            case 'difficulty':
-                query = query.order('cook_time_minutes', { ascending: true }); break
-            default:           query = query.order('created_at', { ascending: false })
+            case 'rating':    query = query.order('rating', { ascending: false }); break
+            case 'calories':  query = query.order('calories', { ascending: false }); break
+            case 'cook_time': query = query.order('cook_time_minutes', { ascending: true }); break
+            case 'difficulty': query = query.order('cook_time_minutes', { ascending: true }); break
+            default:          query = query.order('created_at', { ascending: false })
         }
 
         query = query.range(offset, offset + limitNum - 1)
@@ -33,15 +43,8 @@ router.get('/', async (req, res) => {
         const { data, error, count } = await query
         if (error) return res.status(500).json({ error: error.message })
 
-        let filtered = data ?? []
-
-        // filter healthy_tag (array field) in JS
-        if (healthy_tag) {
-            filtered = filtered.filter((r: any) => r.healthy_tags?.includes(healthy_tag))
-        }
-
         return res.json({
-            data: filtered,
+            data: data ?? [],
             total: count ?? 0,
             totalPages: Math.ceil((count ?? 0) / limitNum),
             page: pageNum,

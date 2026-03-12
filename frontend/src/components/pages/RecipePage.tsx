@@ -11,10 +11,10 @@ import SkeletonCard from "../../components/recipes/SkeletonCard"
 
 const SORT_OPTIONS = [
     { key: 'latest', label: 'ล่าสุด' },
-    { key: 'rating', label: '⭐ Rating' },
-    { key: 'calories', label: '🔥 Calories' },
-    { key: 'cook_time', label: '⏱ Cook Time' },
-    { key: 'difficulty', label: '📊 Difficulty' },
+    { key: 'rating', label: '⭐ เรตติ้ง' },
+    { key: 'calories', label: '🔥 แคลอรี่' },
+    { key: 'cook_time', label: '⏱ เวลาปรุง' },
+    { key: 'difficulty', label: '📊 ความยาก' },
 ]
 
 
@@ -28,7 +28,7 @@ export default function RecipePage() {
     const [categoryFilter, setCategoryFilter] = useState('all')
     const [difficultyFilter, setDifficultyFilter] = useState('all')
     const [healthyTagFilter, setHealthyTagFilter] = useState('all')
-    const [sortBy, setSortBy] = useState('calories')
+    const [sortBy, setSortBy] = useState('latest')
     const [currentPage, setCurrentPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [totalCount, setTotalCount] = useState(0)
@@ -124,11 +124,11 @@ export default function RecipePage() {
     }
 
     return (
-        <div style={{ minHeight: '100vh', background: '#f8faf9', marginTop: 29}}>
+        <div style={{ minHeight: '100vh', background: '#f8faf9', marginTop: 29 }}>
             <style>{`@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
 
             {/* ── Sticky Nav ── */}
-            <div style={{ position: 'sticky', top: 64, zIndex: 40, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #e5e7eb', padding: '0 40px' }}>
+            <div style={{ position: 'sticky', top: 67, zIndex: 40, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #e5e7eb', padding: '0 40px' }}>
                 <div style={{ maxWidth: 1920, margin: '0 auto', height: 64, display: 'flex', alignItems: 'center', gap: 24 }}>
                     {/* Logo */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
@@ -180,10 +180,18 @@ export default function RecipePage() {
 
             {/* ── Content ── */}
             <div style={{ width: '100%', margin: '0 auto', padding: '12px 40px 32px' }}>
-                <div style={{ display: 'flex', gap: 32 }}>
+                <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
 
                     {/* ── Sidebar ── */}
-                    <aside style={{ width: 220, flexShrink: 0 }}>
+                    <aside style={{
+                        width: 220,
+                        flexShrink: 0,
+                        position: 'sticky',
+                        top: 131,              // header (64px) + nav (64px) = 128px
+                        alignSelf: 'flex-start',
+                        maxHeight: 'calc(100vh - 148px)',
+                        overflowY: 'auto'
+                    }}>
 
                         {/* Category */}
                         <div style={{ marginBottom: 28 }}>
@@ -281,6 +289,7 @@ export default function RecipePage() {
                                         key={recipe.id}
                                         recipe={recipe}
                                         isBookmarked={bookmarkedIds.has(recipe.id)}
+                                        activeTag={healthyTagFilter} // เพิ่ม prop นี้
                                         onSelect={() => navigate(`/recipes/${recipe.id}`, { state: { recipe } })}
                                         onToggleBookmark={(e) => toggleBookmark(e, recipe.id)}
                                     />

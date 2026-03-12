@@ -55,11 +55,6 @@ router.get('/', async (req, res) => {
       query = query.in('difficulty', levels)
     }
 
-    if (duration) {
-      const ranges = (duration as string).split(',')
-      query = query.in('duration_range', ranges)
-    }
-
     const { data, error } = await query
 
     if (error) {
@@ -67,6 +62,20 @@ router.get('/', async (req, res) => {
     }
 
     let videos = data ?? []
+
+    // filter by duration_minutes
+    if (duration) {
+      const ranges = (duration as string).split(',')
+      videos = videos.filter(v => {
+        const mins = v.duration_minutes
+        return ranges.some(r => {
+          if (r === 'under-15') return mins < 15
+          if (r === '15-30') return mins >= 15 && mins <= 30
+          if (r === 'over-30') return mins > 30
+          return false
+        })
+      })
+    }
 
     // filter array fields
     if (goal) {

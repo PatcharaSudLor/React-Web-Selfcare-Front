@@ -45,7 +45,7 @@ const difficultyFilters = [
 
 const equipmentFilters = [
   { id: 'none', label: '🏠 ไม่ใช้อุปกรณ์' },
-  { id: 'dumbbell', label: '🏋️ ดัมเบล' },
+  { id: 'dumbbell/kettlebell', label: '🏋️ ดัมเบล/เคตเทิลเบล' },
   { id: 'resistance-band', label: '🔗 ยางยืด' },
   { id: 'machine', label: '⚙️ เครื่องออกกำลังกาย' },
 ]

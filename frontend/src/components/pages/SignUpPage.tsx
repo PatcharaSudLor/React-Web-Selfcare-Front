@@ -67,6 +67,7 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
     const hasNumber = /[0-9]/.test(password);
     const hasLength = password.length >= 8;
     const isStrong = hasLower && hasUpper && hasNumber && hasLength;
+    const [showPolicy, setShowPolicy] = useState(false);
 
     const validateEmail = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -326,8 +327,15 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                             onChange={(e) => setAgreedToTerms(e.target.checked)}
                             className="w-5 h-5 lg:w-6 lg:h-6 rounded border-emerald-300 text-emerald-500 focus:ring-emerald-400 cursor-pointer flex-shrink-0"
                         />
-                        <label htmlFor="terms" className="text-sm lg:text-base text-emerald-300 cursor-pointer">
-                            I agree to the processing of <span className="font-semibold">Personal data</span>
+                        <label className="text-sm lg:text-base text-emerald-300">
+                            I agree to the processing of{" "}
+                            <button
+                                type="button"
+                                onClick={() => setShowPolicy(true)}
+                                className="font-semibold underline hover:text-emerald-500"
+                            >
+                                Personal data
+                            </button>
                         </label>
                     </motion.div>
 
@@ -411,6 +419,60 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                     </motion.p>
                 </motion.div>
             </div>
+            {showPolicy && (
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+                    <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl">
+
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">
+                            Privacy Policy
+                        </h2>
+
+                        <div className="text-sm text-gray-600 space-y-3 max-h-60 overflow-y-auto">
+                            <p>
+                                We collect and process your personal data to provide personalized
+                                health recommendations including workout and nutrition plans.
+                            </p>
+
+                            <p>
+                                Your data may include profile information, preferences,
+                                and health-related inputs that you provide voluntarily.
+                            </p>
+
+                            <p>
+                                Your data will never be sold to third parties and will only be used
+                                to improve your experience within the application.
+                            </p>
+
+                            <p>
+                                By continuing, you agree that your data may be securely stored
+                                and processed in accordance with our privacy practices.
+                            </p>
+                        </div>
+
+                        <div className="flex justify-end gap-3 mt-6">
+                            <button
+                                onClick={() => setShowPolicy(false)}
+                                className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200"
+                            >
+                                Close
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    setAgreedToTerms(true);
+                                    setShowPolicy(false);
+                                }}
+                                className="px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600"
+                            >
+                                Accept
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+            )}
         </motion.div>
     );
 }

@@ -26,8 +26,8 @@ const ChatPage: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [userPreferences, setUserPreferences] = useState<any>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const initialQuerySent = useRef(false);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // ฟังก์ชันดึงข้อมูล Preferences เดิมจาก API
   const fetchPreferences = async () => {
@@ -161,8 +161,10 @@ const ChatPage: React.FC = () => {
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  if (chatContainerRef.current) {
+    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+  }
+};
 
   useEffect(() => {
     scrollToBottom();
@@ -185,7 +187,7 @@ const ChatPage: React.FC = () => {
       {/* Header */}
       <div className="sticky top-16 z-50 bg-white border-b shadow-sm">
         <div className="max-w-4xl mx-auto p-4 flex items-center gap-3">
-          <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+          <button onClick={() => navigate('/home')} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
             <ChevronLeft size={24} className="text-gray-600" />
           </button>
           <div className="bg-green-100 p-2 rounded-lg">
@@ -215,9 +217,9 @@ const ChatPage: React.FC = () => {
       </div>
 
       {/* ช่องแชทโชว์ข้อความ */}
-      <div className="flex-1 flex justify-center p-6">
-        <div className="w-full max-w-4xl bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col h-[70vh]">
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 flex justify-center p-6 mt-3">
+        <div className="w-full max-w-4xl bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col h-[65vh]">
+          <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
                 <div className={`flex gap-3 max-w-[70%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
@@ -373,7 +375,6 @@ const ChatPage: React.FC = () => {
                 </div>
               </div>
             )}
-            <div ref={messagesEndRef} />
           </div>
         </div>
       </div>

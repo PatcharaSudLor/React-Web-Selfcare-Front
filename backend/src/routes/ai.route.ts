@@ -10,7 +10,11 @@ const router = express.Router()
 // --- API Key Rotation (เพื่อใช้ Key สำรองเมื่อ Key หลัก Quota เกิน) ---
 const API_KEYS = [
     process.env.GEMINI_API_KEY || '',
-    process.env.GEMINI_API_KEY_2 || ''
+    process.env.GEMINI_API_KEY_2 || '',
+    process.env.GEMINI_API_KEY_3 || '',
+    process.env.GEMINI_API_KEY_4 || '',
+    process.env.GEMINI_API_KEY_5 || '',
+    process.env.GEMINI_API_KEY_6 || ''
 ].filter(k => k !== '')
 
 let currentKeyIndex = 0

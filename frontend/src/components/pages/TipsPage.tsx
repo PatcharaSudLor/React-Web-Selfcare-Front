@@ -113,7 +113,7 @@ export default function TipsPage() {
             <div className="pointer-events-none absolute right-0 top-0 h-56 w-56 rounded-full bg-cyan-300/25 blur-3xl" />
 
             <div className="relative mx-auto max-w-6xl px-4 py-7 sm:px-6 lg:px-8">
-                <div className="mb-5">
+                <div className="mb-3 mt-2">
                     <button
                         onClick={() => navigate('/home')}
                         className="flex items-center gap-2 text-emerald-600 transition-colors hover:text-emerald-700"

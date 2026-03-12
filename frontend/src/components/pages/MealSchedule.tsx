@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Share2, Utensils, Sun, CloudSun, Moon, Calendar } from 'lucide-react'
+import { ArrowLeft, Share2, Utensils, Sun, CloudSun, Moon, Calendar, Loader2 } from 'lucide-react'
 import type { MealPlanData } from './MealPlanners'
 import { supabase } from '../../utils/supabase'
 
@@ -255,8 +255,53 @@ export default function MealSchedule({ onBack, onSaveToSchedule, mealPlanData }:
     )
 
     if (isLoading) return (
-        <div className="fixed inset-0 flex items-center justify-center bg-white">
-            <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center justify-center min-h-screen w-full bg-gradient-to-br from-emerald-50 to-white">
+
+            <div className="bg-white shadow-xl rounded-2xl p-10 w-[520px] text-center space-y-6">
+
+                {/* Spinner */}
+                <div className="flex justify-center">
+                    <Loader2 className="w-12 h-12 animate-spin text-emerald-500" />
+                </div>
+
+                {/* Title */}
+                <div>
+                    <h2 className="text-xl font-bold text-gray-800">
+                        AI กำลังสร้างแผนโภชนาการสำหรับคุณ
+                    </h2>
+
+                    <p className="text-gray-500 text-sm mt-1">
+                        กรุณารอสักครู่ ระบบกำลังวิเคราะห์ข้อมูลเพื่อจัดแผนอาหารที่เหมาะกับคุณ
+                    </p>
+                </div>
+
+                {/* Progress Steps */}
+                <div className="space-y-3 text-left">
+
+                    <div className="flex items-center gap-3 text-gray-600">
+                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                        กำลังวิเคราะห์ข้อมูลสุขภาพและความต้องการโภชนาการของคุณ
+                    </div>
+
+                    <div className="flex items-center gap-3 text-gray-600">
+                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                        กำลังคำนวณพลังงานและสารอาหารที่เหมาะสมสำหรับคุณ
+                    </div>
+
+                    <div className="flex items-center gap-3 text-gray-600">
+                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                        กำลังเลือกเมนูอาหารที่สมดุลและเหมาะกับเป้าหมายของคุณ
+                    </div>
+
+                    <div className="flex items-center gap-3 text-gray-600">
+                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                        กำลังจัดทำแผนอาหารเฉพาะบุคคลของคุณให้เสร็จสมบูรณ์
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
     )
 

@@ -31,11 +31,11 @@ router.post('/setup', async (req, res) => {
         const bmi = parseFloat(bmiValue.toFixed(1))
 
         let bmiCategory = ''
-        if (bmiValue < 18.5) bmiCategory = 'UnderWeight'
-        else if (bmiValue < 25) bmiCategory = 'Normal'
-        else if (bmiValue < 30) bmiCategory = 'OverWeight'
-        else if (bmiValue < 35) bmiCategory = 'Obese'
-        else bmiCategory = 'Morbidly Obese'
+        if (bmiValue < 18.5) bmiCategory = 'น้ำหนักน้อย'
+        else if (bmiValue < 25) bmiCategory = 'ปกติ'
+        else if (bmiValue < 30) bmiCategory = 'น้ำหนักเกิน'
+        else if (bmiValue < 35) bmiCategory = 'โรคอ้วน'
+        else bmiCategory = 'อ้วนมาก'
 
         const { error } = await supabase
             .from('user_profile')

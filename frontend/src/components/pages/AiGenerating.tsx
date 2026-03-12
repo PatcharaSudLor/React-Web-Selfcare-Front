@@ -14,11 +14,11 @@ export default function AiGenerating() {
         {/* Title */}
         <div>
           <h2 className="text-xl font-bold text-gray-800">
-            AI is generating your workout plan
+            AI กำลังสร้างแผนการออกกำลังกายของคุณ
           </h2>
 
           <p className="text-gray-500 text-sm mt-1">
-            This may take a few seconds
+            อาจใช้เวลาสักครู่
           </p>
         </div>
 
@@ -27,22 +27,22 @@ export default function AiGenerating() {
 
           <div className="flex items-center gap-3 text-gray-600">
             <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-            Analyzing your body type
+            กำลังวิเคราะห์สรีระร่างกายของคุณ
           </div>
 
           <div className="flex items-center gap-3 text-gray-600">
             <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-            Creating weekly workout structure
+            กำลังจัดโครงสร้างตารางออกกำลังกายรายสัปดาห์
           </div>
 
           <div className="flex items-center gap-3 text-gray-600">
             <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-            Optimizing exercises for your goal
+            กำลังปรับการออกกำลังกายให้เหมาะกับเป้าหมายของคุณ
           </div>
 
           <div className="flex items-center gap-3 text-gray-600">
             <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-            Finalizing your personalized plan
+            กำลังจัดทำแผนเฉพาะบุคคลของคุณให้เสร็จสมบูรณ์
           </div>
 
         </div>

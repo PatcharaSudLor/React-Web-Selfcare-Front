@@ -6,7 +6,7 @@ import {
   Lightbulb,
   X,
   Calendar,
-  Heart,
+  Bookmark,
   MessageCircle,
   User,
   LogOut,
@@ -23,21 +23,21 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  { id: 'home', path: '/home', label: 'Home', icon: Home },
-  { id: 'workout', path: '/workouts/planner', label: 'Workout', icon: Dumbbell },
-  { id: 'meal', path: '/meals/planner', label: 'Meal', icon: UtensilsCrossed },
-  { id: 'recipe', path: '/recipes', label: 'Recipes', icon: CookingPot },
-  { id: 'video', path: '/workouts/videos?part=upper-body', label: 'Videos', icon: PlayCircle },
-  { id: 'alerts', path: '/alerts', label: 'Alerts', icon: Bell },
-  { id: 'tips', path: '/tips', label: 'Tips', icon: Lightbulb },
-  { id: 'schedule', path: '/schedule', label: 'Schedule', icon: Calendar },
-  { id: 'favorite', path: '/favorite', label: 'Favorite', icon: Heart },
-  { id: 'assistant', path: '/chat', label: 'Assistant', icon: MessageCircle },
+  { id: 'home', path: '/home', label: 'หน้าหลัก', icon: Home },
+  { id: 'workout', path: '/workouts/planner', label: 'ตารางออกกำลังกาย', icon: Dumbbell },
+  { id: 'meal', path: '/meals/planner', label: 'ตารางอาหาร', icon: UtensilsCrossed },
+  { id: 'recipe', path: '/recipes', label: 'สูตรอาหาร', icon: CookingPot },
+  { id: 'video', path: '/workouts/videos?part=upper-body', label: 'วิดีโอออกกำลังกาย', icon: PlayCircle },
+  { id: 'alerts', path: '/alerts', label: 'แจ้งเตือน', icon: Bell },
+  { id: 'tips', path: '/tips', label: 'เกร็ดความรู้', icon: Lightbulb },
+  { id: 'schedule', path: '/schedule', label: 'ตารางทั้งหมด', icon: Calendar },
+  { id: 'favorite', path: '/favorite', label: 'ที่บันทึกไว้', icon: Bookmark },
+  { id: 'assistant', path: '/chat', label: 'แชทกับผู้ช่วย AI', icon: MessageCircle },
 ]
 
 const bottomItems = [
-  { id: 'profile', path: '/profile', label: 'Profile', icon: User },
-  { id: 'logout', label: 'Logout', icon: LogOut },
+  { id: 'profile', path: '/profile', label: 'โปรไฟล์', icon: User },
+  { id: 'logout', label: 'ออกจากระบบ', icon: LogOut },
 ]
 
 export default function Sidebar({ isOpen, onClose, currentPage, onNavigate, onLogout }: SidebarProps) {

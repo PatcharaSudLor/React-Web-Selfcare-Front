@@ -49,7 +49,7 @@ export default function UserInfoPage({ onBack }: UserInfoPageProps) {
 
   const handleConfirm = async () => {
     if (!username || !gender || !height || !weight || !age || !bloodType) {
-      alert('Please fill in all fields');
+      alert('กรุณากรอกข้อมูลให้ครบทุกช่อง');
       return;
     }
 
@@ -59,7 +59,7 @@ export default function UserInfoPage({ onBack }: UserInfoPageProps) {
     const ageNum = parseInt(age, 10);
 
     if (isNaN(heightNum) || isNaN(weightNum) || isNaN(ageNum)) {
-      alert('Invalid number input');
+      alert('กรุณากรอกตัวเลขให้ถูกต้อง');
       return;
     }
 
@@ -69,7 +69,7 @@ export default function UserInfoPage({ onBack }: UserInfoPageProps) {
 
       //Token validate
       if (!token) {
-        alert('Session expired, please login again')
+        alert('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่อีกครั้ง')
         navigate('/')
         return
       }
@@ -96,7 +96,7 @@ export default function UserInfoPage({ onBack }: UserInfoPageProps) {
       const result = await response.json();
 
       if (!response.ok) {
-        alert(result.error || 'Failed to save user info.');
+        alert(result.error || 'ไม่สามารถบันทึกข้อมูลผู้ใช้ได้');
         return;
       }
 
@@ -118,7 +118,7 @@ export default function UserInfoPage({ onBack }: UserInfoPageProps) {
 
     } catch (err) {
       console.error('Unexpected error saving to Supabase:', err);
-      alert('Failed to save user info. Please try again.');
+      alert('ไม่สามารถบันทึกข้อมูลผู้ใช้ได้ กรุณาลองใหม่อีกครั้ง');
       return;
     }
   };
@@ -133,7 +133,7 @@ export default function UserInfoPage({ onBack }: UserInfoPageProps) {
           className="flex items-center gap-2 text-gray-500 hover:text-emerald-500 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span className="text-sm">Back</span>
+          <span className="text-sm">ย้อนกลับ</span>
         </motion.button>
       </div>
 
@@ -144,23 +144,23 @@ export default function UserInfoPage({ onBack }: UserInfoPageProps) {
               <Activity className="w-8 h-8 text-emerald-600" />
             </div>
             <h1 className="text-5xl font-bold text-gray-800">Tell Us About Yourself</h1>
-            <p className="text-gray-500 text-lg">Help us personalize your health journey</p>
+            <p className="text-gray-500 text-lg">ช่วยให้เราปรับแผนสุขภาพให้เหมาะกับคุณมากขึ้น</p>
           </motion.div>
 
           <motion.div className="space-y-3" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
-            <label className="block text-base font-semibold text-gray-700 text-left -mt-6">Username</label>
-            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Enter your username" className="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all text-gray-700 text-lg" />
+            <label className="block text-base font-semibold text-gray-700 text-left -mt-6">ชื่อผู้ใช้</label>
+            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="กรอกชื่อผู้ใช้ของคุณ" className="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all text-gray-700 text-lg" />
           </motion.div>
 
           <motion.div className="space-y-3 " initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.3 }}>
-            <label className="block text-base font-semibold text-gray-700 text-left -mt-6">Gender</label>
+            <label className="block text-base font-semibold text-gray-700 text-left -mt-6">เพศ</label>
             <div className="grid grid-cols-2 gap-5 ">
               <motion.button onClick={() => setGender('male')} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className={`p-8 rounded-3xl border-2 transition-all ${gender === 'male' ? 'border-blue-400 bg-blue-50 shadow-lg' : 'border-gray-200 bg-white hover:border-blue-200'}`}>
                 <div className="flex flex-col items-center gap-4">
                   <div className={`w-16 h-16 rounded-full flex items-center justify-center ${gender === 'male' ? 'bg-blue-400' : 'bg-gray-200'}`}>
                     <MaleIcon className={`w-8 h-8 ${gender === 'male' ? 'text-white' : 'text-gray-500'}`} />
                   </div>
-                  <span className={`font-semibold text-lg ${gender === 'male' ? 'text-blue-600' : 'text-gray-600'}`}>Male</span>
+                  <span className={`font-semibold text-lg ${gender === 'male' ? 'text-blue-600' : 'text-gray-600'}`}>ชาย</span>
                 </div>
               </motion.button>
 
@@ -169,7 +169,7 @@ export default function UserInfoPage({ onBack }: UserInfoPageProps) {
                   <div className={`w-16 h-16 rounded-full flex items-center justify-center ${gender === 'female' ? 'bg-pink-400' : 'bg-gray-200'}`}>
                     <FemaleIcon className={`w-8 h-8 ${gender === 'female' ? 'text-white' : 'text-gray-500'}`} />
                   </div>
-                  <span className={`font-semibold text-lg ${gender === 'female' ? 'text-pink-600' : 'text-gray-600'}`}>Female</span>
+                  <span className={`font-semibold text-lg ${gender === 'female' ? 'text-pink-600' : 'text-gray-600'}`}>หญิง</span>
                 </div>
               </motion.button>
             </div>
@@ -177,24 +177,24 @@ export default function UserInfoPage({ onBack }: UserInfoPageProps) {
 
           <motion.div className="grid grid-cols-2 gap-5 " initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.4 }}>
             <div className="space-y-3">
-              <label className="block text-base font-semibold text-gray-700 text-left -mt-5">Height (cm)</label>
+              <label className="block text-base font-semibold text-gray-700 text-left -mt-5">ส่วนสูง (ซม.)</label>
               <input type="number" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="170" className="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all text-gray-700 text-lg" />
             </div>
             <div className="space-y-3">
-              <label className="block text-base font-semibold text-gray-700 text-left -mt-5">Age</label>
+              <label className="block text-base font-semibold text-gray-700 text-left -mt-5">อายุ</label>
               <input type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="25" className="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all text-gray-700 text-lg" />
             </div>
           </motion.div>
 
           <motion.div className="grid grid-cols-2 gap-5" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.5 }}>
             <div className="space-y-3">
-              <label className="block text-base font-semibold text-gray-700 text-left -mt-5">Weight (kg)</label>
+              <label className="block text-base font-semibold text-gray-700 text-left -mt-5">น้ำหนัก (กก.)</label>
               <input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="65" className="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all text-gray-700 text-lg" />
             </div>
             <div className="space-y-3">
-              <label className="block text-base font-semibold text-gray-700 text-left -mt-5">Blood Type</label>
+              <label className="block text-base font-semibold text-gray-700 text-left -mt-5">กรุ๊ปเลือด</label>
               <select value={bloodType} onChange={(e) => setBloodType(e.target.value)} className="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all text-gray-700 bg-white appearance-none cursor-pointer text-lg" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', paddingRight: '36px' }}>
-                <option value="">Select</option>
+                <option value="">กรุณาเลือก</option>
                 {bloodTypes.map((type) => <option key={type} value={type}>{type}</option>)}
               </select>
             </div>

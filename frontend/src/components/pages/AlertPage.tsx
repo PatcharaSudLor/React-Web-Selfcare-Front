@@ -25,7 +25,6 @@ interface AlertCardProps {
   onEdit: (alertId: string) => void;
 }
 
-// ข้อ 2 — quotes แบบ dynamic สุ่มทุกวัน
 const quotes = [
   'การดูแลสุขภาพของตัวเองคือการลงทุนที่คุ้มค่าที่สุด',
   'ทุกก้าวเล็กๆ คือความก้าวหน้าที่ยิ่งใหญ่',
@@ -98,10 +97,6 @@ export default function AlertPage({onBack} : AlertPage) {
   const [streak, setStreak] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
 
-  // ข้อ 3 — alerts personalize ตาม goal ของ user
-  // goal: lose = เน้น exercise, nutrition, hydration
-  // goal: gain = เน้น exercise, nutrition, sleep
-  // goal: maintain = ครบทุกอย่าง
   const allAlerts: Alert[] = [
     {
       id: '1',
@@ -134,7 +129,7 @@ export default function AlertPage({onBack} : AlertPage) {
       questionTh: 'วันนี้ทานผักผลไม้แล้วหรือยัง?',
       detail: 'แนะนำ: 5 ส่วนต่อวัน',
       category: 'nutrition',
-      goals: ['lose', 'gain'], // เน้นเฉพาะ lose และ gain
+      goals: ['lose', 'gain'],
     },
     {
       id: '5',
@@ -162,12 +157,22 @@ export default function AlertPage({onBack} : AlertPage) {
     },
   ]
 
-  // ข้อ 3 — filter alerts ตาม goal
-  // TODO: ดึง goal จาก workout_preferences เหมือนที่ทำใน WorkoutVideos
-  // ตอนนี้ใช้ userInfo ก่อน แล้วค่อย migrate
-  const alerts = allAlerts // แสดงทั้งหมดก่อน ปรับได้ทีหลัง
+  const alerts = allAlerts
 
-  // Fetch today's checkins + streak
+  // ✅ แยก fetchStreak ออกมาเพื่อเรียกซ้ำได้
+  const fetchStreak = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    const token = session?.access_token
+    if (!token) return
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/alerts/streak`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    if (res.ok) {
+      const data = await res.json()
+      setStreak(data.streak)
+    }
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true)
@@ -176,7 +181,7 @@ export default function AlertPage({onBack} : AlertPage) {
       if (!token) { setIsLoading(false); return }
 
       const headers = { 'Authorization': `Bearer ${token}` }
-      const today = new Date().toISOString().split('T')[0]
+      const today = new Date().toLocaleDateString('en-CA') // ✅ timezone-safe
 
       const [checkinsRes, streakRes] = await Promise.all([
         fetch(`${import.meta.env.VITE_API_URL}/api/alerts/checkins?date=${today}`, { headers }),
@@ -188,7 +193,6 @@ export default function AlertPage({onBack} : AlertPage) {
         const answeredMap: Record<string, 'yes' | 'no'> = {}
         let count = 0
         checkins.forEach((c: any) => {
-          // map category → alert id
           const alert = allAlerts.find(a => a.category === c.category)
           if (alert) {
             answeredMap[alert.id] = c.answered ? 'yes' : 'no'
@@ -237,6 +241,7 @@ export default function AlertPage({onBack} : AlertPage) {
 
     setAnsweredAlerts(prev => ({ ...prev, [alertId]: answer }))
     await saveCheckin(alert.category, answer === 'yes')
+    await fetchStreak() // ✅ อัพเดท streak ทันทีหลังกด
   }
 
   const handleEditAlert = async (alertId: string) => {
@@ -254,11 +259,10 @@ export default function AlertPage({onBack} : AlertPage) {
       return updated
     })
     await saveCheckin(alert.category, false)
+    await fetchStreak() // ✅ อัพเดท streak เมื่อแก้ไขด้วย
   }
 
   const progressPercentage = (completedCount / alerts.length) * 100
-
-  // ข้อ 5 — ชื่อ user จาก UserContext
   const userName = userInfo?.username || userInfo?.email?.split('@')[0] || ''
 
   if (isLoading) return (
@@ -270,21 +274,18 @@ export default function AlertPage({onBack} : AlertPage) {
   )
 
   return (
-    
     <div className="w-full max-w-2xl mx-auto px-4 py-6">
 
-      {/* Back Button */}
-          <div className="mb-6">
-            <button
-              onClick={onBack}
-              className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="text-sm font-medium">Back</span>
-            </button>
-          </div>
+      <div className="mb-6">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span className="text-sm font-medium">Back</span>
+        </button>
+      </div>
 
-      {/* Header */}
       <div className="mb-6">
         <h2 className="text-3xl text-gray-800 mb-1">Daily Check-in</h2>
         <p className="text-base text-gray-500">
@@ -293,7 +294,6 @@ export default function AlertPage({onBack} : AlertPage) {
         <p className="text-sm text-gray-400 mt-0.5">ตรวจสอบกิจกรรมสุขภาพของคุณวันนี้</p>
       </div>
 
-      {/* Stats */}
       <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-3xl p-6 mb-6 text-white shadow-lg">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -311,7 +311,6 @@ export default function AlertPage({onBack} : AlertPage) {
           </div>
         </div>
 
-        {/* Progress bar */}
         <div className="bg-white bg-opacity-20 rounded-full h-3 overflow-hidden mb-2">
           <div className="bg-white h-full rounded-full transition-all duration-500"
             style={{ width: `${progressPercentage}%` }} />
@@ -324,7 +323,6 @@ export default function AlertPage({onBack} : AlertPage) {
         </div>
       </div>
 
-      {/* Alert Cards */}
       <div className="space-y-3">
         {alerts.map(alert => (
           <AlertCard
@@ -337,7 +335,6 @@ export default function AlertPage({onBack} : AlertPage) {
         ))}
       </div>
 
-      {/* Quote of the Day */}
       <div className="mt-6 bg-gradient-to-r from-pink-50 to-orange-50 rounded-2xl p-5 border border-pink-200">
         <div className="flex items-start gap-3">
           <div className="text-2xl">💡</div>

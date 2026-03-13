@@ -25,7 +25,7 @@ interface SidebarProps {
 const menuItems = [
   { id: 'home', path: '/home', label: 'หน้าหลัก', icon: Home },
   { id: 'workout', path: '/workouts/planner', label: 'ตารางออกกำลังกาย', icon: Dumbbell },
-  { id: 'meal', path: '/meals/planner', label: 'ตารางอาหาร', icon: UtensilsCrossed },
+  { id: 'meal', path: '/meals/planner', label: 'ตารางโภชนาการ', icon: UtensilsCrossed },
   { id: 'recipe', path: '/recipes', label: 'สูตรอาหาร', icon: CookingPot },
   { id: 'video', path: '/workouts/videos?part=upper-body', label: 'วิดีโอออกกำลังกาย', icon: PlayCircle },
   { id: 'alerts', path: '/alerts', label: 'แจ้งเตือน', icon: Bell },

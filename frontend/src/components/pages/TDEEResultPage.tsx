@@ -187,14 +187,14 @@ export default function TDEEResultPage({ onBack }: TDEEResultPageProps) {
                   </p>
 
                   <div className="space-y-2">
-                    <p className="font-semibold text-gray-800">Formula:</p>
+                    <p className="font-semibold text-gray-800">สูตรคำนวณ:</p>
                     <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-                      <p className="font-mono text-sm">TDEE = BMR × Activity Level</p>
+                      <p className="font-mono text-sm">TDEE = BMR × ระดับกิจกรรม</p>
                     </div>
                   </div>
 
                   <div>
-                    <p className="font-semibold text-gray-800 mb-2">Your TDEE includes:</p>
+                    <p className="font-semibold text-gray-800 mb-2">ผลลัพธ์ TDEE ของคุณ:</p>
                     <ul className="list-disc list-inside space-y-1 text-sm ml-2">
                       <li>BMR (พลังงานที่ใช้ขณะพัก)</li>
                       <li>การออกกำลังกายและกิจกรรมทางกาย</li>
